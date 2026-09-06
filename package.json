@@ -1,0 +1,24 @@
+{
+  "name": "sistema-campeonato",
+  "version": "1.0.0",
+  "description": "Seguinte vou fazer um sistema de controle de campeonato de JIUJITSU",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trevizanrafael/sistema-campeonato.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/trevizanrafael/sistema-campeonato/issues"
+  },
+  "homepage": "https://github.com/trevizanrafael/sistema-campeonato#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
