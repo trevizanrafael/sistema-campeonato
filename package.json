@@ -2,8 +2,9 @@
   "name": "sistema-campeonato",
   "version": "1.0.0",
   "description": "Seguinte vou fazer um sistema de controle de campeonato de JIUJITSU",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
+    "dev": "node src/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,6 +20,8 @@
   },
   "homepage": "https://github.com/trevizanrafael/sistema-campeonato#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.23.0"
   }
 }
