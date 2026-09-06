@@ -1,0 +1,10 @@
+-- Migration 005: Tabela equipes
+CREATE TABLE IF NOT EXISTS equipes (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome VARCHAR(200) NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS equipes_nome_unique
+ON equipes (LOWER(nome));
