@@ -36,4 +36,5 @@ module.exports = {
   AuthenticationError,
   NotFoundError,
   BusinessRuleError,
+  RegraNegocioError: BusinessRuleError,
 };

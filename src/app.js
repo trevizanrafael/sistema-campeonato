@@ -10,6 +10,7 @@ const { csrfTokenMiddleware } = require('./middlewares/csrfMiddleware');
 const authRoutes = require('./routes/authRoutes');
 const homeRoutes = require('./routes/homeRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
+const eventoRoutes = require('./routes/eventoRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,6 +55,9 @@ app.use(authRoutes);
 
 // Página inicial e rotas de navegação protegidas
 app.use(homeRoutes);
+
+// Eventos — protegidas
+app.use('/eventos', eventoRoutes);
 
 // Usuários — protegidas
 app.use('/usuarios', usuarioRoutes);

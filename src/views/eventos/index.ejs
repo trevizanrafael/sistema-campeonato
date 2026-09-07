@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo || "Eventos"
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Eventos</h1>
+            <p class="page-subtitle">Gerencie os campeonatos cadastrados.</p>
+          </div>
+
+          <a href="/eventos/novo" class="button button-primary">
+            Novo evento
+          </a>
+        </div>
+
+        <section class="page-content">
+          <form action="/eventos" method="GET" class="search-form">
+            <input
+              type="search"
+              id="busca"
+              name="busca"
+              class="form-control"
+              placeholder="Pesquisar por nome ou descricao"
+              value="<%= typeof busca !== 'undefined' ? busca : '' %>"
+            >
+
+            <button type="submit" class="button button-outline">
+              Pesquisar
+            </button>
+
+            <% if (typeof busca !== 'undefined' && busca) { %>
+              <a href="/eventos" class="button button-outline">
+                Limpar
+              </a>
+            <% } %>
+          </form>
+
+          <% if (eventos && eventos.length > 0) { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Evento</th>
+                    <th>Categorias</th>
+                    <th>Inscricoes</th>
+                    <th class="col-hide-mobile">Criado em</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% eventos.forEach((evento) => { %>
+                    <tr>
+                      <td>
+                        <a href="/eventos/<%= evento.id %>">
+                          <strong><%= evento.nome %></strong>
+                        </a>
+
+                        <% if (evento.descricao) { %>
+                          <p class="table-description">
+                            <%= evento.descricao %>
+                          </p>
+                        <% } %>
+                      </td>
+
+                      <td><%= evento.total_categorias %></td>
+                      <td><%= evento.total_inscricoes %></td>
+
+                      <td class="col-hide-mobile">
+                        <%= formatarData(evento.created_at) %>
+                      </td>
+
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/eventos/<%= evento.id %>"
+                            class="button button-small button-outline"
+                          >
+                            Abrir
+                          </a>
+
+                          <a
+                            href="/eventos/<%= evento.id %>/editar"
+                            class="button button-small button-outline"
+                          >
+                            Editar
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+
+            <% if (typeof totalPaginas !== 'undefined' && totalPaginas > 1) { %>
+              <%- include("../components/pagination", {
+                paginacao: {
+                  paginaAtual,
+                  totalPaginas
+                }
+              }) %>
+            <% } %>
+
+          <% } else { %>
+            <% if (typeof busca !== 'undefined' && busca) { %>
+              <div class="empty-state">
+                <h2>Nenhum resultado encontrado</h2>
+                <p>Nao encontramos eventos correspondentes a pesquisa.</p>
+                <a href="/eventos" class="button button-outline">
+                  Limpar pesquisa
+                </a>
+              </div>
+            <% } else { %>
+              <div class="empty-state">
+                <h2>Nenhum evento cadastrado</h2>
+                <p>Crie o primeiro evento para comecar a cadastrar categorias e inscricoes.</p>
+                <a href="/eventos/novo" class="button button-primary">
+                  Criar primeiro evento
+                </a>
+              </div>
+            <% } %>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

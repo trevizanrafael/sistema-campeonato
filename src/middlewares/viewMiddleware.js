@@ -13,6 +13,16 @@ function carregarDadosDasViews(req, res, next) {
   res.locals.mensagemErro =
     res.locals.mensagemErro || null;
 
+  res.locals.formatarData = (data) => {
+    if (!data) {
+      return '';
+    }
+    return new Intl.DateTimeFormat('pt-BR', {
+      dateStyle: 'short',
+      timeStyle: 'short',
+    }).format(new Date(data));
+  };
+
   next();
 }
 

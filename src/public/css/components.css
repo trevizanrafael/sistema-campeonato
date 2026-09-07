@@ -286,3 +286,21 @@
   gap: 6px;
   flex-wrap: wrap;
 }
+
+/* Ocultar em telas pequenas e ajustes responsivos */
+@media (max-width: 768px) {
+  .col-hide-mobile {
+    display: none !important;
+  }
+
+  .table th,
+  .table td {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .actions,
+  .table-actions {
+    gap: 4px;
+  }
+}
