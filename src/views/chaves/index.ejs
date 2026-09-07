@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `${titulo}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a href="/eventos/<%= evento.id %>" class="button button-small button-outline">
+                &larr; Voltar para <%= evento.nome %>
+              </a>
+            </div>
+            <h1 class="page-title">Chaves de Luta</h1>
+            <p class="page-subtitle">
+              Gerenciamento e sorteio de chaves eliminatorias por categoria para <strong><%= evento.nome %></strong>.
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <% if (!categorias || categorias.length === 0) { %>
+            <div class="card empty-state">
+              <h2>Nenhuma categoria cadastrada</h2>
+              <p>Cadastre categorias no evento antes de gerar as chaves de combate.</p>
+              <a href="/eventos/<%= evento.id %>/categorias/nova" class="button button-primary">
+                Cadastrar primeira categoria
+              </a>
+            </div>
+          <% } else { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Criterios</th>
+                    <th style="text-align: center;">Confirmados</th>
+                    <th>Situacao</th>
+                    <th style="text-align: center;">Tamanho</th>
+                    <th style="text-align: right;">Acoes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% categorias.forEach(function(cat) { %>
+                    <tr>
+                      <td>
+                        <strong><%= cat.categoria_nome %></strong>
+                      </td>
+                      <td style="font-size: 13px; color: var(--color-text-muted);">
+                        <%= cat.categoria_sexo || 'MISTO' %> |
+                        <% if (cat.faixa_minima_nome) { %>
+                          <%= cat.faixa_minima_nome %><%= cat.faixa_maxima_nome && cat.faixa_maxima_nome !== cat.faixa_minima_nome ? ` a ${cat.faixa_maxima_nome}` : '' %>
+                        <% } else { %>
+                          Livre
+                        <% } %>
+                      </td>
+                      <td style="text-align: center;">
+                        <strong><%= cat.total_confirmados %></strong>
+                      </td>
+                      <td>
+                        <% if (!cat.chave_id) { %>
+                          <% if (cat.total_confirmados < 2) { %>
+                            <span class="badge badge-neutral">Inscritos insuficientes</span>
+                          <% } else { %>
+                            <span class="badge badge-neutral">Sem chave</span>
+                          <% } %>
+                        <% } else if (cat.chave_status === 'NAO_INICIADA') { %>
+                          <span class="badge badge-warning">Nao iniciada</span>
+                        <% } else if (cat.chave_status === 'EM_ANDAMENTO') { %>
+                          <span class="badge badge-ativo">Em andamento</span>
+                        <% } else if (cat.chave_status === 'FINALIZADA') { %>
+                          <span class="badge badge-success">Finalizada</span>
+                        <% } else { %>
+                          <span class="badge badge-neutral"><%= cat.chave_status %></span>
+                        <% } %>
+                      </td>
+                      <td style="text-align: center;">
+                        <%= cat.chave_tamanho ? `${cat.chave_tamanho} posicoes` : '—' %>
+                      </td>
+                      <td style="text-align: right;">
+                        <div style="display: inline-flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                          <% if (!cat.chave_id) { %>
+                            <% if (cat.total_confirmados >= 2) { %>
+                              <form
+                                action="/eventos/<%= evento.id %>/categorias/<%= cat.categoria_id %>/chave/gerar"
+                                method="POST"
+                                style="display: inline;"
+                              >
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="button button-small button-primary">
+                                  Gerar chave
+                                </button>
+                              </form>
+                            <% } else { %>
+                              <span style="font-size: 12px; color: var(--color-text-muted);">
+                                Minimo 2 atletas
+                              </span>
+                            <% } %>
+                          <% } else { %>
+                            <a
+                              href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
+                              class="button button-small button-outline"
+                            >
+                              Abrir chave
+                            </a>
+                          <% } %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

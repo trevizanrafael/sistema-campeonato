@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `${chave.nome} - ${evento.nome}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a href="/eventos/<%= evento.id %>/chaves" class="button button-small button-outline">
+                &larr; Voltar para as chaves
+              </a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <h1 class="page-title"><%= chave.nome %></h1>
+              <% if (chave.status === 'NAO_INICIADA') { %>
+                <span class="badge badge-warning">Nao iniciada</span>
+              <% } else if (chave.status === 'EM_ANDAMENTO') { %>
+                <span class="badge badge-ativo">Em andamento</span>
+              <% } else if (chave.status === 'FINALIZADA') { %>
+                <span class="badge badge-success">Finalizada</span>
+              <% } %>
+            </div>
+            <p class="page-subtitle">
+              Categoria: <strong><%= chave.categoria_nome %></strong> | Chave de <strong><%= chave.tamanho %> posicoes</strong>
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <% if (chave.status === 'NAO_INICIADA') { %>
+              <form
+                action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/sortear"
+                method="POST"
+                style="display: inline;"
+              >
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button
+                  type="submit"
+                  class="button button-outline"
+                  onclick="return confirm('Deseja sortear novamente os competidores desta chave?');"
+                >
+                  Sortear novamente
+                </button>
+              </form>
+
+              <form
+                action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/iniciar"
+                method="POST"
+                style="display: inline;"
+              >
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button
+                  type="submit"
+                  class="button button-primary"
+                  onclick="return confirm('Deseja iniciar esta chave? A distribuicao ficara bloqueada e os byes avancarao automaticamente.');"
+                >
+                  Iniciar chave
+                </button>
+              </form>
+
+              <form
+                action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/excluir"
+                method="POST"
+                style="display: inline;"
+              >
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button
+                  type="submit"
+                  class="button button-danger"
+                  onclick="return confirm('Tem certeza de que deseja excluir esta chave?');"
+                >
+                  Excluir chave
+                </button>
+              </form>
+            <% } else { %>
+              <span class="badge badge-neutral" style="padding: 8px 12px; font-size: 13px;">
+                Chave bloqueada para alteracoes estruturais
+              </span>
+            <% } %>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <% if (chave.status === 'EM_ANDAMENTO') { %>
+            <div class="alert alert-success" style="margin-bottom: 24px; border: 1px solid #111; background: #fafafa; color: #111; padding: 12px 16px;">
+              <strong>Chave em andamento:</strong> As lutas da primeira rodada estao prontas para execucao e os avancos por bye foram concluidos.
+            </div>
+          <% } else if (chave.status === 'NAO_INICIADA') { %>
+            <div class="alert alert-warning" style="margin-bottom: 24px; border: 1px solid #111; background: #f5f5f5; color: #111; padding: 12px 16px;">
+              <strong>Previa da chave:</strong> Esta chave ainda nao foi iniciada. Voce pode conferir os confrontos, sortear novamente ou excluir. Ao clicar em <strong>Iniciar chave</strong>, a estrutura sera fixada e os byes avancarao para a proxima rodada.
+            </div>
+          <% } %>
+
+          <div style="display: flex; flex-direction: column; gap: 32px;">
+            <% rodadas.forEach(function(rodada) { %>
+              <div>
+                <div style="border-bottom: 2px solid var(--color-border); padding-bottom: 8px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+                  <h2 style="margin: 0; font-size: 16px; font-weight: 600;">
+                    <% if (rodada.isFinal) { %>
+                      Final
+                    <% } else if (rodada.isSemifinal) { %>
+                      Semifinal (Rodada <%= rodada.numero %>)
+                    <% } else { %>
+                      Rodada <%= rodada.numero %>
+                    <% } %>
+                  </h2>
+                  <span style="font-size: 13px; color: var(--color-text-muted);">
+                    <%= rodada.lutas.length %> <%= rodada.lutas.length === 1 ? 'luta' : 'lutas' %>
+                  </span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+                  <% rodada.lutas.forEach(function(luta) { %>
+                    <div class="card" style="padding: 14px; border: 1px solid var(--color-border); background: #ffffff;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 6px;">
+                        <span style="font-size: 12px; font-weight: 600; color: var(--color-text-muted);">
+                          LUTA <%= luta.posicao %>
+                        </span>
+                        <% if (luta.status === 'FINALIZADA') { %>
+                          <span class="badge badge-success" style="font-size: 11px;">Finalizada</span>
+                        <% } else if (luta.status === 'PRONTA') { %>
+                          <span class="badge badge-ativo" style="font-size: 11px;">Pronta</span>
+                        <% } else { %>
+                          <span class="badge badge-neutral" style="font-size: 11px;">Aguardando</span>
+                        <% } %>
+                      </div>
+
+                      <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Competidor 1 -->
+                        <div style="padding: 8px; border-radius: var(--radius-small); background: <%= (luta.vencedor_id && luta.vencedor_id === luta.competidor_1_id) ? '#f0f0f0' : '#fafafa' %>; border-left: 3px solid <%= (luta.vencedor_id && luta.vencedor_id === luta.competidor_1_id) ? '#111' : '#ddd' %>;">
+                          <% if (luta.competidor_1_id) { %>
+                            <div style="font-weight: 600; font-size: 13px; color: #111;">
+                              <%= luta.competidor_1_nome %>
+                              <% if (luta.vencedor_id && luta.vencedor_id === luta.competidor_1_id) { %>
+                                <span style="font-size: 11px; font-weight: 700; margin-left: 4px;">(Vencedor)</span>
+                              <% } %>
+                            </div>
+                            <div style="font-size: 12px; color: var(--color-text-muted);">
+                              <%= luta.competidor_1_equipe || 'Equipe' %>
+                            </div>
+                          <% } else if (luta.rodada === 1) { %>
+                            <div style="font-style: italic; font-size: 13px; color: #888;">
+                              BYE (Avanco livre)
+                            </div>
+                          <% } else { %>
+                            <div style="font-style: italic; font-size: 13px; color: #aaa;">
+                              Aguardando definicao...
+                            </div>
+                          <% } %>
+                        </div>
+
+                        <!-- Competidor 2 -->
+                        <div style="padding: 8px; border-radius: var(--radius-small); background: <%= (luta.vencedor_id && luta.vencedor_id === luta.competidor_2_id) ? '#f0f0f0' : '#fafafa' %>; border-left: 3px solid <%= (luta.vencedor_id && luta.vencedor_id === luta.competidor_2_id) ? '#111' : '#ddd' %>;">
+                          <% if (luta.competidor_2_id) { %>
+                            <div style="font-weight: 600; font-size: 13px; color: #111;">
+                              <%= luta.competidor_2_nome %>
+                              <% if (luta.vencedor_id && luta.vencedor_id === luta.competidor_2_id) { %>
+                                <span style="font-size: 11px; font-weight: 700; margin-left: 4px;">(Vencedor)</span>
+                              <% } %>
+                            </div>
+                            <div style="font-size: 12px; color: var(--color-text-muted);">
+                              <%= luta.competidor_2_equipe || 'Equipe' %>
+                            </div>
+                          <% } else if (luta.rodada === 1) { %>
+                            <div style="font-style: italic; font-size: 13px; color: #888;">
+                              BYE (Avanco livre)
+                            </div>
+                          <% } else { %>
+                            <div style="font-style: italic; font-size: 13px; color: #aaa;">
+                              Aguardando definicao...
+                            </div>
+                          <% } %>
+                        </div>
+                      </div>
+
+                      <% if (luta.status === 'FINALIZADA' && luta.tipo_resultado) { %>
+                        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed #eee; font-size: 11px; color: var(--color-text-muted);">
+                          Resultado: <strong><%= luta.tipo_resultado %></strong>
+                        </div>
+                      <% } %>
+                    </div>
+                  <% }); %>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

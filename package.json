@@ -14,7 +14,8 @@
     "test:categorias": "node scripts/test-phase8.js",
     "test:inscricoes": "node scripts/test-phase9.js",
     "test:pontuacao": "node scripts/test-phase10.js",
-    "test": "node scripts/test-phase5.js && node scripts/test-phase6.js && node scripts/test-phase7.js && node scripts/test-phase8.js && node scripts/test-phase9.js && node scripts/test-phase10.js"
+    "test:chaves": "node scripts/test-phase11.js",
+    "test": "node scripts/test-phase5.js && node scripts/test-phase6.js && node scripts/test-phase7.js && node scripts/test-phase8.js && node scripts/test-phase9.js && node scripts/test-phase10.js && node scripts/test-phase11.js"
   },
   "repository": {
     "type": "git",

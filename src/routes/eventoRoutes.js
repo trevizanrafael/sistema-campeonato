@@ -24,12 +24,10 @@ router.use('/:eventoId/categorias', categoriaRoutes);
 // Rotas aninhadas de inscrições (Fase 9)
 router.use('/:eventoId/inscricoes', inscricaoRoutes);
 
-router.get('/:id/chaves', (req, res) => {
-  res.render('components/emConstrucao', {
-    titulo: 'Chaves',
-    subtitulo: 'Gere e acompanhe as lutas.',
-  });
-});
+const chaveRoutes = require('./chaveRoutes');
+
+// Rotas aninhadas de chaves e sorteios (Fase 11)
+router.use('/:eventoId', chaveRoutes);
 
 router.get('/:id/ranking', (req, res) => {
   res.render('components/emConstrucao', {
