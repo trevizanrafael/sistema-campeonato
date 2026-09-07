@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo || "Equipes"
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Equipes</h1>
+            <p class="page-subtitle">Gerencie as equipes participantes.</p>
+          </div>
+
+          <a href="/equipes/nova" class="button button-primary">
+            Nova equipe
+          </a>
+        </div>
+
+        <section class="page-content">
+          <% if (equipes && equipes.length > 0) { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Equipe</th>
+                    <th>Inscricoes</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% equipes.forEach((equipe) => { %>
+                    <tr>
+                      <td>
+                        <strong><%= equipe.nome %></strong>
+                      </td>
+
+                      <td>
+                        <%= equipe.total_inscricoes %>
+                      </td>
+
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/equipes/<%= equipe.id %>/editar"
+                            class="button button-small button-outline"
+                          >
+                            Editar
+                          </a>
+
+                          <form
+                            action="/equipes/<%= equipe.id %>/excluir"
+                            method="POST"
+                            style="display: inline;"
+                            data-confirm="Deseja excluir a equipe <%= equipe.nome %>?"
+                          >
+                            <input
+                              type="hidden"
+                              name="_csrf"
+                              value="<%= csrfToken %>"
+                            >
+
+                            <button
+                              type="submit"
+                              class="button button-small button-danger"
+                            >
+                              Excluir
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <h2>Nenhuma equipe cadastrada</h2>
+              <p>Cadastre as equipes participantes para vincular aos competidores.</p>
+              <a href="/equipes/nova" class="button button-primary">
+                Cadastrar primeira equipe
+              </a>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

@@ -12,6 +12,7 @@ const homeRoutes = require('./routes/homeRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const eventoRoutes = require('./routes/eventoRoutes');
 const faixaRoutes = require('./routes/faixaRoutes');
+const equipeRoutes = require('./routes/equipeRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -62,6 +63,9 @@ app.use('/eventos', eventoRoutes);
 
 // Faixas — protegidas
 app.use('/faixas', faixaRoutes);
+
+// Equipes — protegidas
+app.use('/equipes', equipeRoutes);
 
 // Usuários — protegidas
 app.use('/usuarios', usuarioRoutes);

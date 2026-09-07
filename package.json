@@ -10,7 +10,8 @@
     "db:setup": "npm run migrate && npm run create-admin",
     "test:eventos": "node scripts/test-phase5.js",
     "test:faixas": "node scripts/test-phase6.js",
-    "test": "node scripts/test-phase5.js && node scripts/test-phase6.js"
+    "test:equipes": "node scripts/test-phase7.js",
+    "test": "node scripts/test-phase5.js && node scripts/test-phase6.js && node scripts/test-phase7.js"
   },
   "repository": {
     "type": "git",

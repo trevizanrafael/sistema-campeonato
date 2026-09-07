@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo || "Editar equipe"
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Editar equipe</h1>
+            <p class="page-subtitle">Altere o nome da equipe selecionada.</p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <div class="card form-card">
+            <form action="/equipes/<%= equipe.id %>" method="POST">
+              <input
+                type="hidden"
+                name="_csrf"
+                value="<%= csrfToken %>"
+              >
+
+              <%- include("_form", {
+                equipe,
+                erros
+              }) %>
+
+              <div class="form-actions">
+                <a href="/equipes" class="button button-outline">
+                  Cancelar
+                </a>
+
+                <button type="submit" class="button button-primary">
+                  Salvar alteracoes
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>
