@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 const pool = require('./database');
 
 const MIGRATIONS_DIR = path.join(__dirname, 'migrations');
@@ -30,7 +31,7 @@ async function runMigrations() {
       );
 
       if (rows.length > 0) {
-        console.log(`⏭️  Já executada: ${arquivo}`);
+        console.log(`Ja executada: ${arquivo}`);
         continue;
       }
 
@@ -45,15 +46,15 @@ async function runMigrations() {
           [arquivo]
         );
         await client.query('COMMIT');
-        console.log(`✅ Executada: ${arquivo}`);
+        console.log(`Executada: ${arquivo}`);
       } catch (err) {
         await client.query('ROLLBACK');
-        console.error(`❌ Erro na migration ${arquivo}:`, err.message);
+        console.error(`Erro na migration ${arquivo}:`, err.message);
         throw err;
       }
     }
 
-    console.log('\n🎉 Todas as migrations foram executadas com sucesso!');
+    console.log('\nTodas as migrations foram executadas com sucesso.');
   } finally {
     client.release();
     await pool.end();

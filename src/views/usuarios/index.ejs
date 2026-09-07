@@ -1,0 +1,57 @@
+<div class="page-header">
+  <h1>Usuarios</h1>
+  <a href="/usuarios/novo" class="btn btn--primary">Novo Usuario</a>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>E-mail</th>
+        <th>Situacao</th>
+        <th>Acoes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (usuarios.length === 0) { %>
+        <tr>
+          <td colspan="4" style="text-align: center; color: #999;">
+            Nenhum usuario cadastrado.
+          </td>
+        </tr>
+      <% } %>
+      <% usuarios.forEach(function(u) { %>
+        <tr>
+          <td><%= u.nome %></td>
+          <td><%= u.email %></td>
+          <td>
+            <% if (u.ativo) { %>
+              <span class="badge badge--ativo">Ativo</span>
+            <% } else { %>
+              <span class="badge badge--inativo">Inativo</span>
+            <% } %>
+          </td>
+          <td>
+            <div class="actions">
+              <a href="/usuarios/<%= u.id %>/editar" class="btn btn--sm">Editar</a>
+              <a href="/usuarios/<%= u.id %>/senha" class="btn btn--sm">Senha</a>
+              <% if (u.ativo) { %>
+                <form action="/usuarios/<%= u.id %>/desativar" method="POST" style="display:inline">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="btn btn--danger btn--sm"
+                    onclick="return confirm('Desativar este usuario?')">Desativar</button>
+                </form>
+              <% } else { %>
+                <form action="/usuarios/<%= u.id %>/ativar" method="POST" style="display:inline">
+                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                  <button type="submit" class="btn btn--sm">Ativar</button>
+                </form>
+              <% } %>
+            </div>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>

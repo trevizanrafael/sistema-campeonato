@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrar - Sistema Campeonato</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: sans-serif;
+      background: #fff;
+      color: #111;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-card {
+      border: 1px solid #ddd;
+      padding: 2rem;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .login-card__brand {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .login-card__brand h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .login-card__brand p {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.2rem;
+    }
+
+    .error-list {
+      list-style: none;
+      border: 1px solid #ccc;
+      padding: 0.6rem 1rem;
+      margin-bottom: 1rem;
+      background: #f9f9f9;
+    }
+
+    .error-list li {
+      font-size: 0.85rem;
+      padding: 0.1rem 0;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      font-size: 0.9rem;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #111;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 0.6rem;
+      background: #111;
+      color: #fff;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.3rem;
+    }
+
+    .btn-login:hover { background: #333; }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="login-card__brand">
+      <h1>Sistema Campeonato</h1>
+      <p>Painel de Controle</p>
+    </div>
+
+    <% if (erros && erros.length > 0) { %>
+      <ul class="error-list">
+        <% erros.forEach(function(erro) { %>
+          <li><%= erro %></li>
+        <% }); %>
+      </ul>
+    <% } %>
+
+    <form action="/login" method="POST">
+      <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <input
+          type="text"
+          id="email"
+          name="email"
+          value="<%= email %>"
+          autocomplete="username"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="senha">Senha</label>
+        <input
+          type="password"
+          id="senha"
+          name="senha"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button type="submit" class="btn-login">Entrar</button>
+    </form>
+  </div>
+</body>
+</html>
