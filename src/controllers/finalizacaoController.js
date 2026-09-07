@@ -39,9 +39,10 @@ async function mostrarPreview(req, res, next) {
 
 async function finalizar(req, res, next) {
   const { eventoId, chaveId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    await finalizacaoService.finalizarCategoria(eventoId, chaveId);
+    await finalizacaoService.finalizarCategoria(eventoId, chaveId, usuarioId);
     req.session.mensagemSucesso = 'Categoria finalizada com sucesso.';
     return res.redirect(`/eventos/${eventoId}/chaves/${chaveId}`);
   } catch (error) {
@@ -62,9 +63,10 @@ async function finalizar(req, res, next) {
 
 async function reabrir(req, res, next) {
   const { eventoId, chaveId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    await finalizacaoService.reabrirCategoria(eventoId, chaveId);
+    await finalizacaoService.reabrirCategoria(eventoId, chaveId, usuarioId);
     req.session.mensagemSucesso =
       'Categoria reaberta. Os pontos de colocação foram removidos.';
     return res.redirect(`/eventos/${eventoId}/chaves/${chaveId}`);

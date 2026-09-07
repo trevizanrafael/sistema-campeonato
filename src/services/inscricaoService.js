@@ -18,6 +18,7 @@ const {
   ValidationError,
   BusinessRuleError,
 } = require('../utils/errors');
+const auditoriaService = require('./auditoriaService');
 
 async function validarEventoExistente(eventoId, client = pool) {
   const validId = validarId(eventoId);
@@ -90,7 +91,107 @@ async function buscarInscricao(eventoId, inscricaoId) {
   return inscricao;
 }
 
-async function processarCadastro(eventoId, dados) {
+async function persistirCriacaoComAuditoria(dadosInscricao, evento, usuarioId) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const inscricao = await inscricaoRepository.criar(dadosInscricao, client);
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: evento.id,
+      acao: 'INSCRICAO_CRIADA',
+      entidade: 'INSCRICAO',
+      entidadeId: inscricao.id,
+      descricao: `Inscrição "${inscricao.nome}" criada.`,
+      dadosAnteriores: null,
+      dadosNovos: {
+        nome: inscricao.nome,
+        idade: inscricao.idade,
+        peso: inscricao.peso,
+        sexo: inscricao.sexo,
+        faixa_id: inscricao.faixa_id,
+        equipe_id: inscricao.equipe_id,
+        categoria_id: inscricao.categoria_id,
+        status: inscricao.status,
+      },
+      client,
+    });
+    await client.query('COMMIT');
+    return inscricao;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function persistirEdicaoComAuditoria(
+  inscricaoAtual,
+  dadosAtualizacao,
+  eventoId,
+  usuarioId,
+  apenasNome = false
+) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    let atualizada;
+    if (apenasNome) {
+      atualizada = await inscricaoRepository.atualizarApenasNome(
+        inscricaoAtual.id,
+        inscricaoAtual.evento_id,
+        dadosAtualizacao.nome,
+        client
+      );
+    } else {
+      atualizada = await inscricaoRepository.atualizar(
+        inscricaoAtual.id,
+        eventoId,
+        dadosAtualizacao,
+        client
+      );
+    }
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'INSCRICAO_EDITADA',
+      entidade: 'INSCRICAO',
+      entidadeId: atualizada.id,
+      descricao: `Inscrição "${atualizada.nome}" editada.`,
+      dadosAnteriores: {
+        nome: inscricaoAtual.nome,
+        idade: inscricaoAtual.idade,
+        peso: inscricaoAtual.peso,
+        sexo: inscricaoAtual.sexo,
+        faixa_id: inscricaoAtual.faixa_id,
+        equipe_id: inscricaoAtual.equipe_id,
+        categoria_id: inscricaoAtual.categoria_id,
+        status: inscricaoAtual.status,
+      },
+      dadosNovos: {
+        nome: atualizada.nome,
+        idade: atualizada.idade,
+        peso: atualizada.peso,
+        sexo: atualizada.sexo,
+        faixa_id: atualizada.faixa_id,
+        equipe_id: atualizada.equipe_id,
+        categoria_id: atualizada.categoria_id,
+        status: atualizada.status,
+      },
+      client,
+    });
+    await client.query('COMMIT');
+    return atualizada;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function processarCadastro(eventoId, dados, usuarioId = null) {
   const evento = await validarEventoExistente(eventoId);
 
   const [faixas, equipes, categorias] = await Promise.all([
@@ -142,12 +243,16 @@ async function processarCadastro(eventoId, dados) {
       });
     }
 
-    const inscricao = await inscricaoRepository.criar({
-      ...normalizado,
-      evento_id: evento.id,
-      categoria_id: categoriaEscolhida.id,
-      status: 'CONFIRMADA',
-    });
+    const inscricao = await persistirCriacaoComAuditoria(
+      {
+        ...normalizado,
+        evento_id: evento.id,
+        categoria_id: categoriaEscolhida.id,
+        status: 'CONFIRMADA',
+      },
+      evento,
+      usuarioId
+    );
 
     return {
       tipo: 'CRIADA',
@@ -164,12 +269,16 @@ async function processarCadastro(eventoId, dados) {
   );
 
   if (compativeis.length === 0) {
-    const inscricao = await inscricaoRepository.criar({
-      ...normalizado,
-      evento_id: evento.id,
-      categoria_id: null,
-      status: 'PENDENTE',
-    });
+    const inscricao = await persistirCriacaoComAuditoria(
+      {
+        ...normalizado,
+        evento_id: evento.id,
+        categoria_id: null,
+        status: 'PENDENTE',
+      },
+      evento,
+      usuarioId
+    );
 
     return {
       tipo: 'CRIADA',
@@ -182,12 +291,16 @@ async function processarCadastro(eventoId, dados) {
 
   if (compativeis.length === 1) {
     const categoriaEncontrada = compativeis[0];
-    const inscricao = await inscricaoRepository.criar({
-      ...normalizado,
-      evento_id: evento.id,
-      categoria_id: categoriaEncontrada.id,
-      status: 'CONFIRMADA',
-    });
+    const inscricao = await persistirCriacaoComAuditoria(
+      {
+        ...normalizado,
+        evento_id: evento.id,
+        categoria_id: categoriaEncontrada.id,
+        status: 'CONFIRMADA',
+      },
+      evento,
+      usuarioId
+    );
 
     return {
       tipo: 'CRIADA',
@@ -206,7 +319,7 @@ async function processarCadastro(eventoId, dados) {
   };
 }
 
-async function processarEdicao(eventoId, inscricaoId, dados) {
+async function processarEdicao(eventoId, inscricaoId, dados, usuarioId = null) {
   const inscricaoAtual = await buscarInscricao(eventoId, inscricaoId);
 
   const emLuta = await inscricaoRepository.verificarParticipacaoEmLutas(
@@ -226,10 +339,12 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
       });
     }
 
-    const atualizada = await inscricaoRepository.atualizarApenasNome(
-      inscricaoAtual.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
+      { nome: nomeLimpo },
       inscricaoAtual.evento_id,
-      nomeLimpo
+      usuarioId,
+      true
     );
 
     return {
@@ -293,14 +408,15 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
       });
     }
 
-    const atualizada = await inscricaoRepository.atualizar(
-      inscricaoAtual.id,
-      evento.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
       {
         ...normalizado,
         categoria_id: categoriaEscolhida.id,
         status: 'CONFIRMADA',
-      }
+      },
+      evento.id,
+      usuarioId
     );
 
     return {
@@ -318,14 +434,15 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
   );
 
   if (compativeis.length === 0) {
-    const atualizada = await inscricaoRepository.atualizar(
-      inscricaoAtual.id,
-      evento.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
       {
         ...normalizado,
         categoria_id: null,
         status: 'PENDENTE',
-      }
+      },
+      evento.id,
+      usuarioId
     );
 
     return {
@@ -339,14 +456,15 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
 
   if (compativeis.length === 1) {
     const categoriaEncontrada = compativeis[0];
-    const atualizada = await inscricaoRepository.atualizar(
-      inscricaoAtual.id,
-      evento.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
       {
         ...normalizado,
         categoria_id: categoriaEncontrada.id,
         status: 'CONFIRMADA',
-      }
+      },
+      evento.id,
+      usuarioId
     );
 
     return {
@@ -364,14 +482,15 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
   );
 
   if (atualAindaCompativel) {
-    const atualizada = await inscricaoRepository.atualizar(
-      inscricaoAtual.id,
-      evento.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
       {
         ...normalizado,
         categoria_id: atualAindaCompativel.id,
         status: 'CONFIRMADA',
-      }
+      },
+      evento.id,
+      usuarioId
     );
 
     return {
@@ -392,7 +511,7 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
   };
 }
 
-async function cancelarInscricao(eventoId, inscricaoId) {
+async function cancelarInscricao(eventoId, inscricaoId, usuarioId = null) {
   const inscricao = await buscarInscricao(eventoId, inscricaoId);
 
   const emLuta = await inscricaoRepository.verificarParticipacaoEmLutas(
@@ -404,16 +523,41 @@ async function cancelarInscricao(eventoId, inscricaoId) {
     );
   }
 
-  await inscricaoRepository.alterarStatus(
-    inscricao.id,
-    inscricao.evento_id,
-    'CANCELADA'
-  );
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-  return inscricao;
+    await inscricaoRepository.alterarStatus(
+      inscricao.id,
+      inscricao.evento_id,
+      'CANCELADA',
+      undefined,
+      client
+    );
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: inscricao.evento_id,
+      acao: 'INSCRICAO_CANCELADA',
+      entidade: 'INSCRICAO',
+      entidadeId: inscricao.id,
+      descricao: `Inscrição "${inscricao.nome}" cancelada.`,
+      dadosAnteriores: { status: inscricao.status },
+      dadosNovos: { status: 'CANCELADA' },
+      client,
+    });
+
+    await client.query('COMMIT');
+    return inscricao;
+  } catch (erro) {
+    await client.query('ROLLBACK');
+    throw erro;
+  } finally {
+    client.release();
+  }
 }
 
-async function reativarInscricao(eventoId, inscricaoId) {
+async function reativarInscricao(eventoId, inscricaoId, usuarioId = null) {
   const inscricao = await buscarInscricao(eventoId, inscricaoId);
 
   const [faixas, categorias] = await Promise.all([
@@ -453,20 +597,51 @@ async function reativarInscricao(eventoId, inscricaoId) {
     mensagem = `Inscrição reativada e classificada em "${escolhida.nome}".`;
   }
 
-  await inscricaoRepository.alterarStatus(
-    inscricao.id,
-    inscricao.evento_id,
-    novoStatus,
-    novaCategoriaId
-  );
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-  return {
-    inscricao,
-    mensagem,
-  };
+    await inscricaoRepository.alterarStatus(
+      inscricao.id,
+      inscricao.evento_id,
+      novoStatus,
+      novaCategoriaId,
+      client
+    );
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: inscricao.evento_id,
+      acao: 'INSCRICAO_REATIVADA',
+      entidade: 'INSCRICAO',
+      entidadeId: inscricao.id,
+      descricao: `Inscrição "${inscricao.nome}" reativada.`,
+      dadosAnteriores: {
+        status: inscricao.status,
+        categoria_id: inscricao.categoria_id,
+      },
+      dadosNovos: {
+        status: novoStatus,
+        categoria_id: novaCategoriaId,
+      },
+      client,
+    });
+
+    await client.query('COMMIT');
+
+    return {
+      inscricao,
+      mensagem,
+    };
+  } catch (erro) {
+    await client.query('ROLLBACK');
+    throw erro;
+  } finally {
+    client.release();
+  }
 }
 
-async function excluirInscricao(eventoId, inscricaoId) {
+async function excluirInscricao(eventoId, inscricaoId, usuarioId = null) {
   const validEventoId = validarId(eventoId);
   const validInscricaoId = validarId(inscricaoId);
 
@@ -511,6 +686,28 @@ async function excluirInscricao(eventoId, inscricaoId) {
     }
 
     await inscricaoRepository.excluir(validInscricaoId, validEventoId, client);
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: validEventoId,
+      acao: 'INSCRICAO_EXCLUIDA',
+      entidade: 'INSCRICAO',
+      entidadeId: validInscricaoId,
+      descricao: `Inscrição "${inscricao.nome}" excluída.`,
+      dadosAnteriores: {
+        nome: inscricao.nome,
+        idade: inscricao.idade,
+        peso: inscricao.peso,
+        sexo: inscricao.sexo,
+        faixa_id: inscricao.faixa_id,
+        equipe_id: inscricao.equipe_id,
+        categoria_id: inscricao.categoria_id,
+        status: inscricao.status,
+      },
+      dadosNovos: null,
+      client,
+    });
+
     await client.query('COMMIT');
     return inscricao;
   } catch (erro) {

@@ -35,7 +35,8 @@ function mostrarCadastro(req, res) {
 
 async function cadastrar(req, res, next) {
   try {
-    const evento = await eventoService.criarEvento(req.body);
+    const usuarioId = req.session?.usuario?.id || null;
+    const evento = await eventoService.criarEvento(req.body, usuarioId);
     req.session.mensagemSucesso = 'Evento criado com sucesso.';
     return res.redirect(`/eventos/${evento.id}`);
   } catch (erro) {
@@ -90,7 +91,8 @@ async function mostrarEdicao(req, res, next) {
 
 async function editar(req, res, next) {
   try {
-    const evento = await eventoService.editarEvento(req.params.id, req.body);
+    const usuarioId = req.session?.usuario?.id || null;
+    const evento = await eventoService.editarEvento(req.params.id, req.body, usuarioId);
     req.session.mensagemSucesso = 'Evento atualizado com sucesso.';
     return res.redirect('/eventos');
   } catch (erro) {

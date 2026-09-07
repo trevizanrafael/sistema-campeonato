@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `Detalhes da Ação #${log.id} - Auditoria - ${evento.nome}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a
+                href="/eventos/<%= evento.id %>/auditoria"
+                class="button button-small button-outline"
+              >
+                &larr; Voltar para a lista de auditoria
+              </a>
+            </div>
+
+            <h1 class="page-title">
+              Registro de Auditoria #<%= log.id %>
+            </h1>
+
+            <p class="page-subtitle">
+              Evento: <strong><%= evento.nome %></strong> &bull; Operação realizada em
+              <%= new Date(log.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) %>
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content" style="max-width: 900px;">
+          <!-- Informações Gerais da Operação -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <span class="badge <%= log.acao_badge || 'badge-neutral' %>" style="font-size: 13px; padding: 4px 10px;">
+                  <%= log.acao_label %>
+                </span>
+                <code style="font-size: 11px; margin-left: 8px; color: var(--color-text-muted);"><%= log.acao %></code>
+              </div>
+
+              <div style="text-align: right;">
+                <span style="font-size: 12px; color: var(--color-text-muted); display: block;">Data e Horário</span>
+                <strong style="font-size: 13px;"><%= new Date(log.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) %></strong>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--color-border);">
+              <div>
+                <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); display: block;">
+                  Operador / Usuário
+                </span>
+                <strong style="font-size: 14px;"><%= log.usuario_nome || 'Sistema' %></strong>
+                <% if (log.usuario_email) { %>
+                  <small style="color: var(--color-text-muted); display: block; font-size: 12px;"><%= log.usuario_email %></small>
+                <% } %>
+              </div>
+
+              <div>
+                <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); display: block;">
+                  Entidade Afetada
+                </span>
+                <strong style="font-size: 14px;"><%= log.entidade %></strong>
+                <% if (log.entidade_id) { %>
+                  <small style="color: var(--color-text-muted); display: block; font-size: 12px;">ID do registro: #<%= log.entidade_id %></small>
+                <% } %>
+              </div>
+            </div>
+
+            <div>
+              <span style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--color-text-muted); display: block; margin-bottom: 4px;">
+                Descrição
+              </span>
+              <p style="margin: 0; font-size: 14px; line-height: 1.5;">
+                <%= log.descricao %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Comparativo de Dados (Antes vs Depois) -->
+          <% 
+            const antes = log.dados_anteriores;
+            const depois = log.dados_novos;
+            const temAntes = antes && typeof antes === 'object' && Object.keys(antes).length > 0;
+            const temDepois = depois && typeof depois === 'object' && Object.keys(depois).length > 0;
+          %>
+
+          <% if (temAntes || temDepois) { %>
+            <div style="margin-bottom: 24px;">
+              <h2 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">
+                Alterações de Dados
+              </h2>
+
+              <% if (temAntes && temDepois) { %>
+                <!-- Tabela Comparativa Antes vs Depois -->
+                <%
+                  const todasChaves = Array.from(new Set([...Object.keys(antes), ...Object.keys(depois)]));
+                %>
+                <div class="table-container" style="margin-bottom: 16px;">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th style="width: 25%;">Campo / Propriedade</th>
+                        <th style="width: 37%;">Estado Anterior</th>
+                        <th style="width: 38%;">Novo Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% todasChaves.forEach((chave) => { 
+                        const vAntes = antes[chave];
+                        const vDepois = depois[chave];
+                        const alterado = JSON.stringify(vAntes) !== JSON.stringify(vDepois);
+                      %>
+                        <tr style="<%= alterado ? 'background: #fdfdfd;' : '' %>">
+                          <td>
+                            <strong><%= chave %></strong>
+                            <% if (alterado) { %>
+                              <span style="font-size: 10px; text-transform: uppercase; background: #111; color: #fff; padding: 2px 4px; border-radius: 2px; margin-left: 4px;">
+                                alterado
+                              </span>
+                            <% } %>
+                          </td>
+                          <td style="font-size: 13px; color: var(--color-text-muted);">
+                            <% if (vAntes === null || vAntes === undefined) { %>
+                              <em style="color: #999;">nulo</em>
+                            <% } else if (typeof vAntes === 'object') { %>
+                              <code><%= JSON.stringify(vAntes) %></code>
+                            <% } else { %>
+                              <%= vAntes %>
+                            <% } %>
+                          </td>
+                          <td style="font-size: 13px; font-weight: <%= alterado ? '600' : 'normal' %>;">
+                            <% if (vDepois === null || vDepois === undefined) { %>
+                              <em style="color: #999;">nulo</em>
+                            <% } else if (typeof vDepois === 'object') { %>
+                              <code><%= JSON.stringify(vDepois) %></code>
+                            <% } else { %>
+                              <%= vDepois %>
+                            <% } %>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+
+              <% } else if (temDepois && !temAntes) { %>
+                <!-- Somente Estado Novo (Criação) -->
+                <div class="table-container" style="margin-bottom: 16px;">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th style="width: 30%;">Campo</th>
+                        <th>Valor Gravado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% Object.entries(depois).forEach(([chave, valor]) => { %>
+                        <tr>
+                          <td><strong><%= chave %></strong></td>
+                          <td style="font-size: 13px;">
+                            <% if (valor === null || valor === undefined) { %>
+                              <em style="color: #999;">nulo</em>
+                            <% } else if (typeof valor === 'object') { %>
+                              <code><%= JSON.stringify(valor) %></code>
+                            <% } else { %>
+                              <%= valor %>
+                            <% } %>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+
+              <% } else if (temAntes && !temDepois) { %>
+                <!-- Somente Estado Anterior (Exclusão / Anulação) -->
+                <div class="table-container" style="margin-bottom: 16px;">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th style="width: 30%;">Campo</th>
+                        <th>Estado Antes da Exclusão</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% Object.entries(antes).forEach(([chave, valor]) => { %>
+                        <tr>
+                          <td><strong><%= chave %></strong></td>
+                          <td style="font-size: 13px;">
+                            <% if (valor === null || valor === undefined) { %>
+                              <em style="color: #999;">nulo</em>
+                            <% } else if (typeof valor === 'object') { %>
+                              <code><%= JSON.stringify(valor) %></code>
+                            <% } else { %>
+                              <%= valor %>
+                            <% } %>
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+              <% } %>
+
+              <!-- Inspeção Estruturada JSON -->
+              <details style="border: 1px solid var(--color-border); border-radius: 4px; padding: 10px 14px; background: #fafafa;">
+                <summary style="font-size: 12px; font-weight: 600; cursor: pointer; color: var(--color-text-muted);">
+                  Inspecionar estrutura completa (JSON)
+                </summary>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; margin-top: 10px;">
+                  <% if (temAntes) { %>
+                    <div>
+                      <span style="font-size: 11px; font-weight: 700; color: var(--color-text-muted);">DADOS_ANTERIORES:</span>
+                      <pre style="background: #111; color: #fff; padding: 10px; border-radius: 4px; font-size: 11px; overflow-x: auto; margin-top: 4px;"><code><%= JSON.stringify(antes, null, 2) %></code></pre>
+                    </div>
+                  <% } %>
+                  <% if (temDepois) { %>
+                    <div>
+                      <span style="font-size: 11px; font-weight: 700; color: var(--color-text-muted);">DADOS_NOVOS:</span>
+                      <pre style="background: #111; color: #fff; padding: 10px; border-radius: 4px; font-size: 11px; overflow-x: auto; margin-top: 4px;"><code><%= JSON.stringify(depois, null, 2) %></code></pre>
+                    </div>
+                  <% } %>
+                </div>
+              </details>
+            </div>
+          <% } else { %>
+            <div class="card" style="margin-bottom: 24px;">
+              <p style="margin: 0; font-size: 13px; color: var(--color-text-muted); font-style: italic;">
+                Esta operação não armazenou instantâneos de dados complementares.
+              </p>
+            </div>
+          <% } %>
+
+          <div>
+            <a
+              href="/eventos/<%= evento.id %>/auditoria"
+              class="button button-outline"
+            >
+              &larr; Voltar para a lista
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

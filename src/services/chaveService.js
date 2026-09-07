@@ -9,6 +9,7 @@ const {
   NotFoundError,
   BusinessRuleError,
 } = require('../utils/errors');
+const auditoriaService = require('./auditoriaService');
 
 /**
  * Serviço de gerenciamento do ciclo de vida das chaves de luta.
@@ -65,7 +66,7 @@ async function buscarChave(eventoId, chaveId) {
   };
 }
 
-async function gerarChave(eventoId, categoriaId) {
+async function gerarChave(eventoId, categoriaId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -173,6 +174,23 @@ async function gerarChave(eventoId, categoriaId) {
       }
     }
 
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'CHAVE_GERADA',
+      entidade: 'CHAVE',
+      entidadeId: novaChave.id,
+      descricao: `Chave "${novaChave.nome}" gerada com ${resultadoCalculo.totalLutas} lutas.`,
+      dadosAnteriores: null,
+      dadosNovos: {
+        categoria_id: categoriaId,
+        nome: novaChave.nome,
+        tamanho: novaChave.tamanho,
+        totalLutas: resultadoCalculo.totalLutas,
+      },
+      client,
+    });
+
     await client.query('COMMIT');
     return {
       chave: novaChave,
@@ -187,7 +205,7 @@ async function gerarChave(eventoId, categoriaId) {
   }
 }
 
-async function sortearNovamente(eventoId, chaveId) {
+async function sortearNovamente(eventoId, chaveId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -299,6 +317,25 @@ async function sortearNovamente(eventoId, chaveId) {
       }
     }
 
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'CHAVE_SORTEADA_NOVAMENTE',
+      entidade: 'CHAVE',
+      entidadeId: novaChave.id,
+      descricao: `Chave "${novaChave.nome}" sorteada novamente com ${resultadoCalculo.totalLutas} lutas.`,
+      dadosAnteriores: {
+        chave_id: chaveAtual.id,
+        tamanho: chaveAtual.tamanho,
+      },
+      dadosNovos: {
+        chave_id: novaChave.id,
+        tamanho: novaChave.tamanho,
+        totalLutas: resultadoCalculo.totalLutas,
+      },
+      client,
+    });
+
     await client.query('COMMIT');
     return {
       chave: novaChave,
@@ -313,7 +350,7 @@ async function sortearNovamente(eventoId, chaveId) {
   }
 }
 
-async function iniciarChave(eventoId, chaveId) {
+async function iniciarChave(eventoId, chaveId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -403,6 +440,18 @@ async function iniciarChave(eventoId, chaveId) {
       }
     }
 
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'CHAVE_INICIADA',
+      entidade: 'CHAVE',
+      entidadeId: chave.id,
+      descricao: `Chave "${chave.nome}" iniciada.`,
+      dadosAnteriores: { status: chave.status },
+      dadosNovos: { status: 'EM_ANDAMENTO' },
+      client,
+    });
+
     await client.query('COMMIT');
     return { chaveId, status: 'EM_ANDAMENTO' };
   } catch (erro) {
@@ -413,7 +462,7 @@ async function iniciarChave(eventoId, chaveId) {
   }
 }
 
-async function excluirChave(eventoId, chaveId) {
+async function excluirChave(eventoId, chaveId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -442,6 +491,24 @@ async function excluirChave(eventoId, chaveId) {
 
     // 2. Excluir chave (cascateia lutas)
     await chaveRepository.excluir(chaveId, client);
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'CHAVE_EXCLUIDA',
+      entidade: 'CHAVE',
+      entidadeId: chave.id,
+      descricao: `Chave "${chave.nome}" excluída.`,
+      dadosAnteriores: {
+        id: chave.id,
+        categoria_id: chave.categoria_id,
+        nome: chave.nome,
+        status: chave.status,
+        tamanho: chave.tamanho,
+      },
+      dadosNovos: null,
+      client,
+    });
 
     await client.query('COMMIT');
     return { id: chaveId };

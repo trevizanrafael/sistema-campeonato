@@ -39,6 +39,11 @@ const pontuacaoRoutes = require('./pontuacaoRoutes');
 // Rotas aninhadas de pontuação (Fase 10)
 router.use('/:eventoId/pontuacao', pontuacaoRoutes);
 
+const auditoriaRoutes = require('./auditoriaRoutes');
+
+// Rotas aninhadas de auditoria (Fase 18)
+router.use('/:eventoId/auditoria', auditoriaRoutes);
+
 router.get('/:id', eventoController.visualizar);
 
 module.exports = router;

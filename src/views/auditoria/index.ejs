@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `Auditoria - ${evento.nome}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a
+                href="/eventos/<%= evento.id %>"
+                class="button button-small button-outline"
+              >
+                &larr; Voltar para o evento
+              </a>
+            </div>
+
+            <h1 class="page-title">
+              Auditoria e Histórico
+            </h1>
+
+            <p class="page-subtitle">
+              Registro de todas as ações e alterações críticas realizadas no evento <strong><%= evento.nome %></strong>.
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <!-- Barra de Filtros -->
+          <div class="card" style="margin-bottom: 20px; padding: 16px;">
+            <form action="/eventos/<%= evento.id %>/auditoria" method="GET" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">
+              <div style="flex: 1; min-width: 240px;">
+                <label for="filtro-acao" class="form-label" style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">
+                  Filtrar por ação:
+                </label>
+                <select name="acao" id="filtro-acao" class="form-control" style="font-size: 13px; height: 38px;">
+                  <option value="">Todas as ações</option>
+                  <% if (typeof acoesDisponiveis !== 'undefined') { %>
+                    <% Object.entries(acoesDisponiveis).forEach(([codigo, item]) => { %>
+                      <option value="<%= codigo %>" <%= (filtros && filtros.acao === codigo) ? 'selected' : '' %>>
+                        <%= item.label %> (<%= codigo %>)
+                      </option>
+                    <% }) %>
+                  <% } %>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button type="submit" class="button button-primary" style="height: 38px; padding: 0 16px;">
+                  Filtrar
+                </button>
+                <% if (filtros && filtros.acao) { %>
+                  <a href="/eventos/<%= evento.id %>/auditoria" class="button button-outline" style="height: 38px; display: inline-flex; align-items: center;">
+                    Limpar
+                  </a>
+                <% } %>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tabela de Auditoria -->
+          <% if (logs && logs.length > 0) { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 170px;">Data / Horário</th>
+                    <th style="width: 160px;">Usuário</th>
+                    <th style="width: 190px;">Ação</th>
+                    <th style="width: 110px;">Entidade</th>
+                    <th>Descrição</th>
+                    <th style="text-align: right; width: 110px;">Detalhes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% logs.forEach((log) => { %>
+                    <tr>
+                      <td style="font-size: 13px; color: var(--color-text-muted); white-space: nowrap;">
+                        <%= new Date(log.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) %>
+                      </td>
+                      <td>
+                        <strong><%= log.usuario_nome || 'Sistema' %></strong>
+                        <% if (log.usuario_email) { %>
+                          <br><small style="color: var(--color-text-muted); font-size: 11px;"><%= log.usuario_email %></small>
+                        <% } %>
+                      </td>
+                      <td>
+                        <span class="badge <%= log.acao_badge || 'badge-neutral' %>" style="font-size: 12px;">
+                          <%= log.acao_label %>
+                        </span>
+                      </td>
+                      <td style="font-size: 13px;">
+                        <code><%= log.entidade %></code>
+                        <% if (log.entidade_id) { %>
+                          <span style="font-size: 11px; color: var(--color-text-muted);">#<%= log.entidade_id %></span>
+                        <% } %>
+                      </td>
+                      <td style="font-size: 13px;">
+                        <%= log.descricao %>
+                      </td>
+                      <td style="text-align: right;">
+                        <a
+                          href="/eventos/<%= evento.id %>/auditoria/<%= log.id %>"
+                          class="button button-small button-outline"
+                          style="font-size: 12px; padding: 4px 8px;"
+                        >
+                          Ver detalhes &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginação -->
+            <% if (paginacao && paginacao.totalPaginas > 1) { %>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 12px;">
+                <span style="font-size: 13px; color: var(--color-text-muted);">
+                  Página <strong><%= paginacao.paginaAtual %></strong> de <strong><%= paginacao.totalPaginas %></strong>
+                  (Total de <%= paginacao.totalRegistros %> registros)
+                </span>
+
+                <div style="display: flex; gap: 8px;">
+                  <% if (paginacao.paginaAtual > 1) { %>
+                    <a
+                      href="/eventos/<%= evento.id %>/auditoria?pagina=<%= paginacao.paginaAtual - 1 %><%= filtros.acao ? '&acao=' + encodeURIComponent(filtros.acao) : '' %>"
+                      class="button button-small button-outline"
+                    >
+                      &larr; Anterior
+                    </a>
+                  <% } %>
+
+                  <% if (paginacao.paginaAtual < paginacao.totalPaginas) { %>
+                    <a
+                      href="/eventos/<%= evento.id %>/auditoria?pagina=<%= paginacao.paginaAtual + 1 %><%= filtros.acao ? '&acao=' + encodeURIComponent(filtros.acao) : '' %>"
+                      class="button button-small button-outline"
+                    >
+                      Próxima &rarr;
+                    </a>
+                  <% } %>
+                </div>
+              </div>
+            <% } %>
+
+          <% } else { %>
+            <div class="empty-state">
+              <h2>Nenhum registro de auditoria encontrado</h2>
+              <p>
+                <% if (filtros && filtros.acao) { %>
+                  Não foram encontradas ações do tipo selecionado para este evento.
+                <% } else { %>
+                  As ações críticas como geração de chaves, lançamentos de resultados e finalizações aparecerão aqui conforme forem realizadas.
+                <% } %>
+              </p>
+              <% if (filtros && filtros.acao) { %>
+                <div style="margin-top: 16px;">
+                  <a href="/eventos/<%= evento.id %>/auditoria" class="button button-outline">
+                    Ver todos os registros
+                  </a>
+                </div>
+              <% } %>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

@@ -4,6 +4,7 @@ const lutaRepository = require('../repositories/lutaRepository');
 const pontoEquipeRepository = require('../repositories/pontoEquipeRepository');
 const regraPontuacaoRepository = require('../repositories/regraPontuacaoRepository');
 const { NotFoundError, RegraNegocioError } = require('../utils/errors');
+const auditoriaService = require('./auditoriaService');
 
 /**
  * Serviço responsável pelo encerramento de categorias,
@@ -255,7 +256,7 @@ async function calcularPreview(eventoId, chaveId) {
   };
 }
 
-async function finalizarCategoria(eventoId, chaveId) {
+async function finalizarCategoria(eventoId, chaveId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -364,6 +365,27 @@ async function finalizarCategoria(eventoId, chaveId) {
       client
     );
 
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'CATEGORIA_FINALIZADA',
+      entidade: 'CHAVE',
+      entidadeId: chaveId,
+      descricao: `Categoria "${chave.categoria_nome}" finalizada.`,
+      dadosAnteriores: {
+        status: chave.status,
+      },
+      dadosNovos: {
+        status: 'FINALIZADA',
+        podio: {
+          primeiro: podio.primeiro,
+          segundo: podio.segundo,
+          terceiro: podio.terceiro,
+        },
+      },
+      client,
+    });
+
     await client.query('COMMIT');
     return { chave: chaveFinalizada, podio };
   } catch (error) {
@@ -374,7 +396,7 @@ async function finalizarCategoria(eventoId, chaveId) {
   }
 }
 
-async function reabrirCategoria(eventoId, chaveId) {
+async function reabrirCategoria(eventoId, chaveId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -404,6 +426,28 @@ async function reabrirCategoria(eventoId, chaveId) {
       chaveId,
       client
     );
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'CATEGORIA_REABERTA',
+      entidade: 'CHAVE',
+      entidadeId: chaveId,
+      descricao: `Categoria "${chave.categoria_nome}" reaberta.`,
+      dadosAnteriores: {
+        status: chave.status,
+        primeiro_lugar_id: chave.primeiro_lugar_id,
+        segundo_lugar_id: chave.segundo_lugar_id,
+        terceiro_lugar_id: chave.terceiro_lugar_id,
+      },
+      dadosNovos: {
+        status: 'EM_ANDAMENTO',
+        primeiro_lugar_id: null,
+        segundo_lugar_id: null,
+        terceiro_lugar_id: null,
+      },
+      client,
+    });
 
     await client.query('COMMIT');
     return { chave: chaveReaberta };

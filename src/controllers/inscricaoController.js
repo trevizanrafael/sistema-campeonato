@@ -59,11 +59,13 @@ async function mostrarCadastro(req, res, next) {
 
 async function cadastrar(req, res, next) {
   const { eventoId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
     const resultado = await inscricaoService.processarCadastro(
       eventoId,
-      req.body
+      req.body,
+      usuarioId
     );
 
     if (resultado.tipo === 'ESCOLHER_CATEGORIA') {
@@ -142,12 +144,14 @@ async function mostrarEdicao(req, res, next) {
 
 async function editar(req, res, next) {
   const { eventoId, id } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
     const resultado = await inscricaoService.processarEdicao(
       eventoId,
       id,
-      req.body
+      req.body,
+      usuarioId
     );
 
     if (resultado.tipo === 'ESCOLHER_CATEGORIA') {
@@ -208,9 +212,10 @@ async function editar(req, res, next) {
 
 async function cancelar(req, res, next) {
   const { eventoId, id } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    await inscricaoService.cancelarInscricao(eventoId, id);
+    await inscricaoService.cancelarInscricao(eventoId, id, usuarioId);
     req.session.mensagemSucesso = 'Inscrição cancelada com sucesso.';
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
@@ -231,9 +236,10 @@ async function cancelar(req, res, next) {
 
 async function reativar(req, res, next) {
   const { eventoId, id } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    const resultado = await inscricaoService.reativarInscricao(eventoId, id);
+    const resultado = await inscricaoService.reativarInscricao(eventoId, id, usuarioId);
     req.session.mensagemSucesso = resultado.mensagem;
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
@@ -254,9 +260,10 @@ async function reativar(req, res, next) {
 
 async function excluir(req, res, next) {
   const { eventoId, id } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    await inscricaoService.excluirInscricao(eventoId, id);
+    await inscricaoService.excluirInscricao(eventoId, id, usuarioId);
     req.session.mensagemSucesso = 'Inscrição excluída com sucesso.';
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {

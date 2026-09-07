@@ -55,7 +55,9 @@ async function buscarEventoComResumo(id) {
   return evento;
 }
 
-async function criarEvento(dados) {
+const auditoriaService = require('./auditoriaService');
+
+async function criarEvento(dados, usuarioId = null) {
   const normalizado = normalizarEvento(dados);
   const erros = validarEvento(normalizado);
 
@@ -70,6 +72,21 @@ async function criarEvento(dados) {
     const evento = await eventoRepository.criar(normalizado, client);
     await regraPontuacaoRepository.criarPadrao(evento.id, client);
 
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: evento.id,
+      acao: 'EVENTO_CRIADO',
+      entidade: 'EVENTO',
+      entidadeId: evento.id,
+      descricao: `Evento "${evento.nome}" criado.`,
+      dadosAnteriores: null,
+      dadosNovos: {
+        nome: evento.nome,
+        descricao: evento.descricao,
+      },
+      client,
+    });
+
     await client.query('COMMIT');
     return evento;
   } catch (erro) {
@@ -80,10 +97,8 @@ async function criarEvento(dados) {
   }
 }
 
-async function editarEvento(id, dados) {
+async function editarEvento(id, dados, usuarioId = null) {
   const validId = validarId(id);
-  await buscarEvento(validId);
-
   const normalizado = normalizarEvento(dados);
   const erros = validarEvento(normalizado);
 
@@ -91,7 +106,43 @@ async function editarEvento(id, dados) {
     throw new ValidationError(erros);
   }
 
-  return eventoRepository.atualizar(validId, normalizado);
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    const eventoAnterior = await eventoRepository.buscarPorId(validId, client);
+    if (!eventoAnterior) {
+      throw new NotFoundError('Evento não encontrado.');
+    }
+
+    const eventoAtualizado = await eventoRepository.atualizar(validId, normalizado, client);
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: validId,
+      acao: 'EVENTO_EDITADO',
+      entidade: 'EVENTO',
+      entidadeId: validId,
+      descricao: `Evento "${eventoAtualizado.nome}" editado.`,
+      dadosAnteriores: {
+        nome: eventoAnterior.nome,
+        descricao: eventoAnterior.descricao,
+      },
+      dadosNovos: {
+        nome: eventoAtualizado.nome,
+        descricao: eventoAtualizado.descricao,
+      },
+      client,
+    });
+
+    await client.query('COMMIT');
+    return eventoAtualizado;
+  } catch (erro) {
+    await client.query('ROLLBACK');
+    throw erro;
+  } finally {
+    client.release();
+  }
 }
 
 async function excluirEvento(id) {

@@ -56,9 +56,10 @@ async function mostrar(req, res, next) {
 
 async function gerar(req, res, next) {
   const { eventoId, categoriaId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    const resultado = await chaveService.gerarChave(eventoId, categoriaId);
+    const resultado = await chaveService.gerarChave(eventoId, categoriaId, usuarioId);
     let msg = 'Chave gerada com sucesso.';
     if (resultado.conflitosEquipe > 0) {
       msg += ` Atenção: ${resultado.conflitosEquipe} confronto(s) de atletas da mesma equipe não puderam ser evitados na primeira rodada.`;
@@ -90,9 +91,10 @@ async function gerar(req, res, next) {
 
 async function sortear(req, res, next) {
   const { eventoId, chaveId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    const resultado = await chaveService.sortearNovamente(eventoId, chaveId);
+    const resultado = await chaveService.sortearNovamente(eventoId, chaveId, usuarioId);
     let msg = 'Chave sorteada novamente com sucesso.';
     if (resultado.conflitosEquipe > 0) {
       msg += ` Atenção: ${resultado.conflitosEquipe} confronto(s) de atletas da mesma equipe não puderam ser evitados na primeira rodada.`;
@@ -123,9 +125,10 @@ async function sortear(req, res, next) {
 
 async function iniciar(req, res, next) {
   const { eventoId, chaveId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    await chaveService.iniciarChave(eventoId, chaveId);
+    await chaveService.iniciarChave(eventoId, chaveId, usuarioId);
     req.session.mensagemSucesso = 'Chave iniciada com sucesso! Os byes avançaram e as primeiras lutas estão prontas.';
     return res.redirect(`/eventos/${eventoId}/chaves/${chaveId}`);
   } catch (erro) {
@@ -151,9 +154,10 @@ async function iniciar(req, res, next) {
 
 async function excluir(req, res, next) {
   const { eventoId, chaveId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    await chaveService.excluirChave(eventoId, chaveId);
+    await chaveService.excluirChave(eventoId, chaveId, usuarioId);
     req.session.mensagemSucesso = 'Chave excluída com sucesso.';
     return res.redirect(`/eventos/${eventoId}/chaves`);
   } catch (erro) {
