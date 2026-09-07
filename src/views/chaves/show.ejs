@@ -2,8 +2,9 @@
 <html lang="pt-BR">
   <head>
     <%- include("../partials/head", {
-      titulo: `${chave.nome} - ${evento.nome}`
+      titulo: `${categoria ? categoria.nome : chave.nome} - ${evento.nome}`
     }) %>
+    <link rel="stylesheet" href="/css/bracket.css">
   </head>
 
   <body>
@@ -22,7 +23,7 @@
               </a>
             </div>
             <div style="display: flex; align-items: center; gap: 12px;">
-              <h1 class="page-title"><%= chave.nome %></h1>
+              <h1 class="page-title"><%= categoria ? categoria.nome : chave.nome %></h1>
               <% if (chave.status === 'NAO_INICIADA') { %>
                 <span class="badge badge-warning">Nao iniciada</span>
               <% } else if (chave.status === 'EM_ANDAMENTO') { %>
@@ -32,7 +33,7 @@
               <% } %>
             </div>
             <p class="page-subtitle">
-              Categoria: <strong><%= chave.categoria_nome %></strong> | Chave de <strong><%= chave.tamanho %> posicoes</strong>
+              Evento: <strong><%= evento.nome %></strong> | Chave eliminatoria de <strong><%= chave.tamanho %> posicoes</strong>
             </p>
           </div>
 
@@ -91,108 +92,130 @@
         </div>
 
         <section class="page-content">
-          <% if (chave.status === 'EM_ANDAMENTO') { %>
-            <div class="alert alert-success" style="margin-bottom: 24px; border: 1px solid #111; background: #fafafa; color: #111; padding: 12px 16px;">
-              <strong>Chave em andamento:</strong> As lutas da primeira rodada estao prontas para execucao e os avancos por bye foram concluidos.
+          <div class="bracket-legend">
+            <div class="bracket-legend-item">
+              <span class="bracket-legend-box" style="border-color: #111; background: #fff;"></span>
+              <span>Luta pronta</span>
             </div>
-          <% } else if (chave.status === 'NAO_INICIADA') { %>
-            <div class="alert alert-warning" style="margin-bottom: 24px; border: 1px solid #111; background: #f5f5f5; color: #111; padding: 12px 16px;">
-              <strong>Previa da chave:</strong> Esta chave ainda nao foi iniciada. Voce pode conferir os confrontos, sortear novamente ou excluir. Ao clicar em <strong>Iniciar chave</strong>, a estrutura sera fixada e os byes avancarao para a proxima rodada.
+            <div class="bracket-legend-item">
+              <span class="bracket-legend-box" style="border-color: #888; background: #f6f6f6;"></span>
+              <span>Luta finalizada</span>
             </div>
-          <% } %>
+            <div class="bracket-legend-item">
+              <span class="bracket-legend-box" style="border-color: #eee; background: #fff;"></span>
+              <span>Aguardando definicao</span>
+            </div>
+            <div class="bracket-legend-item">
+              <span class="competitor-seed" style="width: 16px; height: 16px; font-size: 9px;">1</span>
+              <span>Cabeca de chave (Seed)</span>
+            </div>
+            <div class="bracket-legend-item">
+              <span style="font-style: italic; font-weight: 600;">BYE</span>
+              <span>Avanco livre</span>
+            </div>
+          </div>
 
-          <div style="display: flex; flex-direction: column; gap: 32px;">
-            <% rodadas.forEach(function(rodada) { %>
-              <div>
-                <div style="border-bottom: 2px solid var(--color-border); padding-bottom: 8px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
-                  <h2 style="margin: 0; font-size: 16px; font-weight: 600;">
-                    <% if (rodada.isFinal) { %>
-                      Final
-                    <% } else if (rodada.isSemifinal) { %>
-                      Semifinal (Rodada <%= rodada.numero %>)
-                    <% } else { %>
-                      Rodada <%= rodada.numero %>
-                    <% } %>
+          <p class="bracket-mobile-tip">
+            Deslize horizontalmente para visualizar as proximas rodadas.
+          </p>
+
+          <div class="bracket-scroll">
+            <div
+              class="bracket"
+              id="bracket"
+              style="--round-count: <%= rodadas.length %>; min-height: <%= alturaMinima %>px;"
+            >
+              <svg
+                class="bracket-connections"
+                id="bracketConnections"
+                aria-hidden="true"
+              ></svg>
+
+              <% rodadas.forEach(function(rodada) { %>
+                <section class="bracket-round">
+                  <h2 class="bracket-round-title">
+                    <%= rodada.nome %>
                   </h2>
-                  <span style="font-size: 13px; color: var(--color-text-muted);">
-                    <%= rodada.lutas.length %> <%= rodada.lutas.length === 1 ? 'luta' : 'lutas' %>
-                  </span>
-                </div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
-                  <% rodada.lutas.forEach(function(luta) { %>
-                    <div class="card" style="padding: 14px; border: 1px solid var(--color-border); background: #ffffff;">
-                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 6px;">
-                        <span style="font-size: 12px; font-weight: 600; color: var(--color-text-muted);">
-                          LUTA <%= luta.posicao %>
-                        </span>
-                        <% if (luta.status === 'FINALIZADA') { %>
-                          <span class="badge badge-success" style="font-size: 11px;">Finalizada</span>
-                        <% } else if (luta.status === 'PRONTA') { %>
-                          <span class="badge badge-ativo" style="font-size: 11px;">Pronta</span>
-                        <% } else { %>
-                          <span class="badge badge-neutral" style="font-size: 11px;">Aguardando</span>
-                        <% } %>
-                      </div>
+                  <div class="bracket-round-matches">
+                    <% rodada.lutas.forEach(function(luta) { %>
+                      <article
+                        class="match-card match-<%= luta.status.toLowerCase() %>"
+                        id="match-<%= luta.id %>"
+                        data-match-id="<%= luta.id %>"
+                        data-next-match-id="<%= luta.proxima_luta_id || '' %>"
+                        data-status="<%= luta.status %>"
+                      >
+                        <div class="match-header">
+                          <span>LUTA <%= luta.posicao %></span>
+                          <span class="match-status">
+                            <% if (luta.status === 'FINALIZADA') { %>
+                              Finalizada
+                            <% } else if (luta.status === 'PRONTA') { %>
+                              Pronta
+                            <% } else if (luta.status === 'CANCELADA') { %>
+                              Cancelada
+                            <% } else { %>
+                              Aguardando
+                            <% } %>
+                          </span>
+                        </div>
 
-                      <div style="display: flex; flex-direction: column; gap: 8px;">
                         <!-- Competidor 1 -->
-                        <div style="padding: 8px; border-radius: var(--radius-small); background: <%= (luta.vencedor_id && luta.vencedor_id === luta.competidor_1_id) ? '#f0f0f0' : '#fafafa' %>; border-left: 3px solid <%= (luta.vencedor_id && luta.vencedor_id === luta.competidor_1_id) ? '#111' : '#ddd' %>;">
-                          <% if (luta.competidor_1_id) { %>
-                            <div style="font-weight: 600; font-size: 13px; color: #111;">
-                              <%= luta.competidor_1_nome %>
-                              <% if (luta.vencedor_id && luta.vencedor_id === luta.competidor_1_id) { %>
-                                <span style="font-size: 11px; font-weight: 700; margin-left: 4px;">(Vencedor)</span>
-                              <% } %>
-                            </div>
-                            <div style="font-size: 12px; color: var(--color-text-muted);">
-                              <%= luta.competidor_1_equipe || 'Equipe' %>
-                            </div>
-                          <% } else if (luta.rodada === 1) { %>
-                            <div style="font-style: italic; font-size: 13px; color: #888;">
-                              BYE (Avanco livre)
-                            </div>
-                          <% } else { %>
-                            <div style="font-style: italic; font-size: 13px; color: #aaa;">
-                              Aguardando definicao...
-                            </div>
+                        <div class="match-competitor <%= luta.competidor1.vencedor ? 'winner' : '' %> <%= luta.competidor1.tipo !== 'COMPETIDOR' ? 'placeholder' : '' %>">
+                          <% if (luta.competidor1.seed) { %>
+                            <span class="competitor-seed" title="Seed <%= luta.competidor1.seed %>">
+                              <%= luta.competidor1.seed %>
+                            </span>
+                          <% } %>
+
+                          <div class="competitor-info">
+                            <strong><%= luta.competidor1.nome %></strong>
+                            <% if (luta.competidor1.equipe) { %>
+                              <small><%= luta.competidor1.equipe %></small>
+                            <% } %>
+                          </div>
+
+                          <% if (luta.placar_1 !== null && luta.placar_1 !== undefined) { %>
+                            <strong class="competitor-score"><%= luta.placar_1 %></strong>
                           <% } %>
                         </div>
 
                         <!-- Competidor 2 -->
-                        <div style="padding: 8px; border-radius: var(--radius-small); background: <%= (luta.vencedor_id && luta.vencedor_id === luta.competidor_2_id) ? '#f0f0f0' : '#fafafa' %>; border-left: 3px solid <%= (luta.vencedor_id && luta.vencedor_id === luta.competidor_2_id) ? '#111' : '#ddd' %>;">
-                          <% if (luta.competidor_2_id) { %>
-                            <div style="font-weight: 600; font-size: 13px; color: #111;">
-                              <%= luta.competidor_2_nome %>
-                              <% if (luta.vencedor_id && luta.vencedor_id === luta.competidor_2_id) { %>
-                                <span style="font-size: 11px; font-weight: 700; margin-left: 4px;">(Vencedor)</span>
-                              <% } %>
-                            </div>
-                            <div style="font-size: 12px; color: var(--color-text-muted);">
-                              <%= luta.competidor_2_equipe || 'Equipe' %>
-                            </div>
-                          <% } else if (luta.rodada === 1) { %>
-                            <div style="font-style: italic; font-size: 13px; color: #888;">
-                              BYE (Avanco livre)
-                            </div>
-                          <% } else { %>
-                            <div style="font-style: italic; font-size: 13px; color: #aaa;">
-                              Aguardando definicao...
-                            </div>
+                        <div class="match-competitor <%= luta.competidor2.vencedor ? 'winner' : '' %> <%= luta.competidor2.tipo !== 'COMPETIDOR' ? 'placeholder' : '' %>">
+                          <% if (luta.competidor2.seed) { %>
+                            <span class="competitor-seed" title="Seed <%= luta.competidor2.seed %>">
+                              <%= luta.competidor2.seed %>
+                            </span>
+                          <% } %>
+
+                          <div class="competitor-info">
+                            <strong><%= luta.competidor2.nome %></strong>
+                            <% if (luta.competidor2.equipe) { %>
+                              <small><%= luta.competidor2.equipe %></small>
+                            <% } %>
+                          </div>
+
+                          <% if (luta.placar_2 !== null && luta.placar_2 !== undefined) { %>
+                            <strong class="competitor-score"><%= luta.placar_2 %></strong>
                           <% } %>
                         </div>
-                      </div>
 
-                      <% if (luta.status === 'FINALIZADA' && luta.tipo_resultado) { %>
-                        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed #eee; font-size: 11px; color: var(--color-text-muted);">
-                          Resultado: <strong><%= luta.tipo_resultado %></strong>
-                        </div>
-                      <% } %>
-                    </div>
-                  <% }); %>
-                </div>
-              </div>
-            <% }); %>
+                        <% if (luta.status === 'FINALIZADA' && luta.tipo_resultado) { %>
+                          <div class="match-result-tag">
+                            <% if (luta.tipo_resultado === 'BYE') { %>
+                              Avanco por BYE
+                            <% } else { %>
+                              Resultado: <strong><%= luta.tipo_resultado %></strong>
+                            <% } %>
+                          </div>
+                        <% } %>
+                      </article>
+                    <% }); %>
+                  </div>
+                </section>
+              <% }); %>
+            </div>
           </div>
         </section>
       </main>
@@ -201,5 +224,6 @@
     </div>
 
     <%- include("../partials/scripts") %>
+    <script src="/js/bracket.js" defer></script>
   </body>
 </html>

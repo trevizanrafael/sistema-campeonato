@@ -1,4 +1,5 @@
 const chaveService = require('../services/chaveService');
+const chaveVisualizacaoService = require('../services/chaveVisualizacaoService');
 const {
   NotFoundError,
   BusinessRuleError,
@@ -32,14 +33,15 @@ async function listar(req, res, next) {
 async function mostrar(req, res, next) {
   try {
     const { eventoId, chaveId } = req.params;
-    const dados = await chaveService.buscarChave(eventoId, chaveId);
+    const dados = await chaveVisualizacaoService.buscarVisualizacao(eventoId, chaveId);
 
     return res.render('chaves/show', {
-      titulo: `${dados.chave.nome} — ${dados.evento.nome}`,
+      titulo: `${dados.categoria.nome} — ${dados.evento.nome}`,
       evento: dados.evento,
+      categoria: dados.categoria,
       chave: dados.chave,
-      lutas: dados.lutas,
       rodadas: dados.rodadas,
+      alturaMinima: dados.alturaMinima,
     });
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {

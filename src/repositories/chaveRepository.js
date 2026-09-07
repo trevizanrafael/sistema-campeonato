@@ -42,9 +42,11 @@ async function buscarPorIdNoEvento(chaveId, eventoId, client) {
     SELECT
       ch.*,
       c.nome AS categoria_nome,
-      c.evento_id
+      c.evento_id,
+      e.nome AS evento_nome
     FROM chaves ch
     JOIN categorias c ON c.id = ch.categoria_id
+    JOIN eventos e ON e.id = c.evento_id
     WHERE ch.id = $1 AND c.evento_id = $2;
   `;
 

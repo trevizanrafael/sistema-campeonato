@@ -37,8 +37,10 @@ async function listarPorChave(chaveId, client) {
     SELECT
       l.*,
       i1.nome AS competidor_1_nome,
+      i1.seed AS competidor_1_seed,
       e1.nome AS competidor_1_equipe,
       i2.nome AS competidor_2_nome,
+      i2.seed AS competidor_2_seed,
       e2.nome AS competidor_2_equipe,
       v.nome AS vencedor_nome
     FROM lutas l
