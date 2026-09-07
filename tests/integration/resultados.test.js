@@ -78,7 +78,7 @@ describe('Integration: Lançamento, Correção e Anulação de Resultados', () =
     const logs = await auditoriaRepository.listarPorEvento(evento.id, { acao: 'RESULTADO_LANCADO' });
     const log = logs.find(l => Number(l.entidade_id) === Number(lutaSemi1.id));
     assert.ok(log, 'Deve existir log RESULTADO_LANCADO');
-    assert.equal(log.dados_novos.vencedor_id, vencedorId);
+    assert.equal(Number(log.dados_novos.vencedor_id), Number(vencedorId));
   });
 
   it('deve corrigir resultado invertendo vencedor, transferindo pontos e registrando RESULTADO_CORRIGIDO', async () => {
@@ -95,13 +95,13 @@ describe('Integration: Lançamento, Correção e Anulação de Resultados', () =
       adminId
     );
 
-    assert.equal(res.luta.vencedor_id, novoVencedorId);
+    assert.equal(Number(res.luta.vencedor_id), Number(novoVencedorId));
 
     const logs = await auditoriaRepository.listarPorEvento(evento.id, { acao: 'RESULTADO_CORRIGIDO' });
     const log = logs.find(l => Number(l.entidade_id) === Number(lutaSemi1.id));
     assert.ok(log, 'Deve existir log RESULTADO_CORRIGIDO');
-    assert.equal(log.dados_anteriores.vencedor_id, lutaSemi1.competidor_1_id);
-    assert.equal(log.dados_novos.vencedor_id, novoVencedorId);
+    assert.equal(Number(log.dados_anteriores.vencedor_id), Number(lutaSemi1.competidor_1_id));
+    assert.equal(Number(log.dados_novos.vencedor_id), Number(novoVencedorId));
   });
 
   it('deve anular resultado voltando luta para PRONTA, estornando pontos e registrando RESULTADO_ANULADO', async () => {
@@ -118,7 +118,7 @@ describe('Integration: Lançamento, Correção e Anulação de Resultados', () =
     const logs = await auditoriaRepository.listarPorEvento(evento.id, { acao: 'RESULTADO_ANULADO' });
     const log = logs.find(l => Number(l.entidade_id) === Number(lutaSemi1.id));
     assert.ok(log, 'Deve existir log RESULTADO_ANULADO');
-    assert.equal(log.dados_anteriores.vencedor_id, lutaSemi1.competidor_2_id);
+    assert.equal(Number(log.dados_anteriores.vencedor_id), Number(lutaSemi1.competidor_2_id));
     assert.equal(log.dados_novos, null);
   });
 });

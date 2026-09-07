@@ -151,12 +151,12 @@ describe('Integration: Cenários Completos de Campeonato (A até F)', () => {
       atletas.push(await criarInscricao(evento.id, catD.id, i % 2 === 0 ? equipeA.id : equipeB.id, faixa.id, { nome: `D_Atleta_${i}` }));
     }
 
-    const { chave } = await chaveService.gerarChave(evento.id, catD.id, adminId);
-    assert.equal(chave.tamanho, 8);
-    assert.equal(chave.totalLutas, 7);
+    const res = await chaveService.gerarChave(evento.id, catD.id, adminId);
+    assert.equal(res.chave.tamanho, 8);
+    assert.equal(res.totalLutas, 7);
 
-    await chaveService.iniciarChave(evento.id, chave.id, adminId);
-    const lutas = await lutaRepository.listarPorChave(chave.id);
+    await chaveService.iniciarChave(evento.id, res.chave.id, adminId);
+    const lutas = await lutaRepository.listarPorChave(res.chave.id);
     const byes = lutas.filter(l => l.rodada === 1 && l.status === 'FINALIZADA');
     assert.equal(byes.length, 3, 'Deve haver 3 lutas finalizadas por BYE na primeira rodada');
   });
