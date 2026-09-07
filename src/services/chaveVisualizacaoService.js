@@ -71,13 +71,19 @@ function prepararSlot(luta, numero, chave) {
 
 function agruparPorRodada(lutas = [], chave = {}) {
   const mapa = new Map();
+  const lutasPorId = new Map(lutas.map((l) => [l.id, l]));
 
   for (const luta of lutas) {
     if (!mapa.has(luta.rodada)) {
       mapa.set(luta.rodada, []);
     }
+
+    const proxima = luta.proxima_luta_id ? lutasPorId.get(luta.proxima_luta_id) : null;
+    const proximaFinalizada = proxima ? proxima.status === 'FINALIZADA' : false;
+
     mapa.get(luta.rodada).push({
       ...luta,
+      proximaFinalizada,
       competidor1: prepararSlot(luta, 1, chave),
       competidor2: prepararSlot(luta, 2, chave),
     });

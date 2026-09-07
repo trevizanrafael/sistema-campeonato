@@ -41,4 +41,8 @@ router.post(
   chaveController.excluir
 );
 
+// Lançamento de resultados de lutas (Fase 13)
+const resultadoRoutes = require('./resultadoRoutes');
+router.use('/chaves/:chaveId/lutas/:lutaId/resultado', resultadoRoutes);
+
 module.exports = router;

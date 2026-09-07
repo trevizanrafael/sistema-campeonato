@@ -201,13 +201,56 @@
                           <% } %>
                         </div>
 
-                        <% if (luta.status === 'FINALIZADA' && luta.tipo_resultado) { %>
-                          <div class="match-result-tag">
-                            <% if (luta.tipo_resultado === 'BYE') { %>
-                              Avanco por BYE
+                        <% if (luta.status === 'FINALIZADA') { %>
+                          <% if (luta.tipo_resultado === 'BYE') { %>
+                            <div class="match-result-tag">
+                              Avanço por BYE
+                            </div>
+                          <% } else if (chave.status === 'EM_ANDAMENTO') { %>
+                            <% if (luta.proximaFinalizada) { %>
+                              <div style="margin-top: 8px; text-align: center;">
+                                <span style="font-size: 11px; color: var(--color-text-muted); display: block; padding: 4px 6px; background: #f0f0f0; border: 1px solid var(--color-border); border-radius: 2px;">
+                                  Resultado bloqueado — próxima luta finalizada
+                                </span>
+                              </div>
                             <% } else { %>
-                              Resultado: <strong><%= luta.tipo_resultado %></strong>
+                              <div style="margin-top: 8px; display: flex; gap: 6px; justify-content: center;">
+                                <a
+                                  href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/lutas/<%= luta.id %>/resultado/editar"
+                                  class="button button-small button-outline"
+                                  style="flex: 1; padding: 3px 6px; font-size: 11px; text-transform: uppercase; font-weight: 600; text-align: center;"
+                                >
+                                  Corrigir
+                                </a>
+                                <form
+                                  action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/lutas/<%= luta.id %>/resultado/anular"
+                                  method="POST"
+                                  style="flex: 1; margin: 0;"
+                                  data-confirm="Deseja anular este resultado? O avanço e os pontos serão removidos."
+                                >
+                                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                  <button
+                                    type="submit"
+                                    class="button button-small button-danger"
+                                    style="width: 100%; padding: 3px 6px; font-size: 11px; text-transform: uppercase; font-weight: 600; text-align: center;"
+                                  >
+                                    Anular
+                                  </button>
+                                </form>
+                              </div>
                             <% } %>
+                          <% } %>
+                        <% } %>
+
+                        <% if (chave.status === 'EM_ANDAMENTO' && luta.status === 'PRONTA') { %>
+                          <div style="margin-top: 8px; text-align: center;">
+                            <a
+                              href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/lutas/<%= luta.id %>/resultado"
+                              class="button button-small"
+                              style="width: 100%; padding: 4px 8px; font-size: 11px; text-transform: uppercase; font-weight: 600; display: block; text-align: center;"
+                            >
+                              Lançar resultado
+                            </a>
                           </div>
                         <% } %>
                       </article>
