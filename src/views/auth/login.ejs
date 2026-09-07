@@ -1,61 +1,86 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entrar | Sistema de Lutas</title>
-  <link rel="stylesheet" href="/css/reset.css">
-  <link rel="stylesheet" href="/css/variables.css">
-  <link rel="stylesheet" href="/css/components.css">
-  <link rel="stylesheet" href="/css/pages.css">
+  <%- include("../partials/head", {
+    titulo: "Entrar",
+    pagina: "login"
+  }) %>
 </head>
 <body class="login-page">
-  <div class="login-card">
-    <div class="login-card__brand">
-      <h1>Sistema de Lutas</h1>
-      <p>Painel de Controle</p>
-    </div>
-
-    <% if (typeof erros !== 'undefined' && erros && erros.length > 0) { %>
-      <ul class="error-list">
-        <% erros.forEach(function(erro) { %>
-          <li><%= erro %></li>
-        <% }); %>
-      </ul>
+  <div class="login-container">
+    <% if (typeof brand !== 'undefined' && brand.id === 'araujo-jj-team') { %>
+      <div class="login-hero">
+        <div class="login-hero-content">
+          <% if (brand.logoLight || brand.logoHorizontal) { %>
+            <img src="<%= brand.logoLight || brand.logoHorizontal %>" alt="<%= brand.nome %>" class="login-hero-logo">
+          <% } %>
+          <h2 class="login-hero-title">
+            ARTE SUAVE, <span>DISCIPLINA</span> & VITÓRIA
+          </h2>
+          <p class="login-hero-slogan">
+            Organização dentro e fora do tatame.
+          </p>
+        </div>
+        <div class="login-hero-footer">
+          Jiu-Jitsu Championship System
+        </div>
+      </div>
     <% } %>
 
-    <form action="/login" method="POST">
-      <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
+    <div class="login-form-side">
+      <div class="login-card">
+        <div class="login-header">
+          <% if (typeof brand !== 'undefined' && brand.logoCircular) { %>
+            <img src="<%= brand.logoCircular %>" alt="<%= brand.nome %>" class="login-circular-logo">
+          <% } %>
+          <h1 class="login-title"><%= (typeof brand !== 'undefined' && brand.nome) ? brand.nome : 'Sistema de Lutas' %></h1>
+          <p class="login-subtitle">Acesso ao Painel de Competição</p>
+        </div>
 
-      <div class="form-group">
-        <label for="email" class="form-label">E-mail</label>
-        <input
-          type="text"
-          id="email"
-          name="email"
-          class="form-control"
-          value="<%= typeof email !== 'undefined' ? email : '' %>"
-          autocomplete="username"
-          required
-        >
-      </div>
+        <% if (typeof erros !== 'undefined' && erros && erros.length > 0) { %>
+          <div class="alert alert-danger" style="margin-bottom: 20px;">
+            <ul style="margin: 0; padding-left: 20px;">
+              <% erros.forEach(function(erro) { %>
+                <li><%= erro %></li>
+              <% }); %>
+            </ul>
+          </div>
+        <% } %>
 
-      <div class="form-group">
-        <label for="senha" class="form-label">Senha</label>
-        <input
-          type="password"
-          id="senha"
-          name="senha"
-          class="form-control"
-          autocomplete="current-password"
-          required
-        >
-      </div>
+        <form action="/login" method="POST">
+          <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">
 
-      <div class="form-actions" style="margin-top: 16px;">
-        <button type="submit" class="button button-primary" style="width: 100%;">Entrar</button>
+          <div class="form-group">
+            <label for="email" class="form-label">E-mail</label>
+            <input
+              type="text"
+              id="email"
+              name="email"
+              class="form-control"
+              value="<%= typeof email !== 'undefined' ? email : '' %>"
+              autocomplete="username"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="senha" class="form-label">Senha</label>
+            <input
+              type="password"
+              id="senha"
+              name="senha"
+              class="form-control"
+              autocomplete="current-password"
+              required
+            >
+          </div>
+
+          <div class="form-actions" style="margin-top: 24px;">
+            <button type="submit" class="button button-primary">Entrar no Sistema</button>
+          </div>
+        </form>
       </div>
-    </form>
+    </div>
   </div>
 </body>
 </html>

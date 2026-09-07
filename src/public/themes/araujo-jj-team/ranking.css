@@ -1,0 +1,120 @@
+/* ==========================================================================
+   RANKING — IDENTIDADE ARAÚJO JJ TEAM
+   Visual marcante de pódio e medalhas, informativo e de alto contraste
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .ranking-table-container {
+  background: var(--ajj-white);
+  border: 1px solid var(--ajj-border);
+  border-top: 4px solid var(--ajj-red);
+  border-radius: var(--radius-medium);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+/* Primeira Equipe (Campeã) */
+[data-theme="araujo-jj-team"] .ranking-row-first,
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child {
+  background: linear-gradient(90deg, #050505 0%, #1c1c1c 100%) !important;
+  color: var(--ajj-white) !important;
+  font-weight: 700;
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child td {
+  color: var(--ajj-white) !important;
+  border-bottom: 2px solid var(--ajj-red);
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child .ranking-posicao {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  color: var(--ajj-red);
+  font-weight: 900;
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child a {
+  color: var(--ajj-white) !important;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: var(--ajj-red);
+}
+
+/* 2ª e 3ª Colocadas */
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:nth-child(2) {
+  background-color: #fafafa !important;
+  font-weight: 600;
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:nth-child(2) .ranking-posicao {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  color: var(--ajj-black);
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:nth-child(3) {
+  background-color: #f5f5f5 !important;
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:nth-child(3) .ranking-posicao {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  color: var(--ajj-gray-dark);
+}
+
+/* Destaque para Coluna de Pontos */
+[data-theme="araujo-jj-team"] .ranking-pontos-total {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: var(--ajj-red);
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child .ranking-pontos-total {
+  color: #ff3333 !important;
+  text-shadow: 0 0 10px rgba(182, 0, 0, 0.4);
+}
+
+/* Badges de Medalhas */
+[data-theme="araujo-jj-team"] .medal-gold {
+  color: #d97706;
+  font-weight: 800;
+}
+
+[data-theme="araujo-jj-team"] .medal-silver {
+  color: #64748b;
+  font-weight: 800;
+}
+
+[data-theme="araujo-jj-team"] .medal-bronze {
+  color: #b45309;
+  font-weight: 800;
+}
+
+/* Extrato da Equipe */
+[data-theme="araujo-jj-team"] .team-stat-card {
+  background: var(--ajj-white);
+  border: 1px solid var(--ajj-border);
+  border-top: 3px solid var(--ajj-black);
+  border-radius: var(--radius-small);
+  padding: 1.25rem;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="araujo-jj-team"] .team-stat-card.stat-primary {
+  border-top-color: var(--ajj-red);
+  background: #fdf6f6;
+}
+
+[data-theme="araujo-jj-team"] .team-stat-value {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  line-height: 1;
+  color: var(--ajj-black);
+  margin-top: 4px;
+}
+
+[data-theme="araujo-jj-team"] .team-stat-card.stat-primary .team-stat-value {
+  color: var(--ajj-red);
+}

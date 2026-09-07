@@ -10,7 +10,11 @@
   </button>
 
   <a href="/" class="app-logo">
-    Sistema de Lutas
+    <% if (typeof brand !== 'undefined' && brand && brand.logoHorizontal) { %>
+      <img src="<%= brand.logoHorizontal %>" alt="<%= brand.nome %>" class="app-logo-image">
+    <% } else { %>
+      <%= (typeof brand !== 'undefined' && brand && brand.nomeSistema) ? brand.nomeSistema : 'Sistema de Lutas' %>
+    <% } %>
   </a>
 
   <% if (typeof usuarioLogado !== 'undefined' && usuarioLogado) { %>

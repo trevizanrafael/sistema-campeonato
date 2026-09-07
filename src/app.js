@@ -37,6 +37,14 @@ app.use(express.json());
 
 // Arquivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+// Tema e Identidade Visual
+const brand = require('./config/brand');
+app.use((req, res, next) => {
+  res.locals.brand = brand;
+  next();
+});
 
 // Sessão
 app.use(sessionMiddleware);

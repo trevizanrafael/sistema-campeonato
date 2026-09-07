@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: `${categoria ? categoria.nome : chave.nome} - ${evento.nome}`
+      titulo: `${categoria ? categoria.nome : chave.nome} - ${evento.nome}`,
+      pagina: "chave"
     }) %>
-    <link rel="stylesheet" href="/css/bracket.css">
   </head>
 
   <body>

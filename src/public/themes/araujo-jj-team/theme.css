@@ -1,0 +1,536 @@
+/* ==========================================================================
+   TEMA ARAÚJO JJ TEAM — IDENTIDADE VISUAL OFICIAL
+   Preto, Branco e Vermelho | Combate, Força, Tradição e Disciplina
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Caveat+Brush&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+
+[data-theme="araujo-jj-team"] {
+  /* Paleta Oficial Araújo JJ Team */
+  --ajj-black: #050505;
+  --ajj-black-soft: #111111;
+  --ajj-charcoal: #1c1c1c;
+
+  --ajj-red: #b60000;
+  --ajj-red-hover: #8f0000;
+  --ajj-red-dark: #690000;
+  --ajj-red-soft: #f7e7e7;
+
+  --ajj-white: #ffffff;
+  --ajj-off-white: #f5f5f2;
+  --ajj-gray-light: #e5e5e5;
+  --ajj-gray: #a3a3a3;
+  --ajj-gray-dark: #4a4a4a;
+
+  --ajj-text: #111111;
+  --ajj-text-muted: #555555;
+  --ajj-border: #d7d7d7;
+
+  /* Formas & Raios */
+  --radius-small: 3px;
+  --radius-medium: 6px;
+  --radius-large: 10px;
+
+  /* Tipografia */
+  --font-heading: "Archivo Black", "Montserrat", Arial, sans-serif;
+  --font-body: "Montserrat", Arial, sans-serif;
+  --font-accent: "Caveat Brush", cursive;
+
+  /* Layout & Dimensões */
+  --header-height: 64px;
+
+  /* Cores Semânticas de Marca */
+  --brand-primary: var(--ajj-red);
+  --brand-primary-hover: var(--ajj-red-hover);
+  --brand-secondary: var(--ajj-black);
+  --page-background: var(--ajj-off-white);
+  --surface-background: var(--ajj-white);
+  --text-primary: var(--ajj-text);
+  --text-secondary: var(--ajj-text-muted);
+  --border-color: var(--ajj-border);
+
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background-color: var(--page-background);
+}
+
+/* ==========================================================================
+   TIPOGRAFIA GERAL
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] h1,
+[data-theme="araujo-jj-team"] h2,
+[data-theme="araujo-jj-team"] h3,
+[data-theme="araujo-jj-team"] .page-title {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--ajj-black);
+}
+
+[data-theme="araujo-jj-team"] h1,
+[data-theme="araujo-jj-team"] .page-title {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.1;
+  position: relative;
+  display: inline-block;
+}
+
+[data-theme="araujo-jj-team"] h2 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+[data-theme="araujo-jj-team"] h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+[data-theme="araujo-jj-team"] .page-subtitle {
+  color: var(--ajj-text-muted);
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   CABEÇALHO (APP-HEADER)
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .app-header {
+  background: linear-gradient(90deg, var(--ajj-black) 0%, var(--ajj-charcoal) 100%);
+  border-bottom: 3px solid var(--ajj-red);
+  color: var(--ajj-white);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  padding: 0 1.5rem;
+  height: var(--header-height);
+  min-height: var(--header-height);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+}
+
+[data-theme="araujo-jj-team"] .app-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+[data-theme="araujo-jj-team"] .app-logo-image {
+  height: 48px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+  display: block;
+}
+
+[data-theme="araujo-jj-team"] .sidebar-toggle {
+  color: var(--ajj-white);
+  border: 1px solid var(--ajj-charcoal);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-small);
+}
+
+[data-theme="araujo-jj-team"] .sidebar-toggle:hover {
+  background: var(--ajj-red);
+  color: var(--ajj-white);
+}
+
+[data-theme="araujo-jj-team"] .header-user-name {
+  color: var(--ajj-gray-light);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+[data-theme="araujo-jj-team"] .header-user .button-outline {
+  background: transparent;
+  border: 1px solid var(--ajj-gray-dark);
+  color: var(--ajj-gray-light);
+  border-radius: var(--radius-small);
+  transition: all 0.2s ease;
+}
+
+[data-theme="araujo-jj-team"] .header-user .button-outline:hover {
+  background: var(--ajj-red);
+  border-color: var(--ajj-red);
+  color: var(--ajj-white);
+}
+
+/* ==========================================================================
+   MENU LATERAL (SIDEBAR)
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .sidebar {
+  background: var(--ajj-black-soft);
+  color: var(--ajj-white);
+  border-right: 1px solid var(--ajj-charcoal);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.15);
+  top: var(--header-height);
+}
+
+[data-theme="araujo-jj-team"] .sidebar-link {
+  color: var(--ajj-gray-light);
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border-left: 4px solid transparent;
+  transition: all 0.18s ease;
+  padding: 12px 20px;
+}
+
+[data-theme="araujo-jj-team"] .sidebar-link:hover {
+  background: #1c1c1c;
+  color: var(--ajj-white);
+  border-left-color: var(--ajj-gray);
+  padding-left: 24px;
+}
+
+[data-theme="araujo-jj-team"] .sidebar-link.active {
+  background: var(--ajj-red);
+  border-left-color: var(--ajj-white);
+  color: var(--ajj-white);
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   CONTEÚDO PRINCIPAL & FUNDOS TEXTURIZADOS
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .main-content {
+  background-color: var(--ajj-off-white);
+  background-image: url("/themes/araujo-jj-team/assets/textures/grunge-light.svg");
+  background-repeat: repeat;
+  background-size: 800px 600px;
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  padding: calc(var(--header-height, 64px) + 28px) 32px 48px;
+}
+
+@media (max-width: 768px) {
+  [data-theme="araujo-jj-team"] .main-content {
+    margin-left: 0;
+    padding: calc(var(--header-height, 64px) + 16px) 16px 32px;
+  }
+}
+
+/* ==========================================================================
+   CARDS, PAINÉIS E DASHBOARD
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .card {
+  background: var(--ajj-white);
+  border: 1px solid var(--ajj-border);
+  border-top: 4px solid var(--ajj-red);
+  border-radius: var(--radius-medium);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.07);
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-theme="araujo-jj-team"] .dashboard-card {
+  text-decoration: none;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="araujo-jj-team"] .dashboard-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 6px 6px 0 rgba(182, 0, 0, 0.15);
+  border-color: var(--ajj-charcoal);
+  border-top-color: var(--ajj-red);
+}
+
+[data-theme="araujo-jj-team"] .dashboard-card h2 {
+  color: var(--ajj-black);
+  margin-bottom: 0.5rem;
+}
+
+[data-theme="araujo-jj-team"] .dashboard-card p {
+  color: var(--ajj-text-muted);
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   BOTÕES E AÇÕES
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .button {
+  font-family: var(--font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.85rem;
+  border-radius: var(--radius-small);
+  padding: 10px 18px;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+[data-theme="araujo-jj-team"] .button-primary {
+  background: var(--ajj-red);
+  color: var(--ajj-white);
+  border: 1px solid var(--ajj-red-dark);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="araujo-jj-team"] .button-primary:hover {
+  background: var(--ajj-red-hover);
+  color: var(--ajj-white);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+[data-theme="araujo-jj-team"] .button-secondary,
+[data-theme="araujo-jj-team"] .button-outline {
+  background: var(--ajj-white);
+  border: 2px solid var(--ajj-black);
+  color: var(--ajj-black);
+}
+
+[data-theme="araujo-jj-team"] .button-secondary:hover,
+[data-theme="araujo-jj-team"] .button-outline:hover {
+  background: var(--ajj-black);
+  color: var(--ajj-white);
+}
+
+[data-theme="araujo-jj-team"] .button-danger {
+  background: #b42318;
+  color: var(--ajj-white);
+  border: 1px solid #7a150e;
+}
+
+[data-theme="araujo-jj-team"] .button-danger:hover {
+  background: #91180f;
+  color: var(--ajj-white);
+}
+
+/* ==========================================================================
+   FORMULÁRIOS & CAMPOS
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .form-group {
+  margin-bottom: 1.25rem;
+}
+
+[data-theme="araujo-jj-team"] .form-label {
+  font-family: var(--font-body);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--ajj-black);
+  margin-bottom: 6px;
+  display: block;
+}
+
+[data-theme="araujo-jj-team"] .form-control {
+  background: var(--ajj-white);
+  border: 1.5px solid var(--ajj-border);
+  border-radius: var(--radius-small);
+  color: var(--ajj-text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+}
+
+[data-theme="araujo-jj-team"] .form-control:focus {
+  border-color: var(--ajj-red);
+  outline: 3px solid rgba(182, 0, 0, 0.16);
+  box-shadow: 0 0 0 1px var(--ajj-red);
+}
+
+/* ==========================================================================
+   TABELAS DE DADOS (MODO CLARO INFORMATIVO)
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ajj-white);
+  border-radius: var(--radius-small);
+  overflow: hidden;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--ajj-border);
+}
+
+[data-theme="araujo-jj-team"] .table th {
+  background: var(--ajj-black);
+  color: var(--ajj-white);
+  text-transform: uppercase;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 3px solid var(--ajj-red);
+}
+
+[data-theme="araujo-jj-team"] .table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ajj-gray-light);
+  color: var(--ajj-text);
+  font-size: 0.9rem;
+}
+
+[data-theme="araujo-jj-team"] .table tr:hover td {
+  background-color: #faf4f4;
+}
+
+/* ==========================================================================
+   BADGES & STATUS
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .badge,
+[data-theme="araujo-jj-team"] .status-badge {
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: var(--radius-small);
+  font-weight: 700;
+  display: inline-block;
+}
+
+[data-theme="araujo-jj-team"] .badge-success,
+[data-theme="araujo-jj-team"] .status-finalizada {
+  background: #18753c;
+  color: var(--ajj-white);
+}
+
+[data-theme="araujo-jj-team"] .badge-warning,
+[data-theme="araujo-jj-team"] .status-em-andamento {
+  background: #a16207;
+  color: var(--ajj-white);
+}
+
+[data-theme="araujo-jj-team"] .badge-danger {
+  background: var(--ajj-red);
+  color: var(--ajj-white);
+}
+
+[data-theme="araujo-jj-team"] .badge-info,
+[data-theme="araujo-jj-team"] .status-pronta {
+  background: var(--ajj-black);
+  border: 1px solid var(--ajj-red);
+  color: var(--ajj-white);
+}
+
+/* ==========================================================================
+   ALERTAS & MENSAGENS FLASH
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .alert {
+  border-radius: var(--radius-small);
+  border-left: 5px solid;
+  padding: 14px 18px;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+[data-theme="araujo-jj-team"] .alert-success {
+  background: #f0fdf4;
+  border-left-color: #18753c;
+  color: #14532d;
+}
+
+[data-theme="araujo-jj-team"] .alert-danger,
+[data-theme="araujo-jj-team"] .alert-error {
+  background: #fef2f2;
+  border-left-color: var(--ajj-red);
+  color: #7f1d1d;
+}
+
+[data-theme="araujo-jj-team"] .alert-warning {
+  background: #fffbeb;
+  border-left-color: #a16207;
+  color: #78350f;
+}
+
+[data-theme="araujo-jj-team"] .alert-info {
+  background: #f8fafc;
+  border-left-color: var(--ajj-black);
+  color: var(--ajj-black);
+}
+
+/* ==========================================================================
+   PÓDIO DE CATEGORIA
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .podio-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+[data-theme="araujo-jj-team"] .podio-card {
+  border-radius: var(--radius-medium);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  position: relative;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="araujo-jj-team"] .podio-primeiro {
+  background: var(--ajj-black);
+  color: var(--ajj-white);
+  border: 2px solid var(--ajj-red);
+  border-top: 6px solid var(--ajj-red);
+  transform: scale(1.03);
+}
+
+[data-theme="araujo-jj-team"] .podio-primeiro h3,
+[data-theme="araujo-jj-team"] .podio-primeiro .podio-posicao {
+  color: var(--ajj-white);
+}
+
+[data-theme="araujo-jj-team"] .podio-primeiro .podio-posicao {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  line-height: 1;
+  color: var(--ajj-red);
+  margin-bottom: 0.5rem;
+}
+
+[data-theme="araujo-jj-team"] .podio-segundo {
+  background: var(--ajj-white);
+  color: var(--ajj-black);
+  border: 2px solid var(--ajj-black);
+  border-top: 6px solid var(--ajj-black);
+}
+
+[data-theme="araujo-jj-team"] .podio-segundo .podio-posicao {
+  font-family: var(--font-heading);
+  font-size: 2.8rem;
+  color: var(--ajj-charcoal);
+  margin-bottom: 0.5rem;
+}
+
+[data-theme="araujo-jj-team"] .podio-terceiro {
+  background: var(--ajj-gray-light);
+  color: var(--ajj-text);
+  border: 2px solid var(--ajj-gray-dark);
+  border-top: 6px solid var(--ajj-gray-dark);
+}
+
+[data-theme="araujo-jj-team"] .podio-terceiro .podio-posicao {
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  color: var(--ajj-gray-dark);
+  margin-bottom: 0.5rem;
+}

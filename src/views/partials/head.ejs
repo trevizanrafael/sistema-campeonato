@@ -1,9 +1,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><%= (typeof titulo !== 'undefined' && titulo) ? `${titulo} | Sistema de Lutas` : "Sistema de Lutas" %></title>
+<title><%= (typeof titulo !== 'undefined' && titulo) ? `${titulo} | ${(typeof brand !== 'undefined' && brand.nomeSistema) ? brand.nomeSistema : 'Sistema de Lutas'}` : ((typeof brand !== 'undefined' && brand.nomeSistema) ? brand.nomeSistema : 'Sistema de Lutas') %></title>
 
+<% if (typeof brand !== 'undefined' && brand.favicon) { %>
+  <link rel="icon" type="image/png" href="<%= brand.favicon %>">
+<% } %>
+
+<!-- Tipografia Esportiva (Google Fonts) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Caveat+Brush&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+
+<!-- Estilos Estruturais Base -->
 <link rel="stylesheet" href="/css/reset.css">
 <link rel="stylesheet" href="/css/variables.css">
 <link rel="stylesheet" href="/css/layout.css">
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/pages.css">
+<link rel="stylesheet" href="/css/bracket.css">
+
+<!-- Tema Dinâmico (Sobrescreve somente aparência) -->
+<% if (typeof brand !== 'undefined' && brand.themeCss) { %>
+  <link rel="stylesheet" href="<%= brand.themeCss %>">
+<% } %>
+
+<% if (typeof pagina !== 'undefined' && pagina === 'login' && typeof brand !== 'undefined' && brand.loginCss) { %>
+  <link rel="stylesheet" href="<%= brand.loginCss %>">
+<% } %>
+
+<% if (typeof pagina !== 'undefined' && (pagina === 'chave' || pagina === 'chaves') && typeof brand !== 'undefined' && brand.bracketCss) { %>
+  <link rel="stylesheet" href="<%= brand.bracketCss %>">
+<% } %>
+
+<% if (typeof pagina !== 'undefined' && pagina === 'ranking' && typeof brand !== 'undefined' && brand.rankingCss) { %>
+  <link rel="stylesheet" href="<%= brand.rankingCss %>">
+<% } %>
+

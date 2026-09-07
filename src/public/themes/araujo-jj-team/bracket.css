@@ -1,0 +1,123 @@
+/* ==========================================================================
+   BRACKET — IDENTIDADE ARAÚJO JJ TEAM
+   Visual esportivo, competitivo, de combate e alta legibilidade
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .bracket {
+  background: var(--ajj-white);
+  border: 1px solid var(--ajj-border);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Títulos de Rodadas */
+[data-theme="araujo-jj-team"] .bracket-round-title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ajj-black);
+  border-bottom: 3px solid var(--ajj-red);
+  padding-bottom: 8px;
+}
+
+/* Cards das Lutas */
+[data-theme="araujo-jj-team"] .match-card {
+  background: var(--ajj-white);
+  border: 1.5px solid var(--ajj-black);
+  border-radius: var(--radius-small);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.15s ease;
+}
+
+[data-theme="araujo-jj-team"] .match-card:hover {
+  box-shadow: 5px 5px 0 rgba(182, 0, 0, 0.18);
+  border-color: var(--ajj-red);
+}
+
+/* Cabeçalho do Card da Luta */
+[data-theme="araujo-jj-team"] .match-header {
+  background: var(--ajj-black);
+  color: var(--ajj-white);
+  border-bottom: 1.5px solid var(--ajj-black);
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+}
+
+[data-theme="araujo-jj-team"] .match-header .match-id {
+  color: var(--ajj-gray-light);
+}
+
+/* Status Pronta / Ação */
+[data-theme="araujo-jj-team"] .match-card.is-ready,
+[data-theme="araujo-jj-team"] .match-card[data-status="PRONTA"] {
+  border-color: var(--ajj-red);
+  box-shadow: 0 0 0 1px var(--ajj-red), 4px 4px 0 rgba(182, 0, 0, 0.15);
+}
+
+[data-theme="araujo-jj-team"] .match-card.is-ready .match-header,
+[data-theme="araujo-jj-team"] .match-card[data-status="PRONTA"] .match-header {
+  background: var(--ajj-black);
+  border-bottom: 2px solid var(--ajj-red);
+}
+
+/* Competidores */
+[data-theme="araujo-jj-team"] .match-competitor {
+  border-left: 4px solid transparent;
+  font-family: var(--font-body);
+  transition: background 0.15s ease;
+}
+
+[data-theme="araujo-jj-team"] .match-competitor.winner {
+  background: #fbf5f5;
+  border-left-color: var(--ajj-red);
+  font-weight: 700;
+  color: var(--ajj-black);
+}
+
+[data-theme="araujo-jj-team"] .competitor-seed {
+  background: var(--ajj-black);
+  color: var(--ajj-white);
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+}
+
+[data-theme="araujo-jj-team"] .competitor-team {
+  color: var(--ajj-text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Botões da Luta */
+[data-theme="araujo-jj-team"] .match-action .button {
+  background: var(--ajj-red);
+  color: var(--ajj-white);
+  border: 1px solid var(--ajj-red-dark);
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+}
+
+[data-theme="araujo-jj-team"] .match-action .button:hover {
+  background: var(--ajj-red-hover);
+}
+
+/* Conectores SVG */
+[data-theme="araujo-jj-team"] .bracket-connections path {
+  stroke: #2b2b2b !important;
+  stroke-width: 2px !important;
+}
+
+[data-theme="araujo-jj-team"] .bracket-connections path.highlighted,
+[data-theme="araujo-jj-team"] .bracket-connection-highlighted {
+  stroke: var(--ajj-red) !important;
+  stroke-width: 2.5px !important;
+}

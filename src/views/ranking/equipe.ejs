@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: `${equipe.equipe_nome} - Detalhes da equipe - ${evento.nome}`
+      titulo: `${equipe.equipe_nome} - Detalhes da equipe - ${evento.nome}`,
+      pagina: "ranking"
     }) %>
   </head>
 

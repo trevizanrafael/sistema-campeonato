@@ -1,0 +1,13 @@
+/* ==========================================================================
+   TEMA BASE — Neutro e Genérico (Fallback do Sistema)
+   ========================================================================== */
+
+[data-theme="base"] {
+  --theme-primary: #1d4ed8;
+  --theme-primary-hover: #1e40af;
+  --theme-bg: #f8fafc;
+  --theme-surface: #ffffff;
+  --theme-text: #0f172a;
+  --theme-text-muted: #64748b;
+  --theme-border: #e2e8f0;
+}
