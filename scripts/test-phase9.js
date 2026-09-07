@@ -133,10 +133,24 @@ async function runTests() {
   const eq2Id = eq2Res.rows[0].id;
 
   // Obter faixas do seed
-  const faixasRows = (await pool.query('SELECT id, nome, ordem FROM faixas ORDER BY ordem')).rows;
+  let faixasRows = (await pool.query('SELECT id, nome, ordem FROM faixas ORDER BY ordem')).rows;
+  if (faixasRows.length < 3) {
+    const nomes = ['Branca', 'Azul', 'Roxa', 'Marrom', 'Preta'];
+    for (const nome of nomes) {
+      const exists = faixasRows.some((f) => f.nome.toLowerCase() === nome.toLowerCase());
+      if (!exists) {
+        const maxOrdem = faixasRows.length > 0 ? Math.max(...faixasRows.map((f) => f.ordem)) + 1 : 1;
+        await pool.query('INSERT INTO faixas (nome, ordem) VALUES ($1, $2) ON CONFLICT DO NOTHING', [
+          nome,
+          maxOrdem,
+        ]);
+        faixasRows = (await pool.query('SELECT id, nome, ordem FROM faixas ORDER BY ordem')).rows;
+      }
+    }
+  }
   const faixaBranca = faixasRows.find((f) => f.nome.toLowerCase().includes('branca')) || faixasRows[0];
-  const faixaAzul = faixasRows.find((f) => f.nome.toLowerCase().includes('azul')) || faixasRows[1];
-  const faixaRoxa = faixasRows.find((f) => f.nome.toLowerCase().includes('roxa')) || faixasRows[2];
+  const faixaAzul = faixasRows.find((f) => f.nome.toLowerCase().includes('azul')) || faixasRows[1] || faixasRows[0];
+  const faixaRoxa = faixasRows.find((f) => f.nome.toLowerCase().includes('roxa')) || faixasRows[2] || faixasRows[faixasRows.length - 1];
 
   // Criar categorias no Evento 1:
   // Cat 1: Juvenil Azul ate 60 kg (16-17 anos, <= 60 kg, faixa Azul, MASCULINO)

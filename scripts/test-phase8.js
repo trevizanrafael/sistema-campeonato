@@ -243,9 +243,17 @@ async function runTests() {
   assert(!!currentCsrf, 'Token CSRF obtido com sucesso para eventos');
 
   // Obter faixas do banco
-  const faixasRows = (await pool.query('SELECT id, nome, ordem FROM faixas ORDER BY ordem')).rows;
-  const faixaAzul = faixasRows.find((f) => f.nome.toLowerCase().includes('azul')) || faixasRows[1];
-  const faixaMarrom = faixasRows.find((f) => f.nome.toLowerCase().includes('marrom')) || faixasRows[3];
+  let faixasRows = (await pool.query('SELECT id, nome, ordem FROM faixas ORDER BY ordem')).rows;
+  if (faixasRows.length < 2) {
+    const maxOrdem = faixasRows.length > 0 ? faixasRows[faixasRows.length - 1].ordem + 1 : 1;
+    await pool.query('INSERT INTO faixas (nome, ordem) VALUES ($1, $2) ON CONFLICT DO NOTHING', [
+      'Faixa Auxiliar Teste',
+      maxOrdem,
+    ]);
+    faixasRows = (await pool.query('SELECT id, nome, ordem FROM faixas ORDER BY ordem')).rows;
+  }
+  const faixaAzul = faixasRows[0];
+  const faixaMarrom = faixasRows[faixasRows.length - 1];
 
   console.log('\n--- 7. Cadastro de Categorias e Validações de Formulário ---');
 

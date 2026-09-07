@@ -87,18 +87,51 @@ async function criarPontoColocacao(dados, client) {
   return rows[0];
 }
 
-async function buscarPontosAtuaisPorEvento(eventoId, client) {
-  const db = client || pool;
-  const sql = `
+async function buscarPontosAtuaisPorEvento(eventoId, chaveIdExcluida = null, client = null) {
+  let clientToUse = client;
+  let chaveExcluir = chaveIdExcluida;
+  if (chaveIdExcluida && typeof chaveIdExcluida === 'object' && chaveIdExcluida.query) {
+    clientToUse = chaveIdExcluida;
+    chaveExcluir = null;
+  }
+
+  const db = clientToUse || pool;
+  let sql = `
     SELECT
       equipe_id,
       COALESCE(SUM(pontos), 0)::INTEGER AS pontos_atuais
     FROM pontos_equipes
     WHERE evento_id = $1
-    GROUP BY equipe_id;
+  `;
+  const params = [eventoId];
+
+  if (chaveExcluir) {
+    params.push(chaveExcluir);
+    sql += ` AND (chave_id IS NULL OR chave_id <> $2)`;
+  }
+
+  sql += ` GROUP BY equipe_id;`;
+
+  const { rows } = await db.query(sql, params);
+  return rows;
+}
+
+async function buscarPontosVitoriaPorChave(chaveId, client = null) {
+  const db = client || pool;
+  const sql = `
+    SELECT
+      pe.equipe_id,
+      e.nome AS equipe_nome,
+      COALESCE(SUM(pe.pontos), 0)::INTEGER AS pontos_vitorias,
+      COUNT(*)::INTEGER AS total_vitorias
+    FROM pontos_equipes pe
+    JOIN equipes e ON e.id = pe.equipe_id
+    WHERE pe.chave_id = $1
+      AND pe.tipo = 'VITORIA'
+    GROUP BY pe.equipe_id, e.nome;
   `;
 
-  const { rows } = await db.query(sql, [eventoId]);
+  const { rows } = await db.query(sql, [chaveId]);
   return rows;
 }
 
@@ -121,5 +154,6 @@ module.exports = {
   excluirPontoVitoria,
   criarPontoColocacao,
   buscarPontosAtuaisPorEvento,
+  buscarPontosVitoriaPorChave,
   excluirPontosColocacaoPorChave,
 };

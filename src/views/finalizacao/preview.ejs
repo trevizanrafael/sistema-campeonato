@@ -79,7 +79,9 @@
                   <thead>
                     <tr>
                       <th>Equipe</th>
-                      <th style="text-align: right;">Pontos atuais</th>
+                      <th style="text-align: right;">Pontos anteriores</th>
+                      <th style="text-align: right;">Vitórias nesta chave</th>
+                      <th style="text-align: right;">Pódio</th>
                       <th style="text-align: right;">Novos pontos</th>
                       <th style="text-align: right;">Total após finalizar</th>
                     </tr>
@@ -89,7 +91,15 @@
                       <tr>
                         <td><strong><%= equipe.equipe_nome %></strong></td>
                         <td style="text-align: right;"><%= equipe.pontos_atuais %></td>
-                        <td style="text-align: right; color: #111;">+<%= equipe.novos_pontos %></td>
+                        <td style="text-align: right;">
+                          <%= equipe.pontos_vitorias > 0 ? '+' + equipe.pontos_vitorias : '-' %>
+                        </td>
+                        <td style="text-align: right;">
+                          <%= equipe.pontos_colocacao > 0 ? '+' + equipe.pontos_colocacao : '-' %>
+                        </td>
+                        <td style="text-align: right; color: #111;">
+                          <strong>+<%= equipe.novos_pontos %></strong>
+                        </td>
                         <td style="text-align: right;">
                           <strong><%= equipe.total_apos %></strong>
                         </td>
@@ -101,7 +111,7 @@
             <% } else { %>
               <div class="card">
                 <p style="margin: 0; font-size: 13px; color: var(--color-text-muted);">
-                  Nenhum ponto adicional será concedido pelas colocações.
+                  Nenhuma equipe pontuará nesta categoria.
                 </p>
               </div>
             <% } %>

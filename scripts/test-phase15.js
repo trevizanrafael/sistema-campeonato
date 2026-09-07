@@ -71,6 +71,36 @@ async function runTests() {
   assert(betaResumo && betaResumo.novos_pontos === 3, 'Beta somou 3 novos pontos (do 2º)');
   assert(betaResumo && betaResumo.total_apos === 5, 'Beta total após finalizar é 5 (2 + 3)');
 
+  // Teste com chaveId e vitórias de equipe fora do pódio (ex: quartas de final)
+  const mockClientChave = {
+    query: async (sql) => {
+      if (sql.includes("pe.tipo = 'VITORIA'")) {
+        return {
+          rows: [
+            { equipe_id: 10, equipe_nome: 'Alpha', pontos_vitorias: 6, total_vitorias: 3 },
+            { equipe_id: 20, equipe_nome: 'Beta', pontos_vitorias: 4, total_vitorias: 2 },
+            { equipe_id: 30, equipe_nome: 'Gamma', pontos_vitorias: 2, total_vitorias: 1 },
+          ],
+        };
+      }
+      return {
+        rows: [
+          { equipe_id: 10, pontos_atuais: 0 },
+          { equipe_id: 20, pontos_atuais: 0 },
+          { equipe_id: 30, pontos_atuais: 0 },
+        ],
+      };
+    },
+  };
+
+  const resumoComChave = await finalizacaoService.calcularResumoEquipes(999, 123, podioMock, mockClientChave);
+  const gammaResumo = resumoComChave.find((r) => r.equipe_id === 30);
+  assert(gammaResumo, 'Equipe Gamma (fora do pódio) aparece no resumo de pontuação');
+  assert(gammaResumo && gammaResumo.pontos_vitorias === 2, 'Gamma possui 2 pontos de vitória');
+  assert(gammaResumo && gammaResumo.pontos_colocacao === 0, 'Gamma possui 0 pontos de colocação');
+  assert(gammaResumo && gammaResumo.novos_pontos === 2, 'Gamma possui 2 novos pontos no total');
+  assert(gammaResumo && gammaResumo.total_apos === 2, 'Gamma total após finalizar é 2');
+
   // ==========================================
   // 2. AUTENTICAÇÃO E PREPARAÇÃO DO AMBIENTE
   // ==========================================

@@ -29,12 +29,10 @@ const chaveRoutes = require('./chaveRoutes');
 // Rotas aninhadas de chaves e sorteios (Fase 11)
 router.use('/:eventoId', chaveRoutes);
 
-router.get('/:id/ranking', (req, res) => {
-  res.render('components/emConstrucao', {
-    titulo: 'Ranking',
-    subtitulo: 'Acompanhe os pontos das equipes.',
-  });
-});
+const rankingRoutes = require('./rankingRoutes');
+
+// Rotas aninhadas de ranking (Fase 17)
+router.use('/:eventoId/ranking', rankingRoutes);
 
 const pontuacaoRoutes = require('./pontuacaoRoutes');
 

@@ -113,9 +113,26 @@ async function calcularPodio(chave, finalLuta, client) {
   };
 }
 
-async function calcularResumoEquipes(eventoId, podio, client) {
+async function calcularResumoEquipes(eventoId, chaveIdOrPodio, podioOrClient, maybeClient) {
+  let chaveId = null;
+  let podio = null;
+  let client = null;
+
+  if (chaveIdOrPodio && typeof chaveIdOrPodio === 'object' && chaveIdOrPodio.primeiro) {
+    // Assinatura de compatibilidade: (eventoId, podio, client)
+    podio = chaveIdOrPodio;
+    client = podioOrClient;
+  } else {
+    // Assinatura completa: (eventoId, chaveId, podio, client)
+    chaveId = chaveIdOrPodio;
+    podio = podioOrClient;
+    client = maybeClient;
+  }
+
+  // 1. Pontos anteriores das equipes (fora desta chave)
   const pontosAtuaisRows = await pontoEquipeRepository.buscarPontosAtuaisPorEvento(
     eventoId,
+    chaveId,
     client
   );
 
@@ -124,27 +141,66 @@ async function calcularResumoEquipes(eventoId, podio, client) {
     pontosAtuaisMap.set(String(row.equipe_id), parseInt(row.pontos_atuais, 10) || 0);
   }
 
-  const mapaResumo = new Map();
-  const colocados = [podio.primeiro, podio.segundo, podio.terceiro].filter(Boolean);
-
-  for (const colocado of colocados) {
-    if (!colocado.equipe_id) continue;
-
-    const equipeKey = String(colocado.equipe_id);
-    const atual = mapaResumo.get(equipeKey) || {
-      equipe_id: colocado.equipe_id,
-      equipe_nome: colocado.equipe_nome,
-      pontos_atuais: pontosAtuaisMap.get(equipeKey) || 0,
-      novos_pontos: 0,
-      total_apos: 0,
-    };
-
-    atual.novos_pontos += colocado.pontos;
-    atual.total_apos = atual.pontos_atuais + atual.novos_pontos;
-    mapaResumo.set(equipeKey, atual);
+  // 2. Pontos de vitória conquistados nesta chave
+  const pontosVitoriasMap = new Map();
+  const nomesEquipesMap = new Map();
+  if (chaveId) {
+    const vitoriasRows = await pontoEquipeRepository.buscarPontosVitoriaPorChave(
+      chaveId,
+      client
+    );
+    for (const row of vitoriasRows) {
+      const key = String(row.equipe_id);
+      pontosVitoriasMap.set(key, parseInt(row.pontos_vitorias, 10) || 0);
+      nomesEquipesMap.set(key, row.equipe_nome);
+    }
   }
 
-  return Array.from(mapaResumo.values());
+  // 3. Pontos de colocação do pódio previsto
+  const pontosPodioMap = new Map();
+  const colocados = podio ? [podio.primeiro, podio.segundo, podio.terceiro].filter(Boolean) : [];
+  for (const colocado of colocados) {
+    if (!colocado.equipe_id) continue;
+    const key = String(colocado.equipe_id);
+    pontosPodioMap.set(key, (pontosPodioMap.get(key) || 0) + (Number(colocado.pontos) || 0));
+    if (colocado.equipe_nome) {
+      nomesEquipesMap.set(key, colocado.equipe_nome);
+    }
+  }
+
+  // 4. Reunir todas as equipes envolvidas (que pontuaram nesta chave ou estão no pódio)
+  const todasEquipesKeys = new Set([
+    ...pontosVitoriasMap.keys(),
+    ...pontosPodioMap.keys(),
+  ]);
+
+  const listaResumo = [];
+  for (const key of todasEquipesKeys) {
+    const pontos_anteriores = pontosAtuaisMap.get(key) || 0;
+    const pontos_vitorias = pontosVitoriasMap.get(key) || 0;
+    const pontos_colocacao = pontosPodioMap.get(key) || 0;
+    const novos_pontos = pontos_vitorias + pontos_colocacao;
+    const total_apos = pontos_anteriores + novos_pontos;
+
+    listaResumo.push({
+      equipe_id: Number(key),
+      equipe_nome: nomesEquipesMap.get(key) || `Equipe #${key}`,
+      pontos_atuais: pontos_anteriores,
+      pontos_vitorias,
+      pontos_colocacao,
+      novos_pontos,
+      total_apos,
+    });
+  }
+
+  // Ordenar: total_apos DESC, novos_pontos DESC, equipe_nome ASC
+  listaResumo.sort((a, b) => {
+    if (b.total_apos !== a.total_apos) return b.total_apos - a.total_apos;
+    if (b.novos_pontos !== a.novos_pontos) return b.novos_pontos - a.novos_pontos;
+    return a.equipe_nome.localeCompare(b.equipe_nome);
+  });
+
+  return listaResumo;
 }
 
 async function calcularPreview(eventoId, chaveId) {
@@ -182,7 +238,7 @@ async function calcularPreview(eventoId, chaveId) {
   }
 
   const podio = await calcularPodio(chave, finalLuta);
-  const resumoEquipes = await calcularResumoEquipes(eventoId, podio);
+  const resumoEquipes = await calcularResumoEquipes(eventoId, chaveId, podio);
 
   return {
     evento: {
