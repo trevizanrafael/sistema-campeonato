@@ -1,5 +1,15 @@
-<div class="error-page">
-  <div class="error-page__code">404</div>
-  <p class="error-page__msg">Página não encontrada.</p>
-  <a href="/" class="btn btn--primary">Voltar ao início</a>
-</div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", { titulo: titulo || "Página não encontrada" }) %>
+  </head>
+  <body>
+    <div class="error-page">
+      <div class="error-page__code">404</div>
+      <h1 class="error-page__title">Página não encontrada</h1>
+      <p class="error-page__msg">A página solicitada não existe ou foi removida.</p>
+      <a href="/" class="button button-primary">Voltar para o Início</a>
+    </div>
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

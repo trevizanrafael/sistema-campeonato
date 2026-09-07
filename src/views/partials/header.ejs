@@ -1,0 +1,35 @@
+<header class="app-header">
+  <button
+    type="button"
+    class="sidebar-toggle"
+    id="sidebarToggle"
+    aria-label="Abrir ou fechar menu"
+    aria-expanded="false"
+  >
+    ☰
+  </button>
+
+  <a href="/" class="app-logo">
+    Sistema de Lutas
+  </a>
+
+  <% if (typeof usuarioLogado !== 'undefined' && usuarioLogado) { %>
+  <div class="header-user">
+    <span class="header-user-name">
+      <%= usuarioLogado.nome %>
+    </span>
+
+    <form action="/logout" method="POST">
+      <input
+        type="hidden"
+        name="_csrf"
+        value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>"
+      >
+
+      <button type="submit" class="button button-outline button-small">
+        Sair
+      </button>
+    </form>
+  </div>
+  <% } %>
+</header>

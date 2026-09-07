@@ -1,14 +1,14 @@
 const express = require('express');
 const helmet = require('helmet');
 const path = require('path');
-const expressLayouts = require('express-ejs-layouts');
 require('dotenv').config();
 
 const sessionMiddleware = require('./config/session');
 const flashMiddleware = require('./middlewares/flashMiddleware');
+const { carregarDadosDasViews } = require('./middlewares/viewMiddleware');
 const { csrfTokenMiddleware } = require('./middlewares/csrfMiddleware');
-const { exigirAutenticacao } = require('./middlewares/authMiddleware');
 const authRoutes = require('./routes/authRoutes');
+const homeRoutes = require('./routes/homeRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 
 const app = express();
@@ -22,11 +22,11 @@ if (process.env.NODE_ENV === 'production') {
 // View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use(expressLayouts);
-app.set('layout', 'layouts/layout');
 
 // Segurança
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
 
 // Leitura de formulários
 app.use(express.urlencoded({ extended: false }));
@@ -41,6 +41,9 @@ app.use(sessionMiddleware);
 // Mensagens temporárias (flash)
 app.use(flashMiddleware);
 
+// Dados globais das views
+app.use(carregarDadosDasViews);
+
 // Token CSRF disponível em todos os templates
 app.use(csrfTokenMiddleware);
 
@@ -49,12 +52,8 @@ app.use(csrfTokenMiddleware);
 // Auth (login/logout)
 app.use(authRoutes);
 
-// Página inicial — protegida
-app.get('/', exigirAutenticacao, (req, res) => {
-  res.render('home', {
-    titulo: 'Início',
-  });
-});
+// Página inicial e rotas de navegação protegidas
+app.use(homeRoutes);
 
 // Usuários — protegidas
 app.use('/usuarios', usuarioRoutes);
@@ -65,7 +64,7 @@ app.use('/usuarios', usuarioRoutes);
 app.use((err, req, res, next) => {
   if (err.code === 'CSRF_INVALID' || err.message === 'invalid csrf token') {
     return res.status(403).render('errors/403', {
-      titulo: 'Acesso Negado',
+      titulo: 'Acesso não permitido',
     });
   }
   next(err);
@@ -74,18 +73,22 @@ app.use((err, req, res, next) => {
 // 404
 app.use((req, res) => {
   res.status(404).render('errors/404', {
-    titulo: 'Não Encontrado',
+    titulo: 'Página não encontrada',
   });
 });
 
 // 500
-app.use((err, req, res, _next) => {
+app.use((err, req, res, next) => {
   if (process.env.NODE_ENV !== 'production') {
     console.error('Erro:', err);
   }
 
+  if (res.headersSent) {
+    return next(err);
+  }
+
   res.status(500).render('errors/500', {
-    titulo: 'Erro Interno',
+    titulo: 'Erro interno',
   });
 });
 

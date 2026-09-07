@@ -1,32 +1,61 @@
-<div class="page-header">
-  <h1>Alterar Senha - <%= usuario.nome %></h1>
-</div>
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo || "Alterar Senha"
+    }) %>
+  </head>
 
-<div class="form-card">
-  <% if (erros && erros.length > 0) { %>
-    <ul class="error-list">
-      <% erros.forEach(function(erro) { %>
-        <li><%= erro %></li>
-      <% }); %>
-    </ul>
-  <% } %>
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
 
-  <form action="/usuarios/<%= usuario.id %>/senha" method="POST">
-    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <main class="main-content">
+        <%- include("../partials/messages") %>
 
-    <div class="form-group">
-      <label for="senha">Nova Senha</label>
-      <input type="password" id="senha" name="senha" required>
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Alterar Senha</h1>
+            <p class="page-subtitle">Defina uma nova senha para <%= usuario.nome %>.</p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <div class="form-card">
+            <% if (typeof erros !== 'undefined' && erros && erros.length > 0) { %>
+              <ul class="error-list">
+                <% erros.forEach(function(erro) { %>
+                  <li><%= erro %></li>
+                <% }); %>
+              </ul>
+            <% } %>
+
+            <form action="/usuarios/<%= usuario.id %>/senha" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+              <div class="form-group">
+                <label for="senha" class="form-label">Nova Senha</label>
+                <input type="password" id="senha" name="senha" class="form-control" required>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmar_senha" class="form-label">Confirmar Nova Senha</label>
+                <input type="password" id="confirmar_senha" name="confirmar_senha" class="form-control" required>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="button button-primary">Alterar Senha</button>
+                <a href="/usuarios" class="button button-outline">Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
     </div>
 
-    <div class="form-group">
-      <label for="confirmar_senha">Confirmar Nova Senha</label>
-      <input type="password" id="confirmar_senha" name="confirmar_senha" required>
-    </div>
-
-    <div class="form-actions">
-      <button type="submit" class="btn btn--primary">Alterar Senha</button>
-      <a href="/usuarios" class="btn">Cancelar</a>
-    </div>
-  </form>
-</div>
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

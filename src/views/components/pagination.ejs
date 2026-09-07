@@ -1,0 +1,17 @@
+<% if (typeof paginacao !== 'undefined' && paginacao && paginacao.totalPaginas > 1) { %>
+  <nav class="pagination" aria-label="Navegacao de paginas">
+    <% if (paginacao.paginaAtual > 1) { %>
+      <a href="?pagina=<%= paginacao.paginaAtual - 1 %>" class="pagination-link">&laquo;</a>
+    <% } %>
+
+    <% for (let i = 1; i <= paginacao.totalPaginas; i++) { %>
+      <a href="?pagina=<%= i %>" class="pagination-link <%= paginacao.paginaAtual === i ? 'active' : '' %>">
+        <%= i %>
+      </a>
+    <% } %>
+
+    <% if (paginacao.paginaAtual < paginacao.totalPaginas) { %>
+      <a href="?pagina=<%= paginacao.paginaAtual + 1 %>" class="pagination-link">&raquo;</a>
+    <% } %>
+  </nav>
+<% } %>
