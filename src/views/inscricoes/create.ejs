@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: "Nova inscricao - " + evento.nome
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a href="/eventos/<%= evento.id %>/inscricoes" class="button button-small button-outline">
+                &larr; Voltar para inscricoes
+              </a>
+            </div>
+
+            <h1 class="page-title">Nova inscricao</h1>
+            <p class="page-subtitle">
+              Evento: <%= evento.nome %>
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <div class="card" style="max-width: 800px;">
+            <form action="/eventos/<%= evento.id %>/inscricoes" method="POST" novalidate>
+              <input
+                type="hidden"
+                name="_csrf"
+                value="<%= csrfToken %>"
+              >
+
+              <%- include("_form") %>
+
+              <div class="form-actions" style="margin-top: 24px; display: flex; gap: 12px;">
+                <button type="submit" class="button button-primary">
+                  Cadastrar competidor
+                </button>
+
+                <a
+                  href="/eventos/<%= evento.id %>/inscricoes"
+                  class="button button-outline"
+                >
+                  Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

@@ -16,16 +16,13 @@ router.post('/:id', csrfProtection, eventoController.editar);
 router.post('/:id/excluir', csrfProtection, eventoController.excluir);
 
 const categoriaRoutes = require('./categoriaRoutes');
+const inscricaoRoutes = require('./inscricaoRoutes');
 
 // Rotas aninhadas de categorias (Fase 8)
 router.use('/:eventoId/categorias', categoriaRoutes);
 
-router.get('/:id/inscricoes', (req, res) => {
-  res.render('components/emConstrucao', {
-    titulo: 'Inscricoes',
-    subtitulo: 'Cadastre e importe os competidores.',
-  });
-});
+// Rotas aninhadas de inscrições (Fase 9)
+router.use('/:eventoId/inscricoes', inscricaoRoutes);
 
 router.get('/:id/chaves', (req, res) => {
   res.render('components/emConstrucao', {
@@ -41,12 +38,10 @@ router.get('/:id/ranking', (req, res) => {
   });
 });
 
-router.get('/:id/pontuacao', (req, res) => {
-  res.render('components/emConstrucao', {
-    titulo: 'Pontuacao',
-    subtitulo: 'Configure os pontos do evento.',
-  });
-});
+const pontuacaoRoutes = require('./pontuacaoRoutes');
+
+// Rotas aninhadas de pontuação (Fase 10)
+router.use('/:eventoId/pontuacao', pontuacaoRoutes);
 
 router.get('/:id', eventoController.visualizar);
 

@@ -151,7 +151,25 @@ function categoriasSeSobrepoem(a, b) {
   return idadeSobrepoe && pesoSobrepoe && faixaSobrepoe && sexoSobrepoe;
 }
 
+/**
+ * Filtra e retorna todas as categorias de um evento que são compatíveis com os dados de uma inscrição.
+ *
+ * @param {Object} inscricao - Dados do atleta/inscrição (idade, peso, faixa_ordem, sexo)
+ * @param {Array<Object>} categorias - Lista de categorias do evento (com faixa_minima_ordem e faixa_maxima_ordem)
+ * @returns {Array<Object>} Categorias compatíveis
+ */
+function buscarCategoriasCompativeis(inscricao, categorias) {
+  if (!inscricao || !Array.isArray(categorias)) {
+    return [];
+  }
+
+  return categorias.filter((categoria) =>
+    inscricaoCompativelComCategoria(inscricao, categoria)
+  );
+}
+
 module.exports = {
   inscricaoCompativelComCategoria,
   categoriasSeSobrepoem,
+  buscarCategoriasCompativeis,
 };

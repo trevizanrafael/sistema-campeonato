@@ -1,0 +1,207 @@
+<% if (!locals.equipes || equipes.length === 0 || !locals.faixas || faixas.length === 0) { %>
+  <div class="alert alert-warning" style="margin-bottom: 24px; border: 1px solid #000; background: #f9f9f9; color: #000; padding: 12px 16px;">
+    <strong>Atencao:</strong> Cadastre pelo menos uma equipe e uma faixa antes de realizar inscricoes.
+    <div style="margin-top: 8px; display: flex; gap: 8px;">
+      <% if (!locals.equipes || equipes.length === 0) { %>
+        <a href="/equipes/nova" class="button button-small button-outline">Cadastrar equipe</a>
+      <% } %>
+      <% if (!locals.faixas || faixas.length === 0) { %>
+        <a href="/faixas" class="button button-small button-outline">Gerenciar faixas</a>
+      <% } %>
+    </div>
+  </div>
+<% } %>
+
+<% if (locals.emLuta) { %>
+  <div class="alert alert-warning" style="margin-bottom: 24px; border: 1px solid #000; background: #f0f0f0; color: #000; padding: 12px 16px;">
+    <strong>Atencao:</strong> Esta inscricao ja participa de uma chave/luta. Somente o nome pode ser alterado. Os dados competitivos (idade, peso, faixa, equipe, seed) estao bloqueados.
+  </div>
+<% } %>
+
+<% if (erros && erros.geral) { %>
+  <div class="alert alert-danger" style="margin-bottom: 24px; border: 1px solid #000; background: #fff; color: #000; padding: 12px 16px;">
+    <%= erros.geral %>
+  </div>
+<% } %>
+
+<!-- Bloco 1: Competidor -->
+<fieldset style="border: 1px solid #ccc; padding: 16px; margin-bottom: 20px;">
+  <legend style="font-weight: 600; padding: 0 8px;">Competidor</legend>
+
+  <div class="form-group" style="margin-bottom: 16px;">
+    <label for="nome" class="form-label">
+      Nome do competidor <span style="color: #666;">*</span>
+    </label>
+    <input
+      type="text"
+      id="nome"
+      name="nome"
+      class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
+      value="<%= inscricao.nome || '' %>"
+      placeholder="Ex: Joao Silva"
+      maxlength="200"
+      required
+      autofocus
+    >
+    <% if (erros && erros.nome) { %>
+      <p class="form-error"><%= erros.nome %></p>
+    <% } %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+    <div class="form-group">
+      <label for="idade" class="form-label">
+        Idade (anos) <span style="color: #666;">*</span>
+      </label>
+      <input
+        type="number"
+        id="idade"
+        name="idade"
+        class="form-control <%= erros && erros.idade ? 'is-invalid' : '' %>"
+        value="<%= inscricao.idade !== undefined && inscricao.idade !== null && !Number.isNaN(inscricao.idade) ? inscricao.idade : '' %>"
+        min="0"
+        max="150"
+        step="1"
+        placeholder="Ex: 22"
+        required
+        <%= locals.emLuta ? 'disabled' : '' %>
+      >
+      <% if (erros && erros.idade) { %>
+        <p class="form-error"><%= erros.idade %></p>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <label for="sexo" class="form-label">
+        Sexo <span style="color: #666;">*</span>
+      </label>
+      <select
+        id="sexo"
+        name="sexo"
+        class="form-control <%= erros && erros.sexo ? 'is-invalid' : '' %>"
+        required
+        <%= locals.emLuta ? 'disabled' : '' %>
+      >
+        <option value="">Selecione</option>
+        <option value="MASCULINO" <%= inscricao.sexo === 'MASCULINO' ? 'selected' : '' %>>Masculino</option>
+        <option value="FEMININO" <%= inscricao.sexo === 'FEMININO' ? 'selected' : '' %>>Feminino</option>
+      </select>
+      <% if (erros && erros.sexo) { %>
+        <p class="form-error"><%= erros.sexo %></p>
+      <% } %>
+    </div>
+  </div>
+</fieldset>
+
+<!-- Bloco 2: Competicao -->
+<fieldset style="border: 1px solid #ccc; padding: 16px; margin-bottom: 20px;">
+  <legend style="font-weight: 600; padding: 0 8px;">Competicao</legend>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 16px;">
+    <div class="form-group">
+      <label for="peso" class="form-label">
+        Peso em kg <span style="color: #666;">*</span>
+      </label>
+      <input
+        type="number"
+        id="peso"
+        name="peso"
+        class="form-control <%= erros && erros.peso ? 'is-invalid' : '' %>"
+        value="<%= inscricao.peso !== undefined && inscricao.peso !== null && !Number.isNaN(inscricao.peso) ? inscricao.peso : '' %>"
+        min="0.01"
+        max="999.99"
+        step="0.01"
+        placeholder="Ex: 75.50"
+        required
+        <%= locals.emLuta ? 'disabled' : '' %>
+      >
+      <% if (erros && erros.peso) { %>
+        <p class="form-error"><%= erros.peso %></p>
+      <% } %>
+      <p class="form-help" style="font-size: 0.85rem; color: #666; margin-top: 4px;">
+        Aceita virgula ou ponto (ex: 75,5).
+      </p>
+    </div>
+
+    <div class="form-group">
+      <label for="faixa_id" class="form-label">
+        Faixa <span style="color: #666;">*</span>
+      </label>
+      <select
+        id="faixa_id"
+        name="faixa_id"
+        class="form-control <%= erros && erros.faixa_id ? 'is-invalid' : '' %>"
+        required
+        <%= locals.emLuta ? 'disabled' : '' %>
+      >
+        <option value="">Selecione a faixa</option>
+        <% if (locals.faixas && faixas.length > 0) { %>
+          <% faixas.forEach((faixa) => { %>
+            <option
+              value="<%= faixa.id %>"
+              <%= String(inscricao.faixa_id) === String(faixa.id) ? 'selected' : '' %>
+            >
+              <%= faixa.nome %>
+            </option>
+          <% }) %>
+        <% } %>
+      </select>
+      <% if (erros && erros.faixa_id) { %>
+        <p class="form-error"><%= erros.faixa_id %></p>
+      <% } %>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+    <div class="form-group">
+      <label for="equipe_id" class="form-label">
+        Equipe <span style="color: #666;">*</span>
+      </label>
+      <select
+        id="equipe_id"
+        name="equipe_id"
+        class="form-control <%= erros && erros.equipe_id ? 'is-invalid' : '' %>"
+        required
+        <%= locals.emLuta ? 'disabled' : '' %>
+      >
+        <option value="">Selecione a equipe</option>
+        <% if (locals.equipes && equipes.length > 0) { %>
+          <% equipes.forEach((equipe) => { %>
+            <option
+              value="<%= equipe.id %>"
+              <%= String(inscricao.equipe_id) === String(equipe.id) ? 'selected' : '' %>
+            >
+              <%= equipe.nome %>
+            </option>
+          <% }) %>
+        <% } %>
+      </select>
+      <% if (erros && erros.equipe_id) { %>
+        <p class="form-error"><%= erros.equipe_id %></p>
+      <% } %>
+    </div>
+
+    <div class="form-group">
+      <label for="seed" class="form-label">
+        Seed (cabeca de chave)
+      </label>
+      <input
+        type="number"
+        id="seed"
+        name="seed"
+        class="form-control <%= erros && erros.seed ? 'is-invalid' : '' %>"
+        value="<%= inscricao.seed !== undefined && inscricao.seed !== null ? inscricao.seed : '' %>"
+        min="1"
+        step="1"
+        placeholder="Opcional (ex: 1)"
+        <%= locals.emLuta ? 'disabled' : '' %>
+      >
+      <% if (erros && erros.seed) { %>
+        <p class="form-error"><%= erros.seed %></p>
+      <% } %>
+      <p class="form-help" style="font-size: 0.85rem; color: #666; margin-top: 4px;">
+        Prioridade opcional na montagem da chave.
+      </p>
+    </div>
+  </div>
+</fieldset>
