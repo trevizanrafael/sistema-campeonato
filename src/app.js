@@ -99,6 +99,12 @@ app.use((err, req, res, next) => {
     return next(err);
   }
 
+  if (err.statusCode === 404 || err.name === 'NotFoundError') {
+    return res.status(404).render('errors/404', {
+      titulo: 'Página não encontrada',
+    });
+  }
+
   res.status(500).render('errors/500', {
     titulo: 'Erro interno',
   });

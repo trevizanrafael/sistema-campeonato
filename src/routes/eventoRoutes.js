@@ -15,13 +15,10 @@ router.get('/:id/editar', eventoController.mostrarEdicao);
 router.post('/:id', csrfProtection, eventoController.editar);
 router.post('/:id/excluir', csrfProtection, eventoController.excluir);
 
-// Rotas provisórias das próximas fases (Fases 6+)
-router.get('/:id/categorias', (req, res) => {
-  res.render('components/emConstrucao', {
-    titulo: 'Categorias',
-    subtitulo: 'Configure peso, idade e faixa.',
-  });
-});
+const categoriaRoutes = require('./categoriaRoutes');
+
+// Rotas aninhadas de categorias (Fase 8)
+router.use('/:eventoId/categorias', categoriaRoutes);
 
 router.get('/:id/inscricoes', (req, res) => {
   res.render('components/emConstrucao', {

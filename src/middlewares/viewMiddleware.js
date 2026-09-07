@@ -23,6 +23,12 @@ function carregarDadosDasViews(req, res, next) {
     }).format(new Date(data));
   };
 
+  const formatters = require('../utils/formatters');
+  res.locals.formatarIntervaloIdade = formatters.formatarIntervaloIdade;
+  res.locals.formatarIntervaloPeso = formatters.formatarIntervaloPeso;
+  res.locals.formatarIntervaloFaixa = formatters.formatarIntervaloFaixa;
+  res.locals.formatarSexo = formatters.formatarSexo;
+
   next();
 }
 

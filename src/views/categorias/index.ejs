@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: "Categorias - " + evento.nome
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a href="/eventos/<%= evento.id %>" class="button button-small button-outline">
+                &larr; Voltar para o evento
+              </a>
+            </div>
+
+            <h1 class="page-title">Categorias</h1>
+            <p class="page-subtitle">
+              Evento: <%= evento.nome %>
+            </p>
+          </div>
+
+          <a
+            href="/eventos/<%= evento.id %>/categorias/nova"
+            class="button button-primary"
+          >
+            Nova categoria
+          </a>
+        </div>
+
+        <section class="page-content">
+          <% if (categorias && categorias.length > 0) { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Categoria</th>
+                    <th>Sexo</th>
+                    <th>Idade</th>
+                    <th>Peso</th>
+                    <th>Faixas</th>
+                    <th>Inscricoes</th>
+                    <th>Chave</th>
+                    <th>Conflito</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% categorias.forEach((categoria) => { %>
+                    <tr>
+                      <td>
+                        <strong><%= categoria.nome %></strong>
+                      </td>
+
+                      <td>
+                        <%= formatarSexo(categoria.sexo) %>
+                      </td>
+
+                      <td>
+                        <%= formatarIntervaloIdade(categoria) %>
+                      </td>
+
+                      <td>
+                        <%= formatarIntervaloPeso(categoria) %>
+                      </td>
+
+                      <td>
+                        <%= formatarIntervaloFaixa(categoria) %>
+                      </td>
+
+                      <td>
+                        <%= categoria.total_inscricoes %>
+                      </td>
+
+                      <td>
+                        <%= Number(categoria.total_chaves) > 0 ? 'Sim' : 'Nao' %>
+                      </td>
+
+                      <td>
+                        <% if (categoria.temSobreposicao) { %>
+                          <span
+                            class="badge"
+                            style="border: 1px solid #000; padding: 2px 6px; font-size: 0.75rem; background: #fff; cursor: help;"
+                            title="Sobrepoe com: <%= categoria.sobreposicoes.join(', ') %>"
+                          >
+                            Sobreposicao
+                          </span>
+                        <% } else { %>
+                          <span style="color: #888; font-size: 0.85rem;">-</span>
+                        <% } %>
+                      </td>
+
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/eventos/<%= evento.id %>/categorias/<%= categoria.id %>/editar"
+                            class="button button-small button-outline"
+                          >
+                            Editar
+                          </a>
+
+                          <form
+                            action="/eventos/<%= evento.id %>/categorias/<%= categoria.id %>/excluir"
+                            method="POST"
+                            style="display: inline;"
+                            data-confirm="Deseja realmente excluir a categoria '<%= categoria.nome %>'?"
+                          >
+                            <input
+                              type="hidden"
+                              name="_csrf"
+                              value="<%= csrfToken %>"
+                            >
+
+                            <button
+                              type="submit"
+                              class="button button-small button-danger"
+                              <%= (Number(categoria.total_inscricoes) > 0 || Number(categoria.total_chaves) > 0) ? 'title="Categoria com inscricoes ou chaves nao pode ser excluida"' : '' %>
+                            >
+                              Excluir
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <h2>Nenhuma categoria cadastrada</h2>
+              <p>Cadastre as categorias de peso, idade e faixa para permitir as inscricoes no evento.</p>
+              <a
+                href="/eventos/<%= evento.id %>/categorias/nova"
+                class="button button-primary"
+              >
+                Cadastrar primeira categoria
+              </a>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>
