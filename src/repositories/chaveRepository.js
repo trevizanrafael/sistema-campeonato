@@ -43,14 +43,92 @@ async function buscarPorIdNoEvento(chaveId, eventoId, client) {
       ch.*,
       c.nome AS categoria_nome,
       c.evento_id,
-      e.nome AS evento_nome
+      e.nome AS evento_nome,
+      p1.nome AS primeiro_lugar_nome,
+      e1.nome AS primeiro_lugar_equipe_nome,
+      p2.nome AS segundo_lugar_nome,
+      e2.nome AS segundo_lugar_equipe_nome,
+      p3.nome AS terceiro_lugar_nome,
+      e3.nome AS terceiro_lugar_equipe_nome
     FROM chaves ch
     JOIN categorias c ON c.id = ch.categoria_id
     JOIN eventos e ON e.id = c.evento_id
+    LEFT JOIN inscricoes p1 ON p1.id = ch.primeiro_lugar_id
+    LEFT JOIN equipes e1 ON e1.id = p1.equipe_id
+    LEFT JOIN inscricoes p2 ON p2.id = ch.segundo_lugar_id
+    LEFT JOIN equipes e2 ON e2.id = p2.equipe_id
+    LEFT JOIN inscricoes p3 ON p3.id = ch.terceiro_lugar_id
+    LEFT JOIN equipes e3 ON e3.id = p3.equipe_id
     WHERE ch.id = $1 AND c.evento_id = $2;
   `;
 
   const { rows } = await db.query(sql, [chaveId, eventoId]);
+  return rows[0] || null;
+}
+
+async function bloquearPorIdNoEvento(chaveId, eventoId, client) {
+  const db = client || pool;
+  const sql = `
+    SELECT
+      ch.*,
+      c.nome AS categoria_nome,
+      c.evento_id
+    FROM chaves ch
+    JOIN categorias c ON c.id = ch.categoria_id
+    WHERE ch.id = $1 AND c.evento_id = $2
+    FOR UPDATE OF ch;
+  `;
+
+  const { rows } = await db.query(sql, [chaveId, eventoId]);
+  return rows[0] || null;
+}
+
+async function salvarPodio(chaveId, dados, client) {
+  const db = client || pool;
+  const sql = `
+    UPDATE chaves
+    SET
+      primeiro_lugar_id = $1,
+      segundo_lugar_id = $2,
+      terceiro_lugar_id = $3,
+      colocacao_editada_manualmente = FALSE,
+      colocacao_editada_por = NULL,
+      colocacao_editada_em = NULL,
+      motivo_edicao_colocacao = NULL,
+      status = 'FINALIZADA',
+      updated_at = NOW()
+    WHERE id = $4
+    RETURNING *;
+  `;
+
+  const { rows } = await db.query(sql, [
+    dados.primeiro_lugar_id,
+    dados.segundo_lugar_id,
+    dados.terceiro_lugar_id,
+    chaveId,
+  ]);
+  return rows[0] || null;
+}
+
+async function limparPodioEReabrir(chaveId, client) {
+  const db = client || pool;
+  const sql = `
+    UPDATE chaves
+    SET
+      primeiro_lugar_id = NULL,
+      segundo_lugar_id = NULL,
+      terceiro_lugar_id = NULL,
+      colocacao_editada_manualmente = FALSE,
+      colocacao_editada_por = NULL,
+      colocacao_editada_em = NULL,
+      motivo_edicao_colocacao = NULL,
+      status = 'EM_ANDAMENTO',
+      updated_at = NOW()
+    WHERE id = $1
+    RETURNING *;
+  `;
+
+  const { rows } = await db.query(sql, [chaveId]);
   return rows[0] || null;
 }
 
@@ -135,6 +213,9 @@ async function excluir(id, client) {
 module.exports = {
   listarPorEvento,
   buscarPorIdNoEvento,
+  bloquearPorIdNoEvento,
+  salvarPodio,
+  limparPodioEReabrir,
   buscarPorId,
   buscarPorCategoria,
   criar,

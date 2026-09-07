@@ -83,37 +83,90 @@
                   Excluir chave
                 </button>
               </form>
-            <% } else { %>
-              <span class="badge badge-neutral" style="padding: 8px 12px; font-size: 13px;">
-                Chave bloqueada para alteracoes estruturais
-              </span>
+            <% } else if (chave.status === 'EM_ANDAMENTO') { %>
+              <% if (todasFinalizadas) { %>
+                <a
+                  href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/finalizar"
+                  class="button button-primary"
+                >
+                  Finalizar categoria
+                </a>
+              <% } else { %>
+                <span class="badge badge-neutral" style="padding: 8px 12px; font-size: 13px;">
+                  Chave bloqueada para alteracoes estruturais
+                </span>
+              <% } %>
+            <% } else if (chave.status === 'FINALIZADA') { %>
+              <form
+                action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/reabrir"
+                method="POST"
+                style="display: inline;"
+                data-confirm="Ao reabrir a categoria, os pontos de colocação serão removidos. Os resultados das lutas e pontos por vitória serão mantidos. Deseja continuar?"
+              >
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                <button
+                  type="submit"
+                  class="button button-outline"
+                >
+                  Reabrir categoria
+                </button>
+              </form>
             <% } %>
           </div>
         </div>
 
         <section class="page-content">
-          <div class="bracket-legend">
-            <div class="bracket-legend-item">
-              <span class="bracket-legend-box" style="border-color: #111; background: #fff;"></span>
-              <span>Luta pronta</span>
+          <% if (chave.status === 'FINALIZADA') { %>
+            <div class="card" style="margin-bottom: 24px; border-left: 4px solid #111;">
+              <div style="margin-bottom: 16px;">
+                <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-muted);">
+                  Categoria finalizada
+                </span>
+                <h2 style="margin: 4px 0; font-size: 18px;">Pódio Oficial</h2>
+                <p style="margin: 0; font-size: 13px; color: var(--color-text-muted);">
+                  <%= chave.colocacao_editada_manualmente ? 'Colocações editadas manualmente' : 'Colocações calculadas automaticamente' %>
+                </p>
+              </div>
+
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                <% if (chave.primeiro_lugar_nome) { %>
+                  <div class="card" style="padding: 12px 16px; background: #fafafa; border-radius: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: #111; color: #fff; padding: 2px 6px; border-radius: 2px;">
+                      1º lugar
+                    </span>
+                    <div style="margin-top: 6px;">
+                      <strong style="display: block; font-size: 15px;"><%= chave.primeiro_lugar_nome %></strong>
+                      <small style="color: var(--color-text-muted);"><%= chave.primeiro_lugar_equipe_nome || 'Sem equipe' %></small>
+                    </div>
+                  </div>
+                <% } %>
+
+                <% if (chave.segundo_lugar_nome) { %>
+                  <div class="card" style="padding: 12px 16px; background: #fafafa; border-radius: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: #555; color: #fff; padding: 2px 6px; border-radius: 2px;">
+                      2º lugar
+                    </span>
+                    <div style="margin-top: 6px;">
+                      <strong style="display: block; font-size: 15px;"><%= chave.segundo_lugar_nome %></strong>
+                      <small style="color: var(--color-text-muted);"><%= chave.segundo_lugar_equipe_nome || 'Sem equipe' %></small>
+                    </div>
+                  </div>
+                <% } %>
+
+                <% if (chave.terceiro_lugar_nome) { %>
+                  <div class="card" style="padding: 12px 16px; background: #fafafa; border-radius: 4px;">
+                    <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: #888; color: #fff; padding: 2px 6px; border-radius: 2px;">
+                      3º lugar
+                    </span>
+                    <div style="margin-top: 6px;">
+                      <strong style="display: block; font-size: 15px;"><%= chave.terceiro_lugar_nome %></strong>
+                      <small style="color: var(--color-text-muted);"><%= chave.terceiro_lugar_equipe_nome || 'Sem equipe' %></small>
+                    </div>
+                  </div>
+                <% } %>
+              </div>
             </div>
-            <div class="bracket-legend-item">
-              <span class="bracket-legend-box" style="border-color: #888; background: #f6f6f6;"></span>
-              <span>Luta finalizada</span>
-            </div>
-            <div class="bracket-legend-item">
-              <span class="bracket-legend-box" style="border-color: #eee; background: #fff;"></span>
-              <span>Aguardando definicao</span>
-            </div>
-            <div class="bracket-legend-item">
-              <span class="competitor-seed" style="width: 16px; height: 16px; font-size: 9px;">1</span>
-              <span>Cabeca de chave (Seed)</span>
-            </div>
-            <div class="bracket-legend-item">
-              <span style="font-style: italic; font-weight: 600;">BYE</span>
-              <span>Avanco livre</span>
-            </div>
-          </div>
+          <% } %>
 
           <p class="bracket-mobile-tip">
             Deslize horizontalmente para visualizar as proximas rodadas.

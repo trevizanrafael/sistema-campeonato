@@ -42,6 +42,7 @@ async function mostrar(req, res, next) {
       chave: dados.chave,
       rodadas: dados.rodadas,
       alturaMinima: dados.alturaMinima,
+      todasFinalizadas: dados.todasFinalizadas,
     });
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {

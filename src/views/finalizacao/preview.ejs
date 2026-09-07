@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `Finalizar ${categoria.nome} - ${evento.nome}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a
+                href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>"
+                class="button button-small button-outline"
+              >
+                &larr; Voltar para a chave
+              </a>
+            </div>
+
+            <h1 class="page-title">
+              Finalizar categoria
+            </h1>
+
+            <p class="page-subtitle">
+              <%= categoria.nome %> &bull; Evento: <strong><%= evento.nome %></strong>
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content" style="max-width: 900px;">
+          <div class="alert alert-warning" style="margin-bottom: 24px;">
+            Confira as colocações e a pontuação antes de finalizar. Após a confirmação, a categoria ficará bloqueada.
+          </div>
+
+          <div style="margin-bottom: 28px;">
+            <h2 style="font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+              Pódio Previsto
+            </h2>
+
+            <div class="podium-preview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+              <% const colocados = [podio.primeiro, podio.segundo, podio.terceiro].filter(Boolean); %>
+              <% colocados.forEach((colocado, index) => { %>
+                <div class="card podium-card" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: 20px; gap: 8px;">
+                  <span class="podium-position" style="font-size: 11px; font-weight: 700; text-transform: uppercase; background: #111; color: #fff; padding: 4px 10px; border-radius: 2px;">
+                    <%= index + 1 %>º lugar
+                  </span>
+                  <strong style="font-size: 16px;"><%= colocado.nome %></strong>
+                  <span style="font-size: 13px; color: var(--color-text-muted);"><%= colocado.equipe_nome %></span>
+                  <span class="podium-points" style="font-size: 13px; font-weight: 700; border: 1px dashed var(--color-border); padding: 4px 8px; border-radius: 2px; margin-top: 4px;">
+                    +<%= colocado.pontos %> <%= colocado.pontos === 1 ? 'ponto' : 'pontos' %>
+                  </span>
+                </div>
+              <% }) %>
+            </div>
+
+            <% if (!podio.terceiro) { %>
+              <p style="font-size: 13px; color: var(--color-text-muted); margin-top: 12px; margin-bottom: 0; font-style: italic;">
+                Não haverá terceiro lugar nesta categoria.
+              </p>
+            <% } %>
+          </div>
+
+          <div style="margin-bottom: 28px;">
+            <h2 style="font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
+              Resumo de Pontuação por Equipe
+            </h2>
+
+            <% if (resumoEquipes && resumoEquipes.length > 0) { %>
+              <div class="table-container">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Equipe</th>
+                      <th style="text-align: right;">Pontos atuais</th>
+                      <th style="text-align: right;">Novos pontos</th>
+                      <th style="text-align: right;">Total após finalizar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% resumoEquipes.forEach((equipe) => { %>
+                      <tr>
+                        <td><strong><%= equipe.equipe_nome %></strong></td>
+                        <td style="text-align: right;"><%= equipe.pontos_atuais %></td>
+                        <td style="text-align: right; color: #111;">+<%= equipe.novos_pontos %></td>
+                        <td style="text-align: right;">
+                          <strong><%= equipe.total_apos %></strong>
+                        </td>
+                      </tr>
+                    <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="card">
+                <p style="margin: 0; font-size: 13px; color: var(--color-text-muted);">
+                  Nenhum ponto adicional será concedido pelas colocações.
+                </p>
+              </div>
+            <% } %>
+          </div>
+
+          <form
+            action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/finalizar"
+            method="POST"
+            data-confirm="Confirma a finalização desta categoria com as colocações e pontuações apresentadas?"
+          >
+            <input
+              type="hidden"
+              name="_csrf"
+              value="<%= csrfToken %>"
+            >
+
+            <div class="form-actions" style="margin-top: 24px;">
+              <a
+                href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>"
+                class="button button-outline"
+              >
+                Voltar e conferir
+              </a>
+
+              <button
+                type="submit"
+                class="button button-primary"
+              >
+                Confirmar finalização
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

@@ -18,7 +18,8 @@
     "test:bracket": "node scripts/test-phase12.js",
     "test:resultado": "node scripts/test-phase13.js",
     "test:correcao": "node scripts/test-phase14.js",
-    "test": "node scripts/test-phase5.js && node scripts/test-phase6.js && node scripts/test-phase7.js && node scripts/test-phase8.js && node scripts/test-phase9.js && node scripts/test-phase10.js && node scripts/test-phase11.js && node scripts/test-phase12.js && node scripts/test-phase13.js && node scripts/test-phase14.js"
+    "test:finalizacao": "node scripts/test-phase15.js",
+    "test": "node scripts/test-phase5.js && node scripts/test-phase6.js && node scripts/test-phase7.js && node scripts/test-phase8.js && node scripts/test-phase9.js && node scripts/test-phase10.js && node scripts/test-phase11.js && node scripts/test-phase12.js && node scripts/test-phase13.js && node scripts/test-phase14.js && node scripts/test-phase15.js"
   },
   "repository": {
     "type": "git",

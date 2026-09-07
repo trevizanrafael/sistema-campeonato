@@ -289,8 +289,8 @@ async function runTests() {
   assert(chaveHtml.includes('BYE'), 'Exibe slot de avanço livre BYE');
   assert(chaveHtml.includes('Aguardando'), 'Exibe slot futuro Aguardando');
 
-  // Legenda e ações de chave não iniciada
-  assert(chaveHtml.includes('class="bracket-legend"'), 'Exibe legenda explicativa da chave');
+  // Ações de chave não iniciada
+  assert(!chaveHtml.includes('class="bracket-legend"'), 'Legenda da chave removida conforme solicitação');
   assert(chaveHtml.includes('Sortear novamente'), 'Exibe botão Sortear novamente');
   assert(chaveHtml.includes('Iniciar chave'), 'Exibe botão Iniciar chave');
   assert(chaveHtml.includes('Excluir chave'), 'Exibe botão Excluir chave');

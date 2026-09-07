@@ -119,6 +119,18 @@ async function buscarVisualizacao(eventoId, chaveId) {
   const lutas = await lutaRepository.listarPorChave(chaveId);
   const { rodadas, alturaMinima } = agruparPorRodada(lutas, chave);
 
+  const finalLuta = lutas.find((l) => !l.proxima_luta_id);
+  const todasFinalizadas =
+    chave.status === 'EM_ANDAMENTO' &&
+    lutas.length > 0 &&
+    lutas.every((l) => l.status === 'FINALIZADA') &&
+    Boolean(
+      finalLuta &&
+        finalLuta.status === 'FINALIZADA' &&
+        finalLuta.vencedor_id &&
+        finalLuta.perdedor_id
+    );
+
   return {
     evento: {
       id: chave.evento_id,
@@ -131,6 +143,7 @@ async function buscarVisualizacao(eventoId, chaveId) {
     chave,
     rodadas,
     alturaMinima,
+    todasFinalizadas,
   };
 }
 

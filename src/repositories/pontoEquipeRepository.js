@@ -58,8 +58,68 @@ async function excluirPontoVitoria(lutaId, client) {
   return rows[0] || null;
 }
 
+async function criarPontoColocacao(dados, client) {
+  const db = client || pool;
+  const sql = `
+    INSERT INTO pontos_equipes (
+      evento_id,
+      equipe_id,
+      inscricao_id,
+      chave_id,
+      tipo,
+      pontos,
+      descricao
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    RETURNING *;
+  `;
+
+  const { rows } = await db.query(sql, [
+    dados.evento_id,
+    dados.equipe_id,
+    dados.inscricao_id || null,
+    dados.chave_id,
+    dados.tipo,
+    dados.pontos,
+    dados.descricao || null,
+  ]);
+
+  return rows[0];
+}
+
+async function buscarPontosAtuaisPorEvento(eventoId, client) {
+  const db = client || pool;
+  const sql = `
+    SELECT
+      equipe_id,
+      COALESCE(SUM(pontos), 0)::INTEGER AS pontos_atuais
+    FROM pontos_equipes
+    WHERE evento_id = $1
+    GROUP BY equipe_id;
+  `;
+
+  const { rows } = await db.query(sql, [eventoId]);
+  return rows;
+}
+
+async function excluirPontosColocacaoPorChave(chaveId, client) {
+  const db = client || pool;
+  const sql = `
+    DELETE FROM pontos_equipes
+    WHERE chave_id = $1
+      AND tipo IN ('PRIMEIRO_LUGAR', 'SEGUNDO_LUGAR', 'TERCEIRO_LUGAR')
+    RETURNING id;
+  `;
+
+  const { rows } = await db.query(sql, [chaveId]);
+  return rows;
+}
+
 module.exports = {
   criarPontoVitoria,
   buscarPorLuta,
   excluirPontoVitoria,
+  criarPontoColocacao,
+  buscarPontosAtuaisPorEvento,
+  excluirPontosColocacaoPorChave,
 };

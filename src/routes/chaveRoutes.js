@@ -41,8 +41,12 @@ router.post(
   chaveController.excluir
 );
 
-// Lançamento de resultados de lutas (Fase 13)
+// Lançamento de resultados de lutas (Fase 13 e 14)
 const resultadoRoutes = require('./resultadoRoutes');
 router.use('/chaves/:chaveId/lutas/:lutaId/resultado', resultadoRoutes);
+
+// Finalização de categoria e pódio (Fase 15)
+const finalizacaoRoutes = require('./finalizacaoRoutes');
+router.use('/chaves/:chaveId', finalizacaoRoutes);
 
 module.exports = router;

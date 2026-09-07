@@ -355,6 +355,107 @@ async function anular(id, client) {
   return rows[0] || null;
 }
 
+async function contarLutasNaoFinalizadas(chaveId, client) {
+  const db = client || pool;
+  const sql = `
+    SELECT COUNT(*)::INTEGER AS pendentes
+    FROM lutas
+    WHERE chave_id = $1
+      AND status <> 'FINALIZADA';
+  `;
+
+  const { rows } = await db.query(sql, [chaveId]);
+  return parseInt(rows[0].pendentes, 10) || 0;
+}
+
+async function buscarFinal(chaveId, client) {
+  const db = client || pool;
+  const sql = `
+    SELECT
+      l.*,
+      vencedor.nome AS vencedor_nome,
+      vencedor.equipe_id AS vencedor_equipe_id,
+      equipe_vencedor.nome AS vencedor_equipe_nome,
+      perdedor.nome AS perdedor_nome,
+      perdedor.equipe_id AS perdedor_equipe_id,
+      equipe_perdedor.nome AS perdedor_equipe_nome
+    FROM lutas l
+    LEFT JOIN inscricoes vencedor
+      ON vencedor.id = l.vencedor_id
+    LEFT JOIN equipes equipe_vencedor
+      ON equipe_vencedor.id = vencedor.equipe_id
+    LEFT JOIN inscricoes perdedor
+      ON perdedor.id = l.perdedor_id
+    LEFT JOIN equipes equipe_perdedor
+      ON equipe_perdedor.id = perdedor.equipe_id
+    WHERE l.chave_id = $1
+      AND l.proxima_luta_id IS NULL;
+  `;
+
+  const { rows } = await db.query(sql, [chaveId]);
+  return rows[0] || null;
+}
+
+async function buscarSemifinalDoCampeao(chaveId, rodadaSemifinal, campeaoId, client) {
+  const db = client || pool;
+  const sql = `
+    SELECT
+      l.*,
+      perdedor.nome AS perdedor_nome,
+      perdedor.equipe_id AS perdedor_equipe_id,
+      equipe.nome AS perdedor_equipe_nome
+    FROM lutas l
+    LEFT JOIN inscricoes perdedor
+      ON perdedor.id = l.perdedor_id
+    LEFT JOIN equipes equipe
+      ON equipe.id = perdedor.equipe_id
+    WHERE l.chave_id = $1
+      AND l.rodada = $2
+      AND l.vencedor_id = $3
+    LIMIT 1;
+  `;
+
+  const { rows } = await db.query(sql, [chaveId, rodadaSemifinal, campeaoId]);
+  return rows[0] || null;
+}
+
+async function buscarOutraSemifinalComPerdedor(chaveId, rodadaSemifinal, client) {
+  const db = client || pool;
+  const sql = `
+    SELECT
+      l.*,
+      perdedor.nome AS perdedor_nome,
+      perdedor.equipe_id AS perdedor_equipe_id,
+      equipe.nome AS perdedor_equipe_nome
+    FROM lutas l
+    LEFT JOIN inscricoes perdedor
+      ON perdedor.id = l.perdedor_id
+    LEFT JOIN equipes equipe
+      ON equipe.id = perdedor.equipe_id
+    WHERE l.chave_id = $1
+      AND l.rodada = $2
+      AND l.perdedor_id IS NOT NULL
+    ORDER BY l.posicao
+    LIMIT 1;
+  `;
+
+  const { rows } = await db.query(sql, [chaveId, rodadaSemifinal]);
+  return rows[0] || null;
+}
+
+async function bloquearTodasPorChave(chaveId, client) {
+  const db = client || pool;
+  const sql = `
+    SELECT id, status, vencedor_id, perdedor_id
+    FROM lutas
+    WHERE chave_id = $1
+    FOR UPDATE;
+  `;
+
+  const { rows } = await db.query(sql, [chaveId]);
+  return rows;
+}
+
 module.exports = {
   criar,
   listarPorChave,
@@ -373,4 +474,9 @@ module.exports = {
   buscarParaCorrecao,
   finalizar,
   anular,
+  contarLutasNaoFinalizadas,
+  buscarFinal,
+  buscarSemifinalDoCampeao,
+  buscarOutraSemifinalComPerdedor,
+  bloquearTodasPorChave,
 };
