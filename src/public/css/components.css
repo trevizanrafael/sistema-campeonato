@@ -287,6 +287,18 @@
   flex-wrap: wrap;
 }
 
+/* Ações de ordenação e botões desabilitados */
+.order-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 /* Ocultar em telas pequenas e ajustes responsivos */
 @media (max-width: 768px) {
   .col-hide-mobile {
@@ -300,7 +312,8 @@
   }
 
   .actions,
-  .table-actions {
+  .table-actions,
+  .order-actions {
     gap: 4px;
   }
 }

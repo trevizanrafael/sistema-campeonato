@@ -9,7 +9,8 @@
     "create-admin": "node scripts/createAdmin.js",
     "db:setup": "npm run migrate && npm run create-admin",
     "test:eventos": "node scripts/test-phase5.js",
-    "test": "node scripts/test-phase5.js"
+    "test:faixas": "node scripts/test-phase6.js",
+    "test": "node scripts/test-phase5.js && node scripts/test-phase6.js"
   },
   "repository": {
     "type": "git",

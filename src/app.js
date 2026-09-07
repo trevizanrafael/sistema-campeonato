@@ -11,6 +11,7 @@ const authRoutes = require('./routes/authRoutes');
 const homeRoutes = require('./routes/homeRoutes');
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const eventoRoutes = require('./routes/eventoRoutes');
+const faixaRoutes = require('./routes/faixaRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -58,6 +59,9 @@ app.use(homeRoutes);
 
 // Eventos — protegidas
 app.use('/eventos', eventoRoutes);
+
+// Faixas — protegidas
+app.use('/faixas', faixaRoutes);
 
 // Usuários — protegidas
 app.use('/usuarios', usuarioRoutes);
