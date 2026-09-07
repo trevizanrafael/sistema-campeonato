@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", { titulo: titulo || "Erro interno" }) %>
+  </head>
+  <body>
+    <div class="error-page">
+      <div class="error-page__code">500</div>
+      <h1 class="error-page__title">Erro interno</h1>
+      <p class="error-page__msg">Ocorreu um erro inesperado. Tente novamente.</p>
+      <a href="/" class="button button-primary">Voltar para o Início</a>
+    </div>
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

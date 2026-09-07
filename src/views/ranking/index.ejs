@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `Ranking das equipes - ${evento.nome}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a
+                href="/eventos/<%= evento.id %>"
+                class="button button-small button-outline"
+              >
+                &larr; Voltar para o evento
+              </a>
+            </div>
+
+            <h1 class="page-title">
+              Ranking das equipes
+            </h1>
+
+            <p class="page-subtitle">
+              Evento: <strong><%= evento.nome %></strong>
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <% if (situacao === 'FINAL') { %>
+            <div class="alert alert-success" style="margin-bottom: 24px;">
+              Ranking final — todas as chaves foram finalizadas.
+            </div>
+          <% } else if (situacao === 'PARCIAL') { %>
+            <div class="alert alert-warning" style="margin-bottom: 24px; background: #f4f4f4; border-color: #666; color: #111;">
+              Ranking parcial — existem categorias não finalizadas.
+            </div>
+          <% } else { %>
+            <div class="alert alert-neutral" style="margin-bottom: 24px; background: #f9f9f9; border: 1px solid var(--color-border); color: #444;">
+              O evento ainda não possui chaves.
+            </div>
+          <% } %>
+
+          <% if (equipes && equipes.length > 0) { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 70px; text-align: center;">Pos.</th>
+                    <th>Equipe</th>
+                    <th style="text-align: right;">Pontos</th>
+                    <th style="text-align: center;">1º (Ouro)</th>
+                    <th style="text-align: center;">2º (Prata)</th>
+                    <th style="text-align: center;">3º (Bronze)</th>
+                    <th style="text-align: center;">Vitórias</th>
+                    <th style="text-align: center;">Byes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% equipes.forEach((equipe) => { %>
+                    <tr>
+                      <td style="text-align: center;">
+                        <strong><%= equipe.posicao %>º</strong>
+                      </td>
+                      <td>
+                        <a
+                          href="/eventos/<%= evento.id %>/ranking/equipes/<%= equipe.equipe_id %>"
+                          style="font-weight: 600; color: var(--color-text); text-decoration: underline;"
+                        >
+                          <%= equipe.equipe_nome %>
+                        </a>
+                      </td>
+                      <td style="text-align: right;">
+                        <strong style="font-size: 15px;"><%= equipe.total_pontos %></strong>
+                      </td>
+                      <td style="text-align: center;"><%= equipe.ouros %></td>
+                      <td style="text-align: center;"><%= equipe.pratas %></td>
+                      <td style="text-align: center;"><%= equipe.bronzes %></td>
+                      <td style="text-align: center;"><%= equipe.vitorias %></td>
+                      <td style="text-align: center;"><%= equipe.byes %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <h2>Nenhuma equipe participante</h2>
+              <p>Nenhuma equipe possui competidores confirmados neste evento.</p>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

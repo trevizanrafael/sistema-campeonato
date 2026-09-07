@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: "Escolher Categoria - " + evento.nome
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a href="/eventos/<%= evento.id %>/inscricoes" class="button button-small button-outline">
+                &larr; Voltar para inscricoes
+              </a>
+            </div>
+
+            <h1 class="page-title">Escolha a categoria do competidor</h1>
+            <p class="page-subtitle">
+              Foram encontradas multiplas categorias compativeis com os dados de <strong><%= inscricao.nome %></strong> (<%= inscricao.idade %> anos, <%= inscricao.peso %> kg, <%= formatarSexo(inscricao.sexo) %>).
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <div class="card" style="max-width: 800px;">
+            <form
+              action="<%= locals.modoEdicao && locals.inscricaoId ? '/eventos/' + evento.id + '/inscricoes/' + inscricaoId : '/eventos/' + evento.id + '/inscricoes' %>"
+              method="POST"
+            >
+              <input
+                type="hidden"
+                name="_csrf"
+                value="<%= csrfToken %>"
+              >
+
+              <!-- Dados do competidor em campos ocultos -->
+              <input type="hidden" name="nome" value="<%= inscricao.nome %>">
+              <input type="hidden" name="idade" value="<%= inscricao.idade %>">
+              <input type="hidden" name="peso" value="<%= inscricao.peso %>">
+              <input type="hidden" name="sexo" value="<%= inscricao.sexo %>">
+              <input type="hidden" name="faixa_id" value="<%= inscricao.faixa_id %>">
+              <input type="hidden" name="equipe_id" value="<%= inscricao.equipe_id %>">
+              <input type="hidden" name="seed" value="<%= inscricao.seed || '' %>">
+              <input type="hidden" name="categoria_confirmada" value="1">
+
+              <p style="margin-bottom: 16px; font-weight: 500;">
+                Selecione em qual das categorias compativeis o competidor devera ser inscrito:
+              </p>
+
+              <div class="category-selection-list">
+                <% categoriasCompativeis.forEach((categoria, index) => { %>
+                  <label
+                    class="card"
+                    style="display: flex; align-items: flex-start; gap: 12px; padding: 14px; margin-bottom: 12px; border: 1px solid #000; cursor: pointer;"
+                  >
+                    <input
+                      type="radio"
+                      name="categoria_id"
+                      value="<%= categoria.id %>"
+                      style="margin-top: 4px;"
+                      required
+                      <%= index === 0 ? 'checked' : '' %>
+                    >
+                    <div>
+                      <strong style="display: block; font-size: 1.05rem; margin-bottom: 4px;">
+                        <%= categoria.nome %>
+                      </strong>
+                      <span style="font-size: 0.85rem; color: #555;">
+                        <%= formatarIntervaloIdade(categoria) %> &middot;
+                        <%= formatarIntervaloPeso(categoria) %> &middot;
+                        <%= formatarIntervaloFaixa(categoria) %> &middot;
+                        <%= formatarSexo(categoria.sexo) %>
+                      </span>
+                    </div>
+                  </label>
+                <% }) %>
+              </div>
+
+              <div class="form-actions" style="margin-top: 24px; display: flex; gap: 12px;">
+                <button type="submit" class="button button-primary">
+                  Confirmar categoria
+                </button>
+
+                <a
+                  href="/eventos/<%= evento.id %>/inscricoes"
+                  class="button button-outline"
+                >
+                  Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

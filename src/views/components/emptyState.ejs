@@ -1,0 +1,10 @@
+<div class="empty-state">
+  <h2><%= titulo %></h2>
+  <p><%= mensagem %></p>
+
+  <% if (typeof acaoUrl !== 'undefined' && acaoUrl && typeof acaoTexto !== 'undefined' && acaoTexto) { %>
+    <a href="<%= acaoUrl %>" class="button button-primary">
+      <%= acaoTexto %>
+    </a>
+  <% } %>
+</div>

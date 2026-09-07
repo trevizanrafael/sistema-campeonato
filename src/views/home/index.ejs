@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">
+              Olá, <%= usuarioLogado.nome %>
+            </h1>
+
+            <p class="page-subtitle">
+              Selecione uma opção no menu para começar.
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <div class="dashboard-grid">
+            <a href="/eventos" class="card dashboard-card">
+              <h2>Eventos</h2>
+              <p>Crie e gerencie campeonatos.</p>
+            </a>
+
+            <a href="/equipes" class="card dashboard-card">
+              <h2>Equipes</h2>
+              <p>Cadastre equipes participantes.</p>
+            </a>
+
+            <a href="/usuarios" class="card dashboard-card">
+              <h2>Usuários</h2>
+              <p>Gerencie os acessos ao sistema.</p>
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

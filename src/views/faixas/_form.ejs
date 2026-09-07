@@ -1,0 +1,20 @@
+<div class="form-group">
+  <label for="nome" class="form-label">
+    Nome da faixa
+  </label>
+
+  <input
+    type="text"
+    id="nome"
+    name="nome"
+    class="form-control <%= erros.nome ? 'is-invalid' : '' %>"
+    value="<%= faixa.nome || '' %>"
+    maxlength="100"
+    required
+    autofocus
+  >
+
+  <% if (erros.nome) { %>
+    <p class="form-error"><%= erros.nome %></p>
+  <% } %>
+</div>

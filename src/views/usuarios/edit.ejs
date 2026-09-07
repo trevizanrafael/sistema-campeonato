@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo || "Editar Usuario"
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Editar Usuario</h1>
+            <p class="page-subtitle">Atualize as informacoes do usuario.</p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <div class="form-card">
+            <% if (typeof erros !== 'undefined' && erros && erros.length > 0) { %>
+              <ul class="error-list">
+                <% erros.forEach(function(erro) { %>
+                  <li><%= erro %></li>
+                <% }); %>
+              </ul>
+            <% } %>
+
+            <form action="/usuarios/<%= usuario.id %>" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+              <div class="form-group">
+                <label for="nome" class="form-label">Nome</label>
+                <input type="text" id="nome" name="nome" class="form-control" value="<%= dados.nome %>" required>
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="form-label">E-mail</label>
+                <input type="text" id="email" name="email" class="form-control" value="<%= dados.email %>" required>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="button button-primary">Salvar</button>
+                <a href="/usuarios" class="button button-outline">Cancelar</a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

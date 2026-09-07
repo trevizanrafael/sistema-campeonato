@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `${titulo} - ${luta.evento_nome}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a
+                href="/eventos/<%= eventoId %>/chaves/<%= chaveId %>#match-<%= luta.id %>"
+                class="button button-small button-outline"
+              >
+                &larr; Voltar para a chave
+              </a>
+            </div>
+            <h1 class="page-title">
+              Definir vencedor — Luta #<%= luta.posicao_chave || luta.id %>
+            </h1>
+            <p class="page-subtitle">
+              Categoria: <strong><%= luta.categoria_nome %></strong> | Evento: <strong><%= luta.evento_nome %></strong>
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <% if (erros && erros.geral) { %>
+            <div
+              class="alert alert-danger"
+              style="margin-bottom: 24px; border: 1px solid #111; background: #fafafa; color: #111; padding: 14px 16px;"
+            >
+              <%= erros.geral %>
+            </div>
+          <% } %>
+
+          <div class="card form-card" style="max-width: 580px;">
+            <p style="margin-top: 0; margin-bottom: 20px; font-size: 14px; color: var(--color-text-muted);">
+              Selecione o atleta que venceu o combate:
+            </p>
+
+            <form
+              action="/eventos/<%= eventoId %>/chaves/<%= chaveId %>/lutas/<%= luta.id %>/resultado"
+              method="POST"
+              id="form-resultado"
+            >
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+              <% if (erros && erros.vencedor_id) { %>
+                <div style="color: #111; font-size: 13px; font-weight: 600; margin-bottom: 16px; padding: 10px 14px; border: 1px solid #111; background: #f5f5f5;">
+                  <%= erros.vencedor_id %>
+                </div>
+              <% } %>
+
+              <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px;">
+                <!-- Competidor 1 -->
+                <label
+                  style="display: flex; align-items: center; gap: 14px; padding: 18px 20px; border: 2px solid var(--color-border); border-radius: var(--radius-small); cursor: pointer; background: #ffffff; transition: all 0.15s ease;"
+                  class="competitor-choice"
+                >
+                  <input
+                    type="radio"
+                    name="vencedor_id"
+                    value="<%= luta.competidor_1_id %>"
+                    <%= (dados && Number(dados.vencedor_id) === Number(luta.competidor_1_id)) ? 'checked' : '' %>
+                    required
+                    style="width: 20px; height: 20px; accent-color: #000000;"
+                  >
+                  <div style="flex: 1;">
+                    <div style="font-size: 16px; font-weight: 700; color: var(--color-text);">
+                      <%= luta.competidor_1_nome %>
+                    </div>
+                    <% if (luta.competidor_1_equipe_nome) { %>
+                      <div style="color: var(--color-text-muted); font-size: 13px; margin-top: 2px;">
+                        <%= luta.competidor_1_equipe_nome %>
+                      </div>
+                    <% } %>
+                  </div>
+                  <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 2px; color: var(--color-text-muted);">
+                    Atleta 1
+                  </span>
+                </label>
+
+                <!-- Competidor 2 -->
+                <label
+                  style="display: flex; align-items: center; gap: 14px; padding: 18px 20px; border: 2px solid var(--color-border); border-radius: var(--radius-small); cursor: pointer; background: #ffffff; transition: all 0.15s ease;"
+                  class="competitor-choice"
+                >
+                  <input
+                    type="radio"
+                    name="vencedor_id"
+                    value="<%= luta.competidor_2_id %>"
+                    <%= (dados && Number(dados.vencedor_id) === Number(luta.competidor_2_id)) ? 'checked' : '' %>
+                    required
+                    style="width: 20px; height: 20px; accent-color: #000000;"
+                  >
+                  <div style="flex: 1;">
+                    <div style="font-size: 16px; font-weight: 700; color: var(--color-text);">
+                      <%= luta.competidor_2_nome %>
+                    </div>
+                    <% if (luta.competidor_2_equipe_nome) { %>
+                      <div style="color: var(--color-text-muted); font-size: 13px; margin-top: 2px;">
+                        <%= luta.competidor_2_equipe_nome %>
+                      </div>
+                    <% } %>
+                  </div>
+                  <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; border: 1px solid var(--color-border); padding: 4px 8px; border-radius: 2px; color: var(--color-text-muted);">
+                    Atleta 2
+                  </span>
+                </label>
+              </div>
+
+              <!-- Ações -->
+              <div style="display: flex; gap: 12px; align-items: center;">
+                <button type="submit" class="button button-primary" id="btn-salvar" style="min-width: 160px; height: 42px; font-size: 15px;">
+                  Confirmar vitória
+                </button>
+                <a
+                  href="/eventos/<%= eventoId %>/chaves/<%= chaveId %>#match-<%= luta.id %>"
+                  class="button button-outline"
+                  style="height: 42px;"
+                >
+                  Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+    <script>
+      (function() {
+        var options = document.querySelectorAll('.competitor-choice');
+        options.forEach(function(opt) {
+          var radio = opt.querySelector('input[type="radio"]');
+          function updateStyles() {
+            options.forEach(function(o) {
+              var r = o.querySelector('input[type="radio"]');
+              if (r && r.checked) {
+                o.style.borderColor = '#000000';
+                o.style.backgroundColor = '#f8f8f8';
+              } else {
+                o.style.borderColor = 'var(--color-border)';
+                o.style.backgroundColor = '#ffffff';
+              }
+            });
+          }
+          opt.addEventListener('click', function() {
+            if (radio) {
+              radio.checked = true;
+              updateStyles();
+            }
+          });
+          if (radio) {
+            radio.addEventListener('change', updateStyles);
+          }
+        });
+        // Atualizar no carregamento inicial se já vier checado
+        var checked = document.querySelector('.competitor-choice input[type="radio"]:checked');
+        if (checked && checked.closest('.competitor-choice')) {
+          checked.closest('.competitor-choice').style.borderColor = '#000000';
+          checked.closest('.competitor-choice').style.backgroundColor = '#f8f8f8';
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: evento.nome || "Painel do Evento"
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a href="/eventos" class="button button-small button-outline">
+                &larr; Voltar para eventos
+              </a>
+            </div>
+
+            <h1 class="page-title"><%= evento.nome %></h1>
+
+            <% if (evento.descricao) { %>
+              <p class="page-subtitle">
+                <%= evento.descricao %>
+              </p>
+            <% } %>
+          </div>
+
+          <a
+            href="/eventos/<%= evento.id %>/editar"
+            class="button button-outline"
+          >
+            Editar evento
+          </a>
+        </div>
+
+        <section class="page-content">
+          <div class="stats-grid">
+            <div class="card stat-card">
+              <span class="stat-label">Categorias</span>
+              <strong class="stat-value">
+                <%= evento.total_categorias %>
+              </strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Inscricoes</span>
+              <strong class="stat-value">
+                <%= evento.total_inscricoes %>
+              </strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Chaves</span>
+              <strong class="stat-value">
+                <%= evento.total_chaves %>
+              </strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Finalizadas</span>
+              <strong class="stat-value">
+                <%= evento.chaves_finalizadas %>
+              </strong>
+            </div>
+          </div>
+
+          <div class="event-menu-grid">
+            <a
+              href="/eventos/<%= evento.id %>/categorias"
+              class="card event-menu-card"
+            >
+              <h2>Categorias</h2>
+              <p>Configure peso, idade e faixa.</p>
+            </a>
+
+            <a
+              href="/eventos/<%= evento.id %>/inscricoes"
+              class="card event-menu-card"
+            >
+              <h2>Inscricoes</h2>
+              <p>Cadastre e importe os competidores.</p>
+            </a>
+
+            <a
+              href="/eventos/<%= evento.id %>/chaves"
+              class="card event-menu-card"
+            >
+              <h2>Chaves</h2>
+              <p>Gere e acompanhe as lutas.</p>
+            </a>
+
+            <a
+              href="/eventos/<%= evento.id %>/ranking"
+              class="card event-menu-card"
+            >
+              <h2>Ranking</h2>
+              <p>Acompanhe os pontos das equipes.</p>
+            </a>
+
+            <a
+              href="/eventos/<%= evento.id %>/pontuacao"
+              class="card event-menu-card"
+            >
+              <h2>Pontuacao</h2>
+              <p>Configure os pontos do evento.</p>
+            </a>
+          </div>
+
+          <section class="danger-zone">
+            <h2>Excluir evento</h2>
+
+            <p>
+              So e possivel excluir um evento que ainda nao possua categorias, inscricoes ou resultados.
+            </p>
+
+            <form
+              action="/eventos/<%= evento.id %>/excluir"
+              method="POST"
+              data-confirm="Deseja realmente excluir este evento?"
+            >
+              <input
+                type="hidden"
+                name="_csrf"
+                value="<%= csrfToken %>"
+              >
+
+              <button type="submit" class="button button-danger">
+                Excluir evento
+              </button>
+            </form>
+          </section>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

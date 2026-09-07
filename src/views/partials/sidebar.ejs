@@ -1,0 +1,40 @@
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav" aria-label="Menu principal">
+    <a
+      href="/"
+      class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath === '/') ? 'active' : '' %>"
+    >
+      Início
+    </a>
+
+    <a
+      href="/eventos"
+      class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/eventos')) ? 'active' : '' %>"
+    >
+      Eventos
+    </a>
+
+    <a
+      href="/equipes"
+      class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/equipes')) ? 'active' : '' %>"
+    >
+      Equipes
+    </a>
+
+    <a
+      href="/faixas"
+      class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/faixas')) ? 'active' : '' %>"
+    >
+      Faixas
+    </a>
+
+    <a
+      href="/usuarios"
+      class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/usuarios')) ? 'active' : '' %>"
+    >
+      Usuários
+    </a>
+  </nav>
+</aside>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo || "Faixas"
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Faixas</h1>
+            <p class="page-subtitle">A ordem define a hierarquia utilizada nas categorias.</p>
+          </div>
+
+          <a href="/faixas/nova" class="button button-primary">
+            Nova faixa
+          </a>
+        </div>
+
+        <section class="page-content">
+          <% if (faixas && faixas.length > 0) { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Posicao</th>
+                    <th>Faixa</th>
+                    <th>Ordenacao</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% faixas.forEach((faixa, index) => { %>
+                    <% const primeira = index === 0; %>
+                    <% const ultima = index === faixas.length - 1; %>
+
+                    <tr>
+                      <td><%= index + 1 %></td>
+
+                      <td>
+                        <strong><%= faixa.nome %></strong>
+                      </td>
+
+                      <td>
+                        <div class="order-actions">
+                          <form
+                            action="/faixas/<%= faixa.id %>/subir"
+                            method="POST"
+                            style="display: inline;"
+                          >
+                            <input
+                              type="hidden"
+                              name="_csrf"
+                              value="<%= csrfToken %>"
+                            >
+
+                            <button
+                              type="submit"
+                              class="button button-small button-outline"
+                              <%= primeira ? "disabled" : "" %>
+                              aria-label="Subir <%= faixa.nome %>"
+                            >
+                              &uarr; Subir
+                            </button>
+                          </form>
+
+                          <form
+                            action="/faixas/<%= faixa.id %>/descer"
+                            method="POST"
+                            style="display: inline;"
+                          >
+                            <input
+                              type="hidden"
+                              name="_csrf"
+                              value="<%= csrfToken %>"
+                            >
+
+                            <button
+                              type="submit"
+                              class="button button-small button-outline"
+                              <%= ultima ? "disabled" : "" %>
+                              aria-label="Descer <%= faixa.nome %>"
+                            >
+                              &darr; Descer
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+
+                      <td>
+                        <div class="table-actions">
+                          <a
+                            href="/faixas/<%= faixa.id %>/editar"
+                            class="button button-small button-outline"
+                          >
+                            Editar
+                          </a>
+
+                          <form
+                            action="/faixas/<%= faixa.id %>/excluir"
+                            method="POST"
+                            style="display: inline;"
+                            data-confirm="Deseja excluir a faixa <%= faixa.nome %>?"
+                          >
+                            <input
+                              type="hidden"
+                              name="_csrf"
+                              value="<%= csrfToken %>"
+                            >
+
+                            <button
+                              type="submit"
+                              class="button button-small button-danger"
+                            >
+                              Excluir
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <h2>Nenhuma faixa cadastrada</h2>
+              <p>Cadastre as faixas antes de criar as categorias.</p>
+              <a href="/faixas/nova" class="button button-primary">
+                Cadastrar primeira faixa
+              </a>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

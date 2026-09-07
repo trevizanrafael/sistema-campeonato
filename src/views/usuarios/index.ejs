@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo || "Usuarios"
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Usuarios</h1>
+            <p class="page-subtitle">Gerencie as pessoas que podem acessar o sistema.</p>
+          </div>
+
+          <a href="/usuarios/novo" class="button button-primary">
+            Novo usuario
+          </a>
+        </div>
+
+        <section class="page-content">
+          <% if (usuarios.length === 0) { %>
+            <%- include("../components/emptyState", {
+              titulo: "Nenhum usuario cadastrado",
+              mensagem: "Cadastre o primeiro usuario para comecar.",
+              acaoUrl: "/usuarios/novo",
+              acaoTexto: "Novo usuario"
+            }) %>
+          <% } else { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Situacao</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% usuarios.forEach(function(u) { %>
+                    <tr>
+                      <td><%= u.nome %></td>
+                      <td><%= u.email %></td>
+                      <td>
+                        <% if (u.ativo) { %>
+                          <span class="badge badge-ativo">Ativo</span>
+                        <% } else { %>
+                          <span class="badge badge-inativo">Inativo</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <div class="actions">
+                          <a href="/usuarios/<%= u.id %>/editar" class="button button-outline button-small">Editar</a>
+                          <a href="/usuarios/<%= u.id %>/senha" class="button button-outline button-small">Senha</a>
+                          <% if (u.ativo) { %>
+                            <form action="/usuarios/<%= u.id %>/desativar" method="POST" style="display:inline"
+                                  data-confirm="Deseja realmente desativar este usuario?">
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button type="submit" class="button button-danger button-small">Desativar</button>
+                            </form>
+                          <% } else { %>
+                            <form action="/usuarios/<%= u.id %>/ativar" method="POST" style="display:inline"
+                                  data-confirm="Deseja realmente ativar este usuario?">
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button type="submit" class="button button-outline button-small">Ativar</button>
+                            </form>
+                          <% } %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

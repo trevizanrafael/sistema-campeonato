@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", { titulo: titulo || "Acesso não permitido" }) %>
+  </head>
+  <body>
+    <div class="error-page">
+      <div class="error-page__code">403</div>
+      <h1 class="error-page__title">Acesso não permitido</h1>
+      <p class="error-page__msg">Você não pode realizar esta operação.</p>
+      <a href="/" class="button button-primary">Voltar para o Início</a>
+    </div>
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

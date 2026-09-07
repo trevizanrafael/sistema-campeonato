@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `${equipe.equipe_nome} - Detalhes da equipe - ${evento.nome}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a
+                href="/eventos/<%= evento.id %>/ranking"
+                class="button button-small button-outline"
+              >
+                &larr; Voltar para o ranking
+              </a>
+            </div>
+
+            <h1 class="page-title">
+              <%= equipe.equipe_nome %>
+            </h1>
+
+            <p class="page-subtitle">
+              Evento: <strong><%= evento.nome %></strong>
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <!-- Estatísticas da equipe -->
+          <div class="stats-grid" style="margin-bottom: 32px;">
+            <div class="card stat-card">
+              <span class="stat-label">Posição no ranking</span>
+              <strong class="stat-value">
+                <%= equipe.posicao ? `${equipe.posicao}º` : '-' %>
+              </strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Total de pontos</span>
+              <strong class="stat-value">
+                <%= equipe.total_pontos %>
+              </strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Pontos por vitórias</span>
+              <strong class="stat-value">
+                <%= equipe.pontos_vitorias %>
+              </strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Pontos por colocações</span>
+              <strong class="stat-value">
+                <%= equipe.pontos_colocacoes %>
+              </strong>
+            </div>
+          </div>
+
+          <!-- Resumo de medalhas e vitórias -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 32px;">
+            <div class="card" style="padding: 16px 20px;">
+              <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); letter-spacing: 0.5px; display: block; margin-bottom: 10px;">
+                Quadro de Medalhas
+              </span>
+              <div style="display: flex; gap: 16px; align-items: center;">
+                <div>
+                  <strong style="font-size: 18px; display: block;"><%= equipe.ouros %></strong>
+                  <span style="font-size: 12px; color: var(--color-text-muted);">1º Lugar (Ouro)</span>
+                </div>
+                <div style="border-left: 1px solid var(--color-border); padding-left: 16px;">
+                  <strong style="font-size: 18px; display: block;"><%= equipe.pratas %></strong>
+                  <span style="font-size: 12px; color: var(--color-text-muted);">2º Lugar (Prata)</span>
+                </div>
+                <div style="border-left: 1px solid var(--color-border); padding-left: 16px;">
+                  <strong style="font-size: 18px; display: block;"><%= equipe.bronzes %></strong>
+                  <span style="font-size: 12px; color: var(--color-text-muted);">3º Lugar (Bronze)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="padding: 16px 20px;">
+              <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-text-muted); letter-spacing: 0.5px; display: block; margin-bottom: 10px;">
+                Desempenho em Lutas
+              </span>
+              <div style="display: flex; gap: 20px; align-items: center;">
+                <div>
+                  <strong style="font-size: 18px; display: block;"><%= equipe.vitorias %></strong>
+                  <span style="font-size: 12px; color: var(--color-text-muted);">Vitórias em combate</span>
+                </div>
+                <div style="border-left: 1px solid var(--color-border); padding-left: 20px;">
+                  <strong style="font-size: 18px; display: block;"><%= equipe.byes %></strong>
+                  <span style="font-size: 12px; color: var(--color-text-muted);">Avanços por BYE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Extrato detalhado de pontos -->
+          <h2 style="font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
+            Extrato de Pontos Conquistados
+          </h2>
+
+          <% if (extrato && extrato.length > 0) { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Competidor</th>
+                    <th>Categoria</th>
+                    <th>Descrição</th>
+                    <th style="text-align: right;">Pontos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% extrato.forEach((item) => { %>
+                    <tr>
+                      <td>
+                        <span class="badge badge-neutral">
+                          <%= item.tipo_formatado %>
+                        </span>
+                      </td>
+                      <td>
+                        <strong><%= item.competidor_nome || '-' %></strong>
+                      </td>
+                      <td>
+                        <%= item.categoria_nome || '-' %>
+                      </td>
+                      <td style="color: var(--color-text-muted); font-size: 13px;">
+                        <%= item.descricao || '-' %>
+                      </td>
+                      <td style="text-align: right;">
+                        <strong style="font-size: 15px;"><%= item.pontos_formatado %></strong>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <h2>Esta equipe ainda não conquistou pontos</h2>
+              <p>Os pontos por vitórias e colocações de pódio aparecerão aqui conforme as lutas e categorias forem finalizadas.</p>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

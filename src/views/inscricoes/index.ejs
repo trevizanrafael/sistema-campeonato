@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: "Inscricoes - " + evento.nome
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a href="/eventos/<%= evento.id %>" class="button button-small button-outline">
+                &larr; Voltar para o evento
+              </a>
+            </div>
+
+            <h1 class="page-title">Inscricoes</h1>
+            <p class="page-subtitle">
+              Evento: <%= evento.nome %>
+            </p>
+          </div>
+
+          <a
+            href="/eventos/<%= evento.id %>/inscricoes/nova"
+            class="button button-primary"
+          >
+            Nova inscricao
+          </a>
+        </div>
+
+        <section class="page-content">
+          <!-- Resumo de status -->
+          <div class="stats-grid" style="margin-bottom: 24px;">
+            <div class="card stat-card">
+              <span class="stat-label">Total</span>
+              <strong class="stat-value"><%= resumo.total %></strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Confirmadas</span>
+              <strong class="stat-value"><%= resumo.confirmadas %></strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Pendentes</span>
+              <strong class="stat-value"><%= resumo.pendentes %></strong>
+            </div>
+
+            <div class="card stat-card">
+              <span class="stat-label">Canceladas</span>
+              <strong class="stat-value"><%= resumo.canceladas %></strong>
+            </div>
+          </div>
+
+          <!-- Barra de filtros -->
+          <div class="card" style="margin-bottom: 20px; padding: 16px;">
+            <form method="GET" action="/eventos/<%= evento.id %>/inscricoes" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+              <div style="flex: 1; min-width: 200px;">
+                <label for="busca" class="form-label" style="font-size: 0.85rem;">Buscar competidor</label>
+                <input
+                  type="text"
+                  id="busca"
+                  name="busca"
+                  class="form-control"
+                  placeholder="Nome, equipe ou categoria..."
+                  value="<%= filtros.busca || '' %>"
+                >
+              </div>
+
+              <div style="min-width: 150px;">
+                <label for="status" class="form-label" style="font-size: 0.85rem;">Status</label>
+                <select id="status" name="status" class="form-control">
+                  <option value="">Todos os status</option>
+                  <option value="CONFIRMADA" <%= filtros.status === 'CONFIRMADA' ? 'selected' : '' %>>Confirmada</option>
+                  <option value="PENDENTE" <%= filtros.status === 'PENDENTE' ? 'selected' : '' %>>Pendente</option>
+                  <option value="CANCELADA" <%= filtros.status === 'CANCELADA' ? 'selected' : '' %>>Cancelada</option>
+                  <option value="DESCLASSIFICADA" <%= filtros.status === 'DESCLASSIFICADA' ? 'selected' : '' %>>Desclassificada</option>
+                </select>
+              </div>
+
+              <div style="min-width: 170px;">
+                <label for="categoria_id" class="form-label" style="font-size: 0.85rem;">Categoria</label>
+                <select id="categoria_id" name="categoria_id" class="form-control">
+                  <option value="">Todas as categorias</option>
+                  <option value="sem_categoria" <%= filtros.categoria_id === 'sem_categoria' ? 'selected' : '' %>>Sem categoria (Pendente)</option>
+                  <% if (locals.categorias && categorias.length > 0) { %>
+                    <% categorias.forEach((c) => { %>
+                      <option value="<%= c.id %>" <%= String(filtros.categoria_id) === String(c.id) ? 'selected' : '' %>>
+                        <%= c.nome %>
+                      </option>
+                    <% }) %>
+                  <% } %>
+                </select>
+              </div>
+
+              <div style="min-width: 150px;">
+                <label for="equipe_id" class="form-label" style="font-size: 0.85rem;">Equipe</label>
+                <select id="equipe_id" name="equipe_id" class="form-control">
+                  <option value="">Todas as equipes</option>
+                  <% if (locals.equipes && equipes.length > 0) { %>
+                    <% equipes.forEach((eq) => { %>
+                      <option value="<%= eq.id %>" <%= String(filtros.equipe_id) === String(eq.id) ? 'selected' : '' %>>
+                        <%= eq.nome %>
+                      </option>
+                    <% }) %>
+                  <% } %>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button type="submit" class="button button-primary">Filtrar</button>
+                <a href="/eventos/<%= evento.id %>/inscricoes" class="button button-outline">Limpar</a>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tabela de inscricoes -->
+          <% if (inscricoes && inscricoes.length > 0) { %>
+            <div class="table-container">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Competidor</th>
+                    <th>Equipe</th>
+                    <th>Faixa</th>
+                    <th>Idade</th>
+                    <th>Peso</th>
+                    <th>Categoria</th>
+                    <th>Status</th>
+                    <th>Acoes</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <% inscricoes.forEach((inscricao) => { %>
+                    <tr>
+                      <td>
+                        <strong><%= inscricao.nome %></strong>
+                        <% if (inscricao.seed) { %>
+                          <span style="font-size: 0.75rem; border: 1px solid #000; padding: 1px 4px; margin-left: 4px;">
+                            Seed #<%= inscricao.seed %>
+                          </span>
+                        <% } %>
+                        <div style="font-size: 0.8rem; color: #666;">
+                          <%= formatarSexo(inscricao.sexo) %>
+                        </div>
+                      </td>
+
+                      <td>
+                        <%= inscricao.equipe_nome %>
+                      </td>
+
+                      <td>
+                        <%= inscricao.faixa_nome %>
+                      </td>
+
+                      <td>
+                        <%= inscricao.idade %> anos
+                      </td>
+
+                      <td>
+                        <%= Number(inscricao.peso).toFixed(2).replace('.', ',') %> kg
+                      </td>
+
+                      <td>
+                        <% if (inscricao.categoria_id) { %>
+                          <%= inscricao.categoria_nome %>
+                        <% } else { %>
+                          <span
+                            class="badge"
+                            style="border: 1px solid #000; padding: 2px 6px; font-size: 0.75rem; background: #fff;"
+                          >
+                            Pendente - sem categoria
+                          </span>
+                        <% } %>
+                      </td>
+
+                      <td>
+                        <% if (inscricao.status === 'CONFIRMADA') { %>
+                          <span style="font-weight: 600; border: 1px solid #000; padding: 2px 6px; font-size: 0.8rem;">
+                            CONFIRMADA
+                          </span>
+                        <% } else if (inscricao.status === 'PENDENTE') { %>
+                          <span style="border: 1px dashed #000; padding: 2px 6px; font-size: 0.8rem;">
+                            PENDENTE
+                          </span>
+                        <% } else if (inscricao.status === 'CANCELADA') { %>
+                          <span style="color: #666; text-decoration: line-through; font-size: 0.8rem;">
+                            CANCELADA
+                          </span>
+                        <% } else { %>
+                          <span style="font-size: 0.8rem;">
+                            <%= inscricao.status %>
+                          </span>
+                        <% } %>
+                      </td>
+
+                      <td>
+                        <div class="table-actions">
+                          <% if (inscricao.participa_luta) { %>
+                            <a
+                              href="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/editar"
+                              class="button button-small button-outline"
+                              title="Inscricao em luta. Somente nome pode ser editado."
+                            >
+                              Editar nome
+                            </a>
+                          <% } else if (inscricao.status === 'CANCELADA') { %>
+                            <a
+                              href="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/editar"
+                              class="button button-small button-outline"
+                            >
+                              Editar
+                            </a>
+
+                            <form
+                              action="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/reativar"
+                              method="POST"
+                              style="display: inline;"
+                              data-confirm="Deseja reativar a inscricao de <%= inscricao.nome %>?"
+                            >
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button type="submit" class="button button-small button-outline">
+                                Reativar
+                              </button>
+                            </form>
+
+                            <form
+                              action="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/excluir"
+                              method="POST"
+                              style="display: inline;"
+                              data-confirm="Deseja excluir permanentemente a inscricao de <%= inscricao.nome %>?"
+                            >
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button type="submit" class="button button-small button-danger">
+                                Excluir
+                              </button>
+                            </form>
+                          <% } else { %>
+                            <a
+                              href="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/editar"
+                              class="button button-small button-outline"
+                            >
+                              Editar
+                            </a>
+
+                            <form
+                              action="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/cancelar"
+                              method="POST"
+                              style="display: inline;"
+                              data-confirm="Deseja cancelar a inscricao de <%= inscricao.nome %>?"
+                            >
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button type="submit" class="button button-small button-outline">
+                                Cancelar
+                              </button>
+                            </form>
+
+                            <form
+                              action="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/excluir"
+                              method="POST"
+                              style="display: inline;"
+                              data-confirm="Deseja excluir permanentemente a inscricao de <%= inscricao.nome %>?"
+                            >
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button type="submit" class="button button-small button-danger">
+                                Excluir
+                              </button>
+                            </form>
+                          <% } %>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="empty-state">
+              <h2>Nenhuma inscricao encontrada</h2>
+              <p>Cadastre competidores manualmente para compor as categorias do evento.</p>
+              <a
+                href="/eventos/<%= evento.id %>/inscricoes/nova"
+                class="button button-primary"
+              >
+                Cadastrar primeiro competidor
+              </a>
+            </div>
+          <% } %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

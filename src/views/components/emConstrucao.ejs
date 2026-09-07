@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", { titulo: titulo }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title"><%= titulo %></h1>
+            <% if (typeof subtitulo !== 'undefined' && subtitulo) { %>
+              <p class="page-subtitle"><%= subtitulo %></p>
+            <% } %>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <%- include("../components/emptyState", {
+            titulo: "Modulo em construcao",
+            mensagem: "Este modulo sera implementado na proxima etapa.",
+            acaoUrl: "/",
+            acaoTexto: "Voltar para o Inicio"
+          }) %>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

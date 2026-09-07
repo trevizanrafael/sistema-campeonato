@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <%- include("../partials/head", {
+      titulo: `${titulo} - ${evento.nome}`
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <div style="margin-bottom: 8px;">
+              <a href="/eventos/<%= evento.id %>" class="button button-small button-outline">
+                &larr; Voltar para <%= evento.nome %>
+              </a>
+            </div>
+            <h1 class="page-title">Configuracao de pontuacao</h1>
+            <p class="page-subtitle">
+              Defina os criterios de pontuacao geral por equipe para o evento <strong><%= evento.nome %></strong>.
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <% if (bloqueada) { %>
+            <div class="alert alert-warning" style="margin-bottom: 24px; border: 1px solid #000; background: #f0f0f0; color: #000; padding: 14px 16px;">
+              <strong>Configuracao bloqueada:</strong> Este evento ja possui lancamentos de pontos registrados para equipes no ranking. Para garantir a integridade historica da classificacao, as regras de pontuacao nao podem mais ser alteradas.
+            </div>
+          <% } %>
+
+          <% if (erros && erros.geral) { %>
+            <div class="alert alert-danger" style="margin-bottom: 24px; border: 1px solid #000; background: #ffffff; color: #000; padding: 14px 16px;">
+              <%= erros.geral %>
+            </div>
+          <% } %>
+
+          <div class="card" style="margin-bottom: 24px; border: 1px solid var(--color-border); background: #fafafa; padding: 16px;">
+            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: var(--color-text);">
+              <strong>Regra de calculo:</strong> Os pontos sao cumulativos. O total de cada equipe e a soma dos pontos obtidos pelas vitorias de seus atletas com os pontos concedidos pelas colocacoes de podio (1o, 2o e 3o lugares), alem de eventuais ajustes e deducoes de penalidades.
+            </p>
+          </div>
+
+          <div class="card form-card" style="max-width: 720px;">
+            <form action="/eventos/<%= evento.id %>/pontuacao" method="POST">
+              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+              <fieldset style="border: 1px solid var(--color-border); padding: 20px; border-radius: var(--radius-small); margin-bottom: 24px;">
+                <legend style="font-weight: 600; padding: 0 8px; font-size: 15px;">Pontos por combate</legend>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                  <label for="pontos_vitoria" class="form-label">
+                    Pontos por vitoria <span style="color: #666;">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    id="pontos_vitoria"
+                    name="pontos_vitoria"
+                    class="form-control <%= erros && erros.pontos_vitoria ? 'is-invalid' : '' %>"
+                    value="<%= (regra && regra.pontos_vitoria !== undefined && regra.pontos_vitoria !== null) ? regra.pontos_vitoria : 0 %>"
+                    min="0"
+                    max="1000"
+                    step="1"
+                    <%= bloqueada ? 'disabled' : '' %>
+                    required
+                  >
+                  <small style="display: block; margin-top: 4px; color: var(--color-text-muted); font-size: 12px;">
+                    Aplicado a vitorias por pontos, finalizacao, decisao, W.O. ou desclassificacao.
+                  </small>
+                  <% if (erros && erros.pontos_vitoria) { %>
+                    <p class="form-error"><%= erros.pontos_vitoria %></p>
+                  <% } %>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0;">
+                  <label style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; font-weight: 500;">
+                    <input
+                      type="checkbox"
+                      id="bye_pontua"
+                      name="bye_pontua"
+                      value="1"
+                      <%= (regra && (regra.bye_pontua === true || regra.bye_pontua === '1' || regra.bye_pontua === 'true')) ? 'checked' : '' %>
+                      <%= bloqueada ? 'disabled' : '' %>
+                    >
+                    <span>Avanco por bye/chapeu concede pontos de vitoria</span>
+                  </label>
+                  <small style="display: block; margin-top: 4px; margin-left: 24px; color: var(--color-text-muted); font-size: 12px;">
+                    Se desmarcado, atletas que avancarem na chave sem lutar nao receberao pontos de vitoria para sua equipe nessa rodada.
+                  </small>
+                </div>
+              </fieldset>
+
+              <fieldset style="border: 1px solid var(--color-border); padding: 20px; border-radius: var(--radius-small); margin-bottom: 24px;">
+                <legend style="font-weight: 600; padding: 0 8px; font-size: 15px;">Pontos adicionais por colocacao</legend>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
+                  <div class="form-group">
+                    <label for="pontos_primeiro" class="form-label">
+                      1o Lugar (Campeao) <span style="color: #666;">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="pontos_primeiro"
+                      name="pontos_primeiro"
+                      class="form-control <%= erros && erros.pontos_primeiro ? 'is-invalid' : '' %>"
+                      value="<%= (regra && regra.pontos_primeiro !== undefined && regra.pontos_primeiro !== null) ? regra.pontos_primeiro : 0 %>"
+                      min="0"
+                      max="1000"
+                      step="1"
+                      <%= bloqueada ? 'disabled' : '' %>
+                      required
+                    >
+                    <small style="display: block; margin-top: 4px; color: var(--color-text-muted); font-size: 12px;">
+                      Pontos adicionais para a equipe.
+                    </small>
+                    <% if (erros && erros.pontos_primeiro) { %>
+                      <p class="form-error"><%= erros.pontos_primeiro %></p>
+                    <% } %>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pontos_segundo" class="form-label">
+                      2o Lugar (Vice) <span style="color: #666;">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="pontos_segundo"
+                      name="pontos_segundo"
+                      class="form-control <%= erros && erros.pontos_segundo ? 'is-invalid' : '' %>"
+                      value="<%= (regra && regra.pontos_segundo !== undefined && regra.pontos_segundo !== null) ? regra.pontos_segundo : 0 %>"
+                      min="0"
+                      max="1000"
+                      step="1"
+                      <%= bloqueada ? 'disabled' : '' %>
+                      required
+                    >
+                    <small style="display: block; margin-top: 4px; color: var(--color-text-muted); font-size: 12px;">
+                      Pontos adicionais para a equipe.
+                    </small>
+                    <% if (erros && erros.pontos_segundo) { %>
+                      <p class="form-error"><%= erros.pontos_segundo %></p>
+                    <% } %>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="pontos_terceiro" class="form-label">
+                      3o Lugar (Bronze) <span style="color: #666;">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="pontos_terceiro"
+                      name="pontos_terceiro"
+                      class="form-control <%= erros && erros.pontos_terceiro ? 'is-invalid' : '' %>"
+                      value="<%= (regra && regra.pontos_terceiro !== undefined && regra.pontos_terceiro !== null) ? regra.pontos_terceiro : 0 %>"
+                      min="0"
+                      max="1000"
+                      step="1"
+                      <%= bloqueada ? 'disabled' : '' %>
+                      required
+                    >
+                    <small style="display: block; margin-top: 4px; color: var(--color-text-muted); font-size: 12px;">
+                      Pontos adicionais para a equipe.
+                    </small>
+                    <% if (erros && erros.pontos_terceiro) { %>
+                      <p class="form-error"><%= erros.pontos_terceiro %></p>
+                    <% } %>
+                  </div>
+                </div>
+              </fieldset>
+
+              <div class="form-actions" style="display: flex; gap: 12px; align-items: center;">
+                <% if (!bloqueada) { %>
+                  <button type="submit" class="button button-primary">
+                    Salvar pontuacao
+                  </button>
+                <% } %>
+                <a href="/eventos/<%= evento.id %>" class="button button-outline">
+                  <%= bloqueada ? 'Voltar para o evento' : 'Cancelar' %>
+                </a>
+              </div>
+            </form>
+          </div>
+
+          <div class="card" style="margin-top: 24px; max-width: 720px; border: 1px solid var(--color-border); background: #ffffff;">
+            <h3 style="margin-top: 0; margin-bottom: 8px; font-size: 15px; font-weight: 600;">Exemplo de pontuacao</h3>
+            <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.6; margin: 0;">
+              Se a configuracao for definida com <strong>1 ponto por vitoria</strong> e <strong>9 pontos para o 1o lugar</strong>:<br>
+              Um competidor que venceu 3 combates e consagrou-se campeao somara para sua equipe:<br>
+              <strong>3 vitorias &times; 1 pt + 1o lugar (9 pts) = 12 pontos no ranking geral.</strong>
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>
