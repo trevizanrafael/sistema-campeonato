@@ -51,7 +51,7 @@
 
           <% if (eventos && eventos.length > 0) { %>
             <div class="table-container">
-              <table class="table">
+              <table class="table table-eventos">
                 <thead>
                   <tr>
                     <th>Campeonato</th>
@@ -65,8 +65,8 @@
                 <tbody>
                   <% eventos.forEach((evento) => { %>
                     <tr>
-                      <td>
-                        <a href="/eventos/<%= evento.id %>">
+                      <td class="col-campeonato">
+                        <a href="/eventos/<%= evento.id %>" class="campeonato-card-titulo">
                           <strong><%= evento.nome %></strong>
                         </a>
 
@@ -77,18 +77,23 @@
                         <% } %>
                       </td>
 
-                      <td><%= evento.total_categorias %></td>
-                      <td><%= evento.total_inscricoes %></td>
+                      <td class="col-num">
+                        <strong><%= evento.total_categorias %></strong>
+                      </td>
+
+                      <td class="col-num">
+                        <strong><%= evento.total_inscricoes %></strong>
+                      </td>
 
                       <td class="col-hide-mobile">
                         <%= formatarData(evento.created_at) %>
                       </td>
 
-                      <td>
+                      <td class="col-acoes">
                         <div class="table-actions">
                           <a
                             href="/eventos/<%= evento.id %>"
-                            class="button button-small button-outline"
+                            class="button button-small button-outline button-abrir"
                           >
                             Abrir
                           </a>

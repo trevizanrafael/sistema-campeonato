@@ -970,49 +970,57 @@
 }
 
 /* ==========================================================
-   Celular: tabelas de Categorias, Inscrições e Chaves viram
-   cartões empilhados (sem scroll lateral)
+   Celular: tabelas de Categorias, Inscrições, Chaves e Eventos
+   viram cartões empilhados (sem scroll lateral)
    ========================================================== */
 
 @media (max-width: 768px) {
   table.table.table-categorias,
   table.table.table-inscricoes,
   table.table.table-chaves,
+  table.table.table-eventos,
   table.table.table-categorias tbody,
   table.table.table-inscricoes tbody,
   table.table.table-chaves tbody,
+  table.table.table-eventos tbody,
   table.table.table-categorias tr,
   table.table.table-inscricoes tr,
   table.table.table-chaves tr,
+  table.table.table-eventos tr,
   table.table.table-categorias td,
   table.table.table-inscricoes td,
-  table.table.table-chaves td {
+  table.table.table-chaves td,
+  table.table.table-eventos td {
     display: block;
     width: 100%;
   }
 
   table.table.table-categorias thead,
   table.table.table-inscricoes thead,
-  table.table.table-chaves thead {
+  table.table.table-chaves thead,
+  table.table.table-eventos thead {
     display: none;
   }
 
   table.table.table-categorias tr,
   table.table.table-inscricoes tr,
-  table.table.table-chaves tr {
+  table.table.table-chaves tr,
+  table.table.table-eventos tr {
     padding: 14px 16px;
     border-bottom: 1px solid var(--color-border);
   }
 
   table.table.table-categorias tr:last-child,
   table.table.table-inscricoes tr:last-child,
-  table.table.table-chaves tr:last-child {
+  table.table.table-chaves tr:last-child,
+  table.table.table-eventos tr:last-child {
     border-bottom: none;
   }
 
   table.table.table-categorias td,
   table.table.table-inscricoes td,
-  table.table.table-chaves td {
+  table.table.table-chaves td,
+  table.table.table-eventos td {
     position: relative;
     padding: 4px 0;
     border: none;
@@ -1027,7 +1035,9 @@
   table.table.table-inscricoes td:nth-child(2),
   table.table.table-inscricoes td:nth-child(3),
   table.table.table-chaves td:nth-child(2),
-  table.table.table-chaves td:nth-child(3) {
+  table.table.table-chaves td:nth-child(3),
+  table.table.table-eventos td:nth-child(2),
+  table.table.table-eventos td:nth-child(3) {
     padding-left: 96px;
     min-height: 28px;
   }
@@ -1037,7 +1047,9 @@
   table.table.table-inscricoes td:nth-child(2)::before,
   table.table.table-inscricoes td:nth-child(3)::before,
   table.table.table-chaves td:nth-child(2)::before,
-  table.table.table-chaves td:nth-child(3)::before {
+  table.table.table-chaves td:nth-child(3)::before,
+  table.table.table-eventos td:nth-child(2)::before,
+  table.table.table-eventos td:nth-child(3)::before {
     position: absolute;
     top: 6px;
     left: 0;
@@ -1067,25 +1079,58 @@
     content: "Status";
   }
 
+  table.table.table-eventos td:nth-child(2)::before {
+    content: "Categorias";
+  }
+
+  table.table.table-eventos td:nth-child(3)::before {
+    content: "Inscrições";
+  }
+
   table.table.table-categorias .col-num,
-  table.table.table-chaves .col-num {
+  table.table.table-chaves .col-num,
+  table.table.table-eventos .col-num {
     text-align: left;
+  }
+
+  table.table.table-eventos .col-campeonato {
+    padding-bottom: 6px;
+  }
+
+  table.table.table-eventos .campeonato-card-titulo {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  table.table.table-eventos .table-description {
+    max-width: none;
+    margin: 4px 0 2px;
+    font-size: 13px;
   }
 
   /* Ações: botões em linha, ocupando a largura */
   table.table.table-categorias td.col-acoes,
   table.table.table-inscricoes td.col-acoes,
-  table.table.table-chaves td.col-acoes {
+  table.table.table-chaves td.col-acoes,
+  table.table.table-eventos td.col-acoes {
     padding-top: 10px;
     text-align: left;
     white-space: normal;
   }
 
   table.table.table-categorias .table-actions,
-  table.table.table-inscricoes .table-actions {
+  table.table.table-inscricoes .table-actions,
+  table.table.table-eventos .table-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  table.table.table-eventos .table-actions .button {
+    flex: 1;
+    min-width: 100px;
+    justify-content: center;
+    text-align: center;
   }
 
   table.table.table-chaves td.col-acoes .button,
