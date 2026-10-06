@@ -272,6 +272,14 @@
                                   href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/lutas/<%= luta.id %>/resultado/editar"
                                   class="button button-small button-outline"
                                   style="flex: 1; padding: 3px 6px; font-size: 11px; text-transform: uppercase; font-weight: 600; text-align: center;"
+                                  data-resultado="<%= JSON.stringify({
+                                    modo: 'corrigir',
+                                    acao: '/eventos/' + evento.id + '/chaves/' + chave.id + '/lutas/' + luta.id + '/resultado/editar',
+                                    titulo: 'Luta ' + luta.posicao,
+                                    vencedorId: luta.competidor1.vencedor ? luta.competidor1.id : (luta.competidor2.vencedor ? luta.competidor2.id : null),
+                                    c1: { id: luta.competidor1.id, nome: luta.competidor1.nome, equipe: luta.competidor1.equipe },
+                                    c2: { id: luta.competidor2.id, nome: luta.competidor2.nome, equipe: luta.competidor2.equipe }
+                                  }) %>"
                                 >
                                   Corrigir
                                 </a>
@@ -280,6 +288,7 @@
                                   method="POST"
                                   style="flex: 1; margin: 0;"
                                   data-confirm="Deseja anular este resultado? O avanço e os pontos serão removidos."
+                                  data-ajax
                                 >
                                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                   <button
@@ -301,6 +310,14 @@
                               href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/lutas/<%= luta.id %>/resultado"
                               class="button button-small"
                               style="width: 100%; padding: 4px 8px; font-size: 11px; text-transform: uppercase; font-weight: 600; display: block; text-align: center;"
+                              data-resultado="<%= JSON.stringify({
+                                modo: 'lancar',
+                                acao: '/eventos/' + evento.id + '/chaves/' + chave.id + '/lutas/' + luta.id + '/resultado',
+                                titulo: 'Luta ' + luta.posicao,
+                                vencedorId: null,
+                                c1: { id: luta.competidor1.id, nome: luta.competidor1.nome, equipe: luta.competidor1.equipe },
+                                c2: { id: luta.competidor2.id, nome: luta.competidor2.nome, equipe: luta.competidor2.equipe }
+                              }) %>"
                             >
                               Lançar resultado
                             </a>
@@ -316,10 +333,48 @@
         </section>
       </main>
 
+      <%# Modal de resultado (preenchido por /js/resultado-modal.js) %>
+      <dialog class="modal-resultado" id="modalResultado" aria-labelledby="modalResultadoTitulo">
+        <form method="POST" id="formModalResultado" class="modal-resultado-form" data-ajax>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <header class="modal-resultado-header">
+            <div>
+              <span class="modal-resultado-rotulo" id="modalResultadoRotulo">Lançar resultado</span>
+              <h2 id="modalResultadoTitulo">Quem venceu?</h2>
+            </div>
+            <button type="button" class="modal-resultado-fechar" data-fechar-modal aria-label="Fechar">&times;</button>
+          </header>
+
+          <p class="modal-resultado-aviso" id="modalResultadoAviso" hidden>
+            <strong>Atenção:</strong> a correção remove o avanço e a pontuação do vencedor atual e aplica o novo resultado.
+          </p>
+
+          <div class="modal-resultado-opcoes">
+            <% [1, 2].forEach(function(n) { %>
+              <label class="modal-resultado-opcao">
+                <input type="radio" name="vencedor_id" id="modalVencedor<%= n %>" required>
+                <span class="modal-resultado-atleta">
+                  <strong data-nome></strong>
+                  <small data-equipe></small>
+                </span>
+                <span class="modal-resultado-tag" data-tag>Atleta <%= n %></span>
+              </label>
+            <% }); %>
+          </div>
+
+          <footer class="modal-resultado-acoes">
+            <button type="button" class="button button-outline" data-fechar-modal>Cancelar</button>
+            <button type="submit" class="button button-primary" id="modalResultadoConfirmar">Confirmar vitória</button>
+          </footer>
+        </form>
+      </dialog>
+
       <%- include("../partials/footer") %>
     </div>
 
     <%- include("../partials/scripts") %>
     <script src="/js/bracket.js" defer></script>
+    <script src="/js/resultado-modal.js" defer></script>
   </body>
 </html>

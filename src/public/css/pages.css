@@ -1102,3 +1102,225 @@
     max-width: none;
   }
 }
+
+/* ==========================================================
+   Modal de resultado (tela da chave)
+   ========================================================== */
+
+.modal-resultado {
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  overflow: auto;
+}
+
+.modal-resultado::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.modal-resultado[open] {
+  animation: modal-resultado-entrar 160ms ease-out;
+}
+
+@keyframes modal-resultado-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.modal-resultado-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.modal-resultado-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modal-resultado-rotulo {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.modal-resultado-header h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.modal-resultado-fechar {
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.modal-resultado-fechar:hover {
+  color: var(--color-text);
+}
+
+.modal-resultado-aviso {
+  margin: 0;
+  padding: 10px 12px;
+  background: var(--color-warning-background);
+  border-left: 3px solid var(--color-warning);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.modal-resultado-opcoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-resultado-opcao {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.modal-resultado-opcao:hover {
+  border-color: var(--color-text-muted);
+}
+
+.modal-resultado-opcao:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-background);
+}
+
+.modal-resultado-opcao input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  accent-color: var(--color-primary);
+}
+
+.modal-resultado-atleta {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.modal-resultado-atleta strong {
+  font-size: 16px;
+}
+
+.modal-resultado-atleta small {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.modal-resultado-tag {
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.modal-resultado-tag--atual {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.modal-resultado-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .modal-resultado-acoes {
+    flex-direction: column-reverse;
+  }
+
+  .modal-resultado-acoes .button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+/* ==========================================================
+   Aviso flutuante (toast) e destaque da luta atualizada
+   ========================================================== */
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 1000;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 12px 18px;
+  border-radius: var(--radius-small);
+  background: var(--color-primary);
+  color: var(--color-surface);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  transition: opacity 200ms ease, transform 200ms ease;
+  pointer-events: none;
+}
+
+.toast-erro {
+  background: #8a1c1c;
+  color: #ffffff;
+}
+
+.toast-visivel {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.match-card.match-atualizada {
+  animation: match-atualizada 1.6s ease-out;
+}
+
+@keyframes match-atualizada {
+  0% {
+    box-shadow: 0 0 0 0 rgba(182, 0, 0, 0.55);
+  }
+  30% {
+    box-shadow: 0 0 0 6px rgba(182, 0, 0, 0.35);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(182, 0, 0, 0);
+  }
+}
