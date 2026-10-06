@@ -1,28 +1,35 @@
 const express = require('express');
 const chaveController = require('../controllers/chaveController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const { exigirAutenticacao, exigirPermissao } = require('../middlewares/authMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 const router = express.Router({ mergeParams: true });
 
 router.use(exigirAutenticacao);
 
+const podeVer = exigirPermissao('chaves.visualizar');
+const podeGerar = exigirPermissao('chaves.gerar');
+const podeGerenciar = exigirPermissao('chaves.gerenciar');
+const podeOperar = exigirPermissao('lutas.operar');
+
 // Listar categorias e chaves do evento
-router.get('/chaves', chaveController.listar);
+router.get('/chaves', podeVer, chaveController.listar);
 
 // Gerar chave para uma categoria
 router.post(
   '/categorias/:categoriaId/chave/gerar',
+  podeGerar,
   csrfProtection,
   chaveController.gerar
 );
 
 // Abrir visualização da chave
-router.get('/chaves/:chaveId', chaveController.mostrar);
+router.get('/chaves/:chaveId', podeVer, chaveController.mostrar);
 
 // Sortear novamente (apenas se NAO_INICIADA)
 router.post(
   '/chaves/:chaveId/sortear',
+  podeGerar,
   csrfProtection,
   chaveController.sortear
 );
@@ -30,6 +37,7 @@ router.post(
 // Iniciar chave e avançar byes (apenas se NAO_INICIADA)
 router.post(
   '/chaves/:chaveId/iniciar',
+  podeOperar,
   csrfProtection,
   chaveController.iniciar
 );
@@ -37,6 +45,7 @@ router.post(
 // Excluir chave (apenas se NAO_INICIADA)
 router.post(
   '/chaves/:chaveId/excluir',
+  podeGerenciar,
   csrfProtection,
   chaveController.excluir
 );

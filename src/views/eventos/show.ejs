@@ -31,12 +31,14 @@
             <% } %>
           </div>
 
-          <a
-            href="/eventos/<%= evento.id %>/editar"
-            class="button button-outline"
-          >
-            Editar evento
-          </a>
+          <% if (pode('eventos.gerenciar')) { %>
+            <a
+              href="/eventos/<%= evento.id %>/editar"
+              class="button button-outline"
+            >
+              Editar evento
+            </a>
+          <% } %>
         </div>
 
         <section class="page-content">
@@ -71,55 +73,68 @@
           </div>
 
           <div class="event-menu-grid">
-            <a
-              href="/eventos/<%= evento.id %>/categorias"
-              class="card event-menu-card"
-            >
-              <h2>Categorias</h2>
-              <p>Configure peso, idade e faixa.</p>
-            </a>
+            <% if (pode('categorias.gerenciar')) { %>
+              <a
+                href="/eventos/<%= evento.id %>/categorias"
+                class="card event-menu-card"
+              >
+                <h2>Categorias</h2>
+                <p>Configure peso, idade e faixa.</p>
+              </a>
+            <% } %>
 
-            <a
-              href="/eventos/<%= evento.id %>/inscricoes"
-              class="card event-menu-card"
-            >
-              <h2>Inscricoes</h2>
-              <p>Cadastre e importe os competidores.</p>
-            </a>
+            <% if (pode('inscricoes.gerenciar')) { %>
+              <a
+                href="/eventos/<%= evento.id %>/inscricoes"
+                class="card event-menu-card"
+              >
+                <h2>Inscricoes</h2>
+                <p>Cadastre e importe os competidores.</p>
+              </a>
+            <% } %>
 
-            <a
-              href="/eventos/<%= evento.id %>/chaves"
-              class="card event-menu-card"
-            >
-              <h2>Chaves</h2>
-              <p>Gere e acompanhe as lutas.</p>
-            </a>
+            <% if (pode('chaves.visualizar')) { %>
+              <a
+                href="/eventos/<%= evento.id %>/chaves"
+                class="card event-menu-card"
+              >
+                <h2>Chaves</h2>
+                <p>Gere e acompanhe as lutas.</p>
+              </a>
+            <% } %>
 
-            <a
-              href="/eventos/<%= evento.id %>/ranking"
-              class="card event-menu-card"
-            >
-              <h2>Ranking</h2>
-              <p>Acompanhe os pontos das equipes.</p>
-            </a>
+            <% if (pode('ranking.visualizar')) { %>
+              <a
+                href="/eventos/<%= evento.id %>/ranking"
+                class="card event-menu-card"
+              >
+                <h2>Ranking</h2>
+                <p>Acompanhe os pontos das equipes.</p>
+              </a>
+            <% } %>
 
-            <a
-              href="/eventos/<%= evento.id %>/pontuacao"
-              class="card event-menu-card"
-            >
-              <h2>Pontuacao</h2>
-              <p>Configure os pontos do evento.</p>
-            </a>
+            <% if (pode('pontuacao.gerenciar')) { %>
+              <a
+                href="/eventos/<%= evento.id %>/pontuacao"
+                class="card event-menu-card"
+              >
+                <h2>Pontuacao</h2>
+                <p>Configure os pontos do evento.</p>
+              </a>
+            <% } %>
 
-            <a
-              href="/eventos/<%= evento.id %>/auditoria"
-              class="card event-menu-card"
-            >
-              <h2>Auditoria</h2>
-              <p>Consulte o histórico de alterações.</p>
-            </a>
+            <% if (pode('auditoria.visualizar')) { %>
+              <a
+                href="/eventos/<%= evento.id %>/auditoria"
+                class="card event-menu-card"
+              >
+                <h2>Auditoria</h2>
+                <p>Consulte o histórico de alterações.</p>
+              </a>
+            <% } %>
           </div>
 
+          <% if (pode('eventos.gerenciar')) { %>
           <section class="danger-zone">
             <h2>Excluir evento</h2>
 
@@ -143,6 +158,7 @@
               </button>
             </form>
           </section>
+          <% } %>
         </section>
       </main>
 

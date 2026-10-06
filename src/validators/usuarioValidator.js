@@ -1,3 +1,13 @@
+const { cargoValido } = require('../config/permissoes');
+
+function validarCargo(cargo, erros) {
+  if (!cargo) {
+    erros.push('O cargo e obrigatorio.');
+  } else if (!cargoValido(String(cargo).trim().toUpperCase())) {
+    erros.push('Cargo invalido.');
+  }
+}
+
 function validarCriacao(dados) {
   const erros = [];
   const nome = (dados.nome || '').trim();
@@ -27,6 +37,8 @@ function validarCriacao(dados) {
     erros.push('A confirmacao de senha nao confere.');
   }
 
+  validarCargo(dados.cargo, erros);
+
   return erros;
 }
 
@@ -48,6 +60,8 @@ function validarEdicao(dados) {
   } else if (email.length > 255) {
     erros.push('O e-mail deve ter no maximo 255 caracteres.');
   }
+
+  validarCargo(dados.cargo, erros);
 
   return erros;
 }

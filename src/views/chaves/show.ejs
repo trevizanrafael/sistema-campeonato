@@ -39,6 +39,7 @@
 
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
             <% if (chave.status === 'NAO_INICIADA') { %>
+              <% if (pode('chaves.gerar')) { %>
               <form
                 action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/sortear"
                 method="POST"
@@ -53,6 +54,7 @@
                   Sortear novamente
                 </button>
               </form>
+              <% } %>
 
               <form
                 action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/iniciar"
@@ -69,6 +71,7 @@
                 </button>
               </form>
 
+              <% if (pode('chaves.gerenciar')) { %>
               <form
                 action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/excluir"
                 method="POST"
@@ -83,6 +86,7 @@
                   Excluir chave
                 </button>
               </form>
+              <% } %>
             <% } else if (chave.status === 'EM_ANDAMENTO') { %>
               <% if (todasFinalizadas) { %>
                 <a
@@ -96,7 +100,7 @@
                   Chave bloqueada para alteracoes estruturais
                 </span>
               <% } %>
-            <% } else if (chave.status === 'FINALIZADA') { %>
+            <% } else if (chave.status === 'FINALIZADA' && pode('chaves.gerenciar')) { %>
               <form
                 action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/reabrir"
                 method="POST"

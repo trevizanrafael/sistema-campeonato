@@ -7,7 +7,7 @@
     <div class="error-page">
       <div class="error-page__code">403</div>
       <h1 class="error-page__title">Acesso não permitido</h1>
-      <p class="error-page__msg">Você não pode realizar esta operação.</p>
+      <p class="error-page__msg"><%= (typeof mensagem !== 'undefined' && mensagem) ? mensagem : 'Você não pode realizar esta operação.' %></p>
       <a href="/" class="button button-primary">Voltar para o Início</a>
     </div>
     <%- include("../partials/scripts") %>

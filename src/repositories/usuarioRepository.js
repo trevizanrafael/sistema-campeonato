@@ -2,7 +2,7 @@ const pool = require('../config/database');
 
 async function buscarPorId(id) {
   const { rows } = await pool.query(
-    `SELECT id, nome, email, ativo, created_at, updated_at
+    `SELECT id, nome, email, cargo, ultimo_evento_id, ativo, created_at, updated_at
      FROM usuarios
      WHERE id = $1`,
     [id]
@@ -12,7 +12,7 @@ async function buscarPorId(id) {
 
 async function buscarPorEmail(email) {
   const { rows } = await pool.query(
-    `SELECT id, nome, email, senha_hash, ativo, created_at, updated_at
+    `SELECT id, nome, email, cargo, senha_hash, ativo, created_at, updated_at
      FROM usuarios
      WHERE LOWER(email) = LOWER($1)
      LIMIT 1`,
@@ -23,7 +23,7 @@ async function buscarPorEmail(email) {
 
 async function listarTodos() {
   const { rows } = await pool.query(
-    `SELECT id, nome, email, ativo, created_at, updated_at
+    `SELECT id, nome, email, cargo, ativo, created_at, updated_at
      FROM usuarios
      ORDER BY nome`
   );
@@ -32,10 +32,10 @@ async function listarTodos() {
 
 async function criar(dados) {
   const { rows } = await pool.query(
-    `INSERT INTO usuarios (nome, email, senha_hash)
-     VALUES ($1, LOWER($2), $3)
-     RETURNING id, nome, email, ativo, created_at`,
-    [dados.nome, dados.email, dados.senhaHash]
+    `INSERT INTO usuarios (nome, email, senha_hash, cargo)
+     VALUES ($1, LOWER($2), $3, $4)
+     RETURNING id, nome, email, cargo, ativo, created_at`,
+    [dados.nome, dados.email, dados.senhaHash, dados.cargo]
   );
   return rows[0];
 }
@@ -43,10 +43,10 @@ async function criar(dados) {
 async function atualizar(id, dados) {
   const { rows } = await pool.query(
     `UPDATE usuarios
-     SET nome = $1, email = LOWER($2), updated_at = NOW()
-     WHERE id = $3
-     RETURNING id, nome, email, ativo, updated_at`,
-    [dados.nome, dados.email, id]
+     SET nome = $1, email = LOWER($2), cargo = $3, updated_at = NOW()
+     WHERE id = $4
+     RETURNING id, nome, email, cargo, ativo, updated_at`,
+    [dados.nome, dados.email, dados.cargo, id]
   );
   return rows[0] || null;
 }
@@ -93,6 +93,22 @@ async function contarAtivos() {
   return parseInt(rows[0].total, 10);
 }
 
+async function contarAdministradoresAtivos() {
+  const { rows } = await pool.query(
+    `SELECT COUNT(*) AS total
+     FROM usuarios
+     WHERE ativo = TRUE AND cargo = 'ADMINISTRADOR'`
+  );
+  return parseInt(rows[0].total, 10);
+}
+
+async function atualizarUltimoEvento(id, eventoId) {
+  await pool.query(
+    'UPDATE usuarios SET ultimo_evento_id = $1 WHERE id = $2',
+    [eventoId, id]
+  );
+}
+
 module.exports = {
   buscarPorId,
   buscarPorEmail,
@@ -103,4 +119,6 @@ module.exports = {
   alterarStatus,
   emailJaExiste,
   contarAtivos,
+  contarAdministradoresAtivos,
+  atualizarUltimoEvento,
 };

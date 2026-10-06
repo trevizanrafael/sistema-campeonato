@@ -11,6 +11,8 @@
       <%- include("../partials/header") %>
       <%- include("../partials/sidebar") %>
 
+      <% const ehOperador = !pode('eventos.gerenciar'); %>
+
       <main class="main-content">
         <%- include("../partials/messages") %>
 
@@ -21,28 +23,103 @@
             </h1>
 
             <p class="page-subtitle">
-              Selecione uma opção no menu para começar.
+              <% if (ehOperador) { %>
+                <%= ultimoEvento ? 'Continue de onde parou.' : 'Escolha o campeonato em que você vai trabalhar.' %>
+              <% } else { %>
+                Selecione uma opção para começar.
+              <% } %>
             </p>
           </div>
         </div>
 
         <section class="page-content">
-          <div class="dashboard-grid">
-            <a href="/eventos" class="card dashboard-card">
-              <h2>Eventos</h2>
-              <p>Crie e gerencie campeonatos.</p>
-            </a>
+          <% if (ultimoEvento) { %>
+            <%# Atalho principal: último campeonato aberto %>
+            <article class="card continue-card <%= ehOperador ? 'continue-card--hero' : '' %>">
+              <div class="continue-card__info">
+                <span class="continue-card__eyebrow">Último campeonato aberto</span>
+                <h2 class="continue-card__title"><%= ultimoEvento.nome %></h2>
 
-            <a href="/equipes" class="card dashboard-card">
-              <h2>Equipes</h2>
-              <p>Cadastre equipes participantes.</p>
-            </a>
+                <ul class="continue-card__stats">
+                  <li><strong><%= ultimoEvento.total_inscricoes %></strong> inscrições</li>
+                  <li><strong><%= ultimoEvento.total_chaves %></strong> chaves</li>
+                  <li><strong><%= ultimoEvento.chaves_finalizadas %></strong> finalizadas</li>
+                </ul>
+              </div>
 
-            <a href="/usuarios" class="card dashboard-card">
-              <h2>Usuários</h2>
-              <p>Gerencie os acessos ao sistema.</p>
-            </a>
-          </div>
+              <div class="continue-card__actions">
+                <% if (ehOperador) { %>
+                  <a href="/eventos/<%= ultimoEvento.id %>/chaves" class="button button-primary button-large" id="btnContinuarChaves">
+                    Abrir chaves de luta &rarr;
+                  </a>
+                  <a href="/eventos/<%= ultimoEvento.id %>/ranking" class="button button-outline" id="btnContinuarRanking">
+                    Ver ranking
+                  </a>
+                <% } else { %>
+                  <a href="/eventos/<%= ultimoEvento.id %>" class="button button-primary" id="btnContinuarEvento">
+                    Continuar &rarr;
+                  </a>
+                <% } %>
+              </div>
+            </article>
+
+            <% if (ehOperador) { %>
+              <p class="continue-card__switch">
+                Vai trabalhar em outro campeonato?
+                <a href="/eventos">Escolher outro campeonato</a>
+              </p>
+            <% } %>
+          <% } else if (ehOperador) { %>
+            <%# Operador sem histórico: lista rápida dos campeonatos recentes %>
+            <% if (eventosRecentes.length > 0) { %>
+              <div class="quick-pick">
+                <% eventosRecentes.forEach(function(evento) { %>
+                  <a href="/eventos/<%= evento.id %>/chaves" class="card quick-pick__item">
+                    <span class="quick-pick__name"><%= evento.nome %></span>
+                    <span class="quick-pick__meta"><%= evento.total_inscricoes %> inscrições &middot; <%= evento.total_categorias %> categorias</span>
+                  </a>
+                <% }); %>
+              </div>
+              <p class="continue-card__switch">
+                Não encontrou? <a href="/eventos">Ver todos os campeonatos</a>
+              </p>
+            <% } else { %>
+              <div class="empty-state">
+                <h2>Nenhum campeonato disponível</h2>
+                <p>Peça para um organizador cadastrar o campeonato.</p>
+              </div>
+            <% } %>
+          <% } %>
+
+          <% if (!ehOperador) { %>
+            <div class="dashboard-grid" style="<%= ultimoEvento ? 'margin-top: 24px;' : '' %>">
+              <a href="/eventos" class="card dashboard-card">
+                <h2>Eventos</h2>
+                <p>Crie e gerencie campeonatos.</p>
+              </a>
+
+              <% if (pode('equipes.gerenciar')) { %>
+                <a href="/equipes" class="card dashboard-card">
+                  <h2>Equipes</h2>
+                  <p>Cadastre equipes participantes.</p>
+                </a>
+              <% } %>
+
+              <% if (pode('faixas.gerenciar')) { %>
+                <a href="/faixas" class="card dashboard-card">
+                  <h2>Faixas</h2>
+                  <p>Configure as graduações.</p>
+                </a>
+              <% } %>
+
+              <% if (pode('usuarios.gerenciar')) { %>
+                <a href="/usuarios" class="card dashboard-card">
+                  <h2>Usuários</h2>
+                  <p>Gerencie os acessos ao sistema.</p>
+                </a>
+              <% } %>
+            </div>
+          <% } %>
         </section>
       </main>
 

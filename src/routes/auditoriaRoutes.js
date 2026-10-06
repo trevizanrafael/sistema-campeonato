@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const auditoriaController = require('../controllers/auditoriaController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const { exigirAutenticacao, exigirPermissao } = require('../middlewares/authMiddleware');
 
 // Todas as rotas de auditoria exigem autenticação
-router.use(exigirAutenticacao);
+router.use(exigirAutenticacao, exigirPermissao('auditoria.visualizar'));
 
 // Listar histórico de auditoria do evento
 router.get('/', auditoriaController.listar);

@@ -23,6 +23,12 @@
       <%= usuarioLogado.nome %>
     </span>
 
+    <% if (usuarioLogado.cargo) { %>
+      <span class="badge badge-cargo badge-cargo--<%= String(usuarioLogado.cargo).toLowerCase() %> col-hide-mobile">
+        <%= nomeCargo(usuarioLogado.cargo) %>
+      </span>
+    <% } %>
+
     <form action="/logout" method="POST">
       <input
         type="hidden"

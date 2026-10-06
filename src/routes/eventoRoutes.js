@@ -1,19 +1,29 @@
 const express = require('express');
 const eventoController = require('../controllers/eventoController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const {
+  exigirAutenticacao,
+  exigirPermissao,
+  registrarUltimoEvento,
+} = require('../middlewares/authMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 const router = express.Router();
 
 router.use(exigirAutenticacao);
 
-router.get('/', eventoController.listar);
-router.get('/novo', eventoController.mostrarCadastro);
-router.post('/', csrfProtection, eventoController.cadastrar);
+const podeVer = exigirPermissao('eventos.visualizar');
+const podeGerenciar = exigirPermissao('eventos.gerenciar');
 
-router.get('/:id/editar', eventoController.mostrarEdicao);
-router.post('/:id', csrfProtection, eventoController.editar);
-router.post('/:id/excluir', csrfProtection, eventoController.excluir);
+router.get('/', podeVer, eventoController.listar);
+router.get('/novo', podeGerenciar, eventoController.mostrarCadastro);
+router.post('/', podeGerenciar, csrfProtection, eventoController.cadastrar);
+
+// Memoriza o último campeonato aberto (qualquer rota /eventos/:id/...)
+router.use('/:eventoId', registrarUltimoEvento);
+
+router.get('/:id/editar', podeGerenciar, eventoController.mostrarEdicao);
+router.post('/:id', podeGerenciar, csrfProtection, eventoController.editar);
+router.post('/:id/excluir', podeGerenciar, csrfProtection, eventoController.excluir);
 
 const categoriaRoutes = require('./categoriaRoutes');
 const inscricaoRoutes = require('./inscricaoRoutes');
@@ -44,6 +54,6 @@ const auditoriaRoutes = require('./auditoriaRoutes');
 // Rotas aninhadas de auditoria (Fase 18)
 router.use('/:eventoId/auditoria', auditoriaRoutes);
 
-router.get('/:id', eventoController.visualizar);
+router.get('/:id', podeVer, eventoController.visualizar);
 
 module.exports = router;

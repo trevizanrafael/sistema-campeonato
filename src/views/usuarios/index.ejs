@@ -40,6 +40,7 @@
                   <tr>
                     <th>Nome</th>
                     <th>E-mail</th>
+                    <th>Cargo</th>
                     <th>Situacao</th>
                     <th>Acoes</th>
                   </tr>
@@ -49,6 +50,9 @@
                     <tr>
                       <td><%= u.nome %></td>
                       <td><%= u.email %></td>
+                      <td>
+                        <span class="badge badge-cargo badge-cargo--<%= String(u.cargo).toLowerCase() %>"><%= nomeCargo(u.cargo) %></span>
+                      </td>
                       <td>
                         <% if (u.ativo) { %>
                           <span class="badge badge-ativo">Ativo</span>

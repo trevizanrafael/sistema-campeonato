@@ -32,10 +32,14 @@
           <% if (!categorias || categorias.length === 0) { %>
             <div class="card empty-state">
               <h2>Nenhuma categoria cadastrada</h2>
-              <p>Cadastre categorias no evento antes de gerar as chaves de combate.</p>
-              <a href="/eventos/<%= evento.id %>/categorias/nova" class="button button-primary">
-                Cadastrar primeira categoria
-              </a>
+              <% if (pode('categorias.gerenciar')) { %>
+                <p>Cadastre categorias no evento antes de gerar as chaves de combate.</p>
+                <a href="/eventos/<%= evento.id %>/categorias/nova" class="button button-primary">
+                  Cadastrar primeira categoria
+                </a>
+              <% } else { %>
+                <p>Este campeonato ainda nao tem categorias. Aguarde o organizador configurar.</p>
+              <% } %>
             </div>
           <% } else { %>
             <div class="table-container">
@@ -90,7 +94,7 @@
                       <td style="text-align: right;">
                         <div style="display: inline-flex; gap: 8px; justify-content: flex-end; align-items: center;">
                           <% if (!cat.chave_id) { %>
-                            <% if (cat.total_confirmados >= 2) { %>
+                            <% if (cat.total_confirmados >= 2 && pode('chaves.gerar')) { %>
                               <form
                                 action="/eventos/<%= evento.id %>/categorias/<%= cat.categoria_id %>/chave/gerar"
                                 method="POST"
@@ -101,6 +105,10 @@
                                   Gerar chave
                                 </button>
                               </form>
+                            <% } else if (cat.total_confirmados >= 2) { %>
+                              <span style="font-size: 12px; color: var(--color-text-muted);">
+                                Aguardando organizador gerar
+                              </span>
                             <% } else { %>
                               <span style="font-size: 12px; color: var(--color-text-muted);">
                                 Minimo 2 atletas

@@ -17,25 +17,25 @@ async function listar(req, res, next) {
 function mostrarCadastro(req, res) {
   return res.render('usuarios/create', {
     titulo: 'Novo Usuario',
-    dados: { nome: '', email: '', senha: '', confirmar_senha: '' },
+    dados: { nome: '', email: '', senha: '', confirmar_senha: '', cargo: 'OPERADOR' },
     erros: [],
   });
 }
 
 async function cadastrar(req, res, next) {
   try {
-    const { nome, email, senha, confirmar_senha } = req.body;
+    const { nome, email, senha, confirmar_senha, cargo } = req.body;
 
-    const erros = validarCriacao({ nome, email, senha, confirmar_senha });
+    const erros = validarCriacao({ nome, email, senha, confirmar_senha, cargo });
     if (erros.length > 0) {
       return res.status(422).render('usuarios/create', {
         titulo: 'Novo Usuario',
-        dados: { nome: nome || '', email: email || '', senha: senha || '', confirmar_senha: confirmar_senha || '' },
+        dados: { nome: nome || '', email: email || '', senha: '', confirmar_senha: '', cargo: cargo || '' },
         erros,
       });
     }
 
-    await usuarioService.criarUsuario({ nome, email, senha });
+    await usuarioService.criarUsuario({ nome, email, senha, cargo });
 
     req.session.mensagemSucesso = 'Usuario cadastrado com sucesso.';
     return res.redirect('/usuarios');
@@ -43,7 +43,7 @@ async function cadastrar(req, res, next) {
     if (erro instanceof BusinessRuleError) {
       return res.status(422).render('usuarios/create', {
         titulo: 'Novo Usuario',
-        dados: { nome: req.body.nome || '', email: req.body.email || '', senha: req.body.senha || '', confirmar_senha: req.body.confirmar_senha || '' },
+        dados: { nome: req.body.nome || '', email: req.body.email || '', senha: '', confirmar_senha: '', cargo: req.body.cargo || '' },
         erros: [erro.message],
       });
     }
@@ -56,7 +56,7 @@ async function mostrarEdicao(req, res, next) {
     const usuario = await usuarioService.buscarUsuario(req.params.id);
     return res.render('usuarios/edit', {
       titulo: 'Editar Usuario',
-      dados: { nome: usuario.nome, email: usuario.email },
+      dados: { nome: usuario.nome, email: usuario.email, cargo: usuario.cargo },
       usuario,
       erros: [],
     });
@@ -70,21 +70,21 @@ async function mostrarEdicao(req, res, next) {
 
 async function editar(req, res, next) {
   try {
-    const { nome, email } = req.body;
+    const { nome, email, cargo } = req.body;
     const id = req.params.id;
 
-    const erros = validarEdicao({ nome, email });
+    const erros = validarEdicao({ nome, email, cargo });
     if (erros.length > 0) {
       const usuario = await usuarioService.buscarUsuario(id);
       return res.status(422).render('usuarios/edit', {
         titulo: 'Editar Usuario',
-        dados: { nome: nome || '', email: email || '' },
+        dados: { nome: nome || '', email: email || '', cargo: cargo || usuario.cargo },
         usuario,
         erros,
       });
     }
 
-    await usuarioService.editarUsuario(id, { nome, email });
+    await usuarioService.editarUsuario(id, { nome, email, cargo }, req.session.usuario.id);
 
     req.session.mensagemSucesso = 'Usuario atualizado com sucesso.';
     return res.redirect('/usuarios');
@@ -94,7 +94,7 @@ async function editar(req, res, next) {
         const usuario = await usuarioService.buscarUsuario(req.params.id);
         return res.status(422).render('usuarios/edit', {
           titulo: 'Editar Usuario',
-          dados: { nome: req.body.nome || '', email: req.body.email || '' },
+          dados: { nome: req.body.nome || '', email: req.body.email || '', cargo: req.body.cargo || usuario.cargo },
           usuario,
           erros: [erro.message],
         });

@@ -1,3 +1,5 @@
+const { temPermissao, nomeCargo, CARGOS_INFO } = require('../config/permissoes');
+
 function carregarDadosDasViews(req, res, next) {
   res.locals.usuarioLogado =
     req.session && req.session.usuario ? req.session.usuario : null;
@@ -28,6 +30,15 @@ function carregarDadosDasViews(req, res, next) {
   res.locals.formatarIntervaloPeso = formatters.formatarIntervaloPeso;
   res.locals.formatarIntervaloFaixa = formatters.formatarIntervaloFaixa;
   res.locals.formatarSexo = formatters.formatarSexo;
+
+  // Permissões por cargo — lê res.locals.usuarioLogado no momento da renderização,
+  // pois exigirAutenticacao o substitui pela versão atualizada do banco.
+  res.locals.pode = (permissao) => {
+    const usuario = res.locals.usuarioLogado;
+    return Boolean(usuario && temPermissao(usuario.cargo, permissao));
+  };
+  res.locals.nomeCargo = nomeCargo;
+  res.locals.CARGOS_INFO = CARGOS_INFO;
 
   next();
 }

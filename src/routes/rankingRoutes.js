@@ -1,10 +1,10 @@
 const express = require('express');
 const rankingController = require('../controllers/rankingController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const { exigirAutenticacao, exigirPermissao } = require('../middlewares/authMiddleware');
 
 const router = express.Router({ mergeParams: true });
 
-router.use(exigirAutenticacao);
+router.use(exigirAutenticacao, exigirPermissao('ranking.visualizar'));
 
 // Mostrar ranking geral das equipes no evento
 router.get('/', rankingController.mostrarRanking);

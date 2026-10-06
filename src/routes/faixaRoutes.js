@@ -1,11 +1,11 @@
 const express = require('express');
 const faixaController = require('../controllers/faixaController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const { exigirAutenticacao, exigirPermissao } = require('../middlewares/authMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 const router = express.Router();
 
-router.use(exigirAutenticacao);
+router.use(exigirAutenticacao, exigirPermissao('faixas.gerenciar'));
 
 router.get('/', faixaController.listar);
 router.get('/nova', faixaController.mostrarCadastro);

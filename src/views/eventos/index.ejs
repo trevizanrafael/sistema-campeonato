@@ -17,12 +17,14 @@
         <div class="page-header">
           <div>
             <h1 class="page-title">Eventos</h1>
-            <p class="page-subtitle">Gerencie os campeonatos cadastrados.</p>
+            <p class="page-subtitle"><%= pode('eventos.gerenciar') ? 'Gerencie os campeonatos cadastrados.' : 'Escolha o campeonato em que voce vai trabalhar.' %></p>
           </div>
 
-          <a href="/eventos/novo" class="button button-primary">
-            Novo evento
-          </a>
+          <% if (pode('eventos.gerenciar')) { %>
+            <a href="/eventos/novo" class="button button-primary">
+              Novo evento
+            </a>
+          <% } %>
         </div>
 
         <section class="page-content">
@@ -91,12 +93,14 @@
                             Abrir
                           </a>
 
-                          <a
-                            href="/eventos/<%= evento.id %>/editar"
-                            class="button button-small button-outline"
-                          >
-                            Editar
-                          </a>
+                          <% if (pode('eventos.gerenciar')) { %>
+                            <a
+                              href="/eventos/<%= evento.id %>/editar"
+                              class="button button-small button-outline"
+                            >
+                              Editar
+                            </a>
+                          <% } %>
                         </div>
                       </td>
                     </tr>
@@ -126,10 +130,14 @@
             <% } else { %>
               <div class="empty-state">
                 <h2>Nenhum evento cadastrado</h2>
-                <p>Crie o primeiro evento para comecar a cadastrar categorias e inscricoes.</p>
-                <a href="/eventos/novo" class="button button-primary">
-                  Criar primeiro evento
-                </a>
+                <% if (pode('eventos.gerenciar')) { %>
+                  <p>Crie o primeiro evento para comecar a cadastrar categorias e inscricoes.</p>
+                  <a href="/eventos/novo" class="button button-primary">
+                    Criar primeiro evento
+                  </a>
+                <% } else { %>
+                  <p>Peca para um organizador cadastrar o campeonato.</p>
+                <% } %>
               </div>
             <% } %>
           <% } %>

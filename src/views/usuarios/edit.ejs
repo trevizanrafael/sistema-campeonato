@@ -44,6 +44,13 @@
                 <input type="text" id="email" name="email" class="form-control" value="<%= dados.email %>" required>
               </div>
 
+              <% const proprioUsuario = String(usuario.id) === String(usuarioLogado.id); %>
+              <%- include("_cargo", {
+                dados: dados,
+                bloqueado: proprioUsuario,
+                motivoBloqueio: "Voce nao pode alterar o seu proprio cargo. Peca para outro Administrador."
+              }) %>
+
               <div class="form-actions">
                 <button type="submit" class="button button-primary">Salvar</button>
                 <a href="/usuarios" class="button button-outline">Cancelar</a>

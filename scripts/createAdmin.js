@@ -37,8 +37,8 @@ async function createAdmin() {
     const senhaHash = await bcrypt.hash(senha, 12);
 
     await client.query(
-      `INSERT INTO usuarios (nome, email, senha_hash, ativo)
-       VALUES ($1, $2, $3, TRUE)`,
+      `INSERT INTO usuarios (nome, email, senha_hash, ativo, cargo)
+       VALUES ($1, $2, $3, TRUE, 'ADMINISTRADOR')`,
       [nome, email, senhaHash]
     );
 

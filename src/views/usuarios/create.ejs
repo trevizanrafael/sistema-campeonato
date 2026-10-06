@@ -54,6 +54,8 @@
                 <input type="password" id="confirmar_senha" name="confirmar_senha" class="form-control" value="<%= dados.confirmar_senha || '' %>" required>
               </div>
 
+              <%- include("_cargo", { dados: dados }) %>
+
               <div class="form-actions">
                 <button type="submit" class="button button-primary">Cadastrar</button>
                 <a href="/usuarios" class="button button-outline">Cancelar</a>

@@ -6,7 +6,11 @@
         <a href="/equipes/nova" class="button button-small button-outline">Cadastrar equipe</a>
       <% } %>
       <% if (!locals.faixas || faixas.length === 0) { %>
-        <a href="/faixas" class="button button-small button-outline">Gerenciar faixas</a>
+        <% if (pode('faixas.gerenciar')) { %>
+          <a href="/faixas" class="button button-small button-outline">Gerenciar faixas</a>
+        <% } else { %>
+          <span style="font-size: 13px;">Peca a um Administrador para cadastrar as faixas.</span>
+        <% } %>
       <% } %>
     </div>
   </div>

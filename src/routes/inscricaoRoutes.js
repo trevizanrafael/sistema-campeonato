@@ -1,12 +1,12 @@
 const express = require('express');
 const inscricaoController = require('../controllers/inscricaoController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const { exigirAutenticacao, exigirPermissao } = require('../middlewares/authMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 // mergeParams: true permite acessar :eventoId do roteador pai (eventoRoutes)
 const router = express.Router({ mergeParams: true });
 
-router.use(exigirAutenticacao);
+router.use(exigirAutenticacao, exigirPermissao('inscricoes.gerenciar'));
 
 router.get('/', inscricaoController.listar);
 router.get('/nova', inscricaoController.mostrarCadastro);
