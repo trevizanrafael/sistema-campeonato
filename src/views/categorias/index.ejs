@@ -35,67 +35,60 @@
         <section class="page-content">
           <% if (categorias && categorias.length > 0) { %>
             <div class="table-container">
-              <table class="table">
+              <table class="table table-categorias">
                 <thead>
                   <tr>
                     <th>Categoria</th>
-                    <th>Sexo</th>
-                    <th>Idade</th>
-                    <th>Peso</th>
-                    <th>Faixas</th>
-                    <th>Inscrições</th>
-                    <th>Chave</th>
-                    <th>Conflito</th>
-                    <th>Ações</th>
+                    <th class="col-num">Atletas</th>
+                    <th>Situação</th>
+                    <th class="col-acoes">Ações</th>
                   </tr>
                 </thead>
 
                 <tbody>
                   <% categorias.forEach((categoria) => { %>
+                    <% const temChave = Number(categoria.total_chaves) > 0; %>
+                    <% const bloqueada = Number(categoria.total_inscricoes) > 0 || temChave; %>
                     <tr>
                       <td>
-                        <strong><%= categoria.nome %></strong>
+                        <strong class="categoria-nome"><%= categoria.nome %></strong>
+                        <ul class="categoria-criterios" aria-label="Critérios da categoria">
+                          <li title="Sexo"><%= formatarSexo(categoria.sexo) %></li>
+                          <li title="Idade"><%= formatarIntervaloIdade(categoria) %></li>
+                          <li title="Peso"><%= formatarIntervaloPeso(categoria) %></li>
+                          <li title="Faixas"><%= formatarIntervaloFaixa(categoria) %></li>
+                        </ul>
+                      </td>
+
+                      <td class="col-num">
+                        <strong><%= categoria.total_inscricoes %></strong>
                       </td>
 
                       <td>
-                        <%= formatarSexo(categoria.sexo) %>
-                      </td>
+                        <div class="categoria-situacao">
+                          <% if (temChave) { %>
+                            <span class="badge badge-success">Chave gerada</span>
+                          <% } else { %>
+                            <span class="badge">Sem chave</span>
+                          <% } %>
 
-                      <td>
-                        <%= formatarIntervaloIdade(categoria) %>
-                      </td>
-
-                      <td>
-                        <%= formatarIntervaloPeso(categoria) %>
-                      </td>
-
-                      <td>
-                        <%= formatarIntervaloFaixa(categoria) %>
-                      </td>
-
-                      <td>
-                        <%= categoria.total_inscricoes %>
-                      </td>
-
-                      <td>
-                        <%= Number(categoria.total_chaves) > 0 ? 'Sim' : 'Não' %>
-                      </td>
-
-                      <td>
+                          <% if (categoria.temSobreposicao) { %>
+                            <span
+                              class="badge badge-warning categoria-conflito"
+                              title="Sobrepõe com: <%= categoria.sobreposicoes.join(', ') %>"
+                            >
+                              Sobreposição
+                            </span>
+                          <% } %>
+                        </div>
                         <% if (categoria.temSobreposicao) { %>
-                          <span
-                            class="badge"
-                            style="border: 1px solid #000; padding: 2px 6px; font-size: 0.75rem; background: #fff; cursor: help;"
-                            title="Sobrepoe com: <%= categoria.sobreposicoes.join(', ') %>"
-                          >
-                            Sobreposição
-                          </span>
-                        <% } else { %>
-                          <span style="color: #888; font-size: 0.85rem;">-</span>
+                          <small class="categoria-conflito-detalhe">
+                            Com: <%= categoria.sobreposicoes.join(', ') %>
+                          </small>
                         <% } %>
                       </td>
 
-                      <td>
+                      <td class="col-acoes">
                         <div class="table-actions">
                           <a
                             href="/eventos/<%= evento.id %>/categorias/<%= categoria.id %>/editar"
@@ -119,7 +112,7 @@
                             <button
                               type="submit"
                               class="button button-small button-danger"
-                              <%= (Number(categoria.total_inscricoes) > 0 || Number(categoria.total_chaves) > 0) ? 'title="Categoria com inscrições ou chaves não pode ser excluída"' : '' %>
+                              <%- bloqueada ? 'title="Categoria com inscrições ou chaves não pode ser excluída"' : '' %>
                             >
                               Excluir
                             </button>

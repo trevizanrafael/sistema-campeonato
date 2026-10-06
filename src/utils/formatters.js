@@ -40,7 +40,8 @@ function formatarIntervaloPeso(categoria = {}) {
   const min = categoria.peso_minimo;
   const max = categoria.peso_maximo;
 
-  const temMin = min !== null && min !== undefined && min !== '';
+  // Peso mínimo 0 equivale a "sem mínimo" (qualquer peso acima de 0)
+  const temMin = min !== null && min !== undefined && min !== '' && Number(min) !== 0;
   const temMax = max !== null && max !== undefined && max !== '';
 
   if (temMin && temMax) {
