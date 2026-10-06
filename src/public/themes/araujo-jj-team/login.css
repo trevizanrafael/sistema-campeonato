@@ -190,16 +190,46 @@
 
 /* Responsividade: Telas Menores e Celulares */
 @media (max-width: 820px) {
+  /* Página "parada": ocupa exatamente a área visível (dvh desconta a barra do navegador) */
+  html[data-theme="araujo-jj-team"]:has(.login-page),
+  [data-theme="araujo-jj-team"] .login-page {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  [data-theme="araujo-jj-team"] .login-page {
+    min-height: 0;
+    box-sizing: border-box;
+    padding: 1rem;
+  }
+
   [data-theme="araujo-jj-team"] .login-hero {
     display: none;
   }
 
   [data-theme="araujo-jj-team"] .login-container {
     max-width: 440px;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto; /* se não couber (ex.: teclado aberto), rola só o cartão */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   }
 
+  /* Sem o banner, o formulário ocupa o cartão inteiro (flex 0.9 deixava uma faixa escura do lado) */
   [data-theme="araujo-jj-team"] .login-form-side {
-    padding: 2.5rem 2rem;
+    flex: 1;
+    padding: 2rem 1.5rem;
+  }
+
+  [data-theme="araujo-jj-team"] .login-header {
+    margin-bottom: 1.25rem;
+  }
+
+  [data-theme="araujo-jj-team"] .login-circular-logo {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 0.75rem;
   }
 }
