@@ -8,12 +8,16 @@ document.addEventListener('DOMContentLoaded', () => {
     sidebar?.classList.add('open');
     sidebarBackdrop?.classList.add('visible');
     sidebarToggle?.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('sidebar-aberta');
+    document.documentElement.classList.add('sidebar-aberta');
   }
 
   function fecharMenu() {
     sidebar?.classList.remove('open');
     sidebarBackdrop?.classList.remove('visible');
     sidebarToggle?.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('sidebar-aberta');
+    document.documentElement.classList.remove('sidebar-aberta');
   }
 
   sidebarToggle?.addEventListener('click', () => {
@@ -26,6 +30,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   sidebarBackdrop?.addEventListener('click', fecharMenu);
+  sidebarBackdrop?.addEventListener('touchmove', (event) => {
+    event.preventDefault();
+  }, { passive: false });
+
+  // Ao clicar em qualquer link da sidebar no celular, fecha o menu
+  sidebar?.addEventListener('click', (event) => {
+    if (event.target.closest('a')) {
+      fecharMenu();
+    }
+  });
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
