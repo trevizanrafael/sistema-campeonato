@@ -18,6 +18,10 @@
         <div class="page-header">
           <div>
             <%- include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: categoria ? categoria.nome : chave.nome }] }) %>
+            <a href="/eventos/<%= evento.id %>/chaves" class="botao-voltar-mobile" id="botaoVoltarChaves">
+              <%- include("../partials/icone", { nome: 'voltar' }) %>
+              Voltar para chaves
+            </a>
             <div style="display: flex; align-items: center; gap: 12px;">
               <h1 class="page-title"><%= categoria ? categoria.nome : chave.nome %></h1>
               <% if (chave.status === 'NAO_INICIADA') { %>

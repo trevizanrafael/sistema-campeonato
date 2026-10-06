@@ -1324,3 +1324,37 @@
     box-shadow: 0 0 0 0 rgba(182, 0, 0, 0);
   }
 }
+
+/* ==========================================================
+   Botão "Voltar" compacto (só no celular)
+   ========================================================== */
+
+.botao-voltar-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .botao-voltar-mobile {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding: 6px 12px 6px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-small);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .botao-voltar-mobile:active {
+    background: var(--color-background);
+  }
+
+  .botao-voltar-mobile .icone {
+    width: 16px;
+    height: 16px;
+  }
+}
