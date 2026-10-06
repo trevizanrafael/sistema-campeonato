@@ -119,9 +119,10 @@ app.use((err, req, res, next) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor rodando na porta ${PORT}`);
-  console.log(`http://localhost:${PORT}`);
+  console.log(`No PC: http://localhost:${PORT}`);
+  console.log(`No celular: http://192.168.3.30:${PORT}`);
 });
 
 module.exports = app;
