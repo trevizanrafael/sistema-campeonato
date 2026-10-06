@@ -6,6 +6,7 @@ Documentação técnica do banco de dados e regras de negócio.
 
 | Arquivo | Conteúdo |
 |---------|----------|
+| [requisitos.md](requisitos.md) | Especificação de Requisitos Funcionais (RF) e Não-Funcionais (RNF) |
 | [convencoes.md](convencoes.md) | Convenções gerais do banco de dados |
 | [tabelas.md](tabelas.md) | Estrutura de todas as tabelas |
 | [logica-categorias.md](logica-categorias.md) | Categorização automática de inscrições |
