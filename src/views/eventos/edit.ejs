@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: titulo || "Editar evento"
+      titulo: titulo || "Editar campeonato"
     }) %>
   </head>
 
@@ -16,8 +16,9 @@
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Editar evento</h1>
-            <p class="page-subtitle">Altere o nome ou a descricao.</p>
+            <%- include("../partials/trilha", { itens: [{ label: 'Editar dados' }] }) %>
+            <h1 class="page-title">Editar campeonato</h1>
+            <p class="page-subtitle">Altere o nome ou a descrição.</p>
           </div>
         </div>
 
@@ -41,7 +42,7 @@
                 </a>
 
                 <button type="submit" class="button button-primary">
-                  Salvar alteracoes
+                  Salvar alterações
                 </button>
               </div>
             </form>

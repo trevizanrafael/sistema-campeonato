@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: `Ranking das equipes - ${evento.nome}`,
+      titulo: `Ranking das academias - ${evento.nome}`,
       pagina: "ranking"
     }) %>
   </head>
@@ -17,21 +17,14 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a
-                href="/eventos/<%= evento.id %>"
-                class="button button-small button-outline"
-              >
-                &larr; Voltar para o evento
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Ranking' }] }) %>
 
             <h1 class="page-title">
-              Ranking das equipes
+              Ranking das academias
             </h1>
 
             <p class="page-subtitle">
-              Evento: <strong><%= evento.nome %></strong>
+              Campeonato: <strong><%= evento.nome %></strong>
             </p>
           </div>
         </div>
@@ -47,7 +40,7 @@
             </div>
           <% } else { %>
             <div class="alert alert-neutral" style="margin-bottom: 24px; background: #f9f9f9; border: 1px solid var(--color-border); color: #444;">
-              O evento ainda não possui chaves.
+              O campeonato ainda não possui chaves.
             </div>
           <% } %>
 
@@ -57,7 +50,7 @@
                 <thead>
                   <tr>
                     <th style="width: 70px; text-align: center;">Pos.</th>
-                    <th>Equipe</th>
+                    <th>Academia</th>
                     <th style="text-align: right;">Pontos</th>
                     <th style="text-align: center;">1º (Ouro)</th>
                     <th style="text-align: center;">2º (Prata)</th>
@@ -95,8 +88,8 @@
             </div>
           <% } else { %>
             <div class="empty-state">
-              <h2>Nenhuma equipe participante</h2>
-              <p>Nenhuma equipe possui competidores confirmados neste evento.</p>
+              <h2>Nenhuma academia participante</h2>
+              <p>Nenhuma academia possui competidores confirmados neste campeonato.</p>
             </div>
           <% } %>
         </section>

@@ -125,9 +125,9 @@ function validarInscricao(inscricao, { faixasMap = null, equipesMap = null } = {
 
   // Equipe
   if (!inscricao.equipe_id) {
-    erros.equipe_id = 'Selecione uma equipe válida.';
+    erros.equipe_id = 'Selecione uma academia válida.';
   } else if (equipesMap && !equipesMap.has(Number(inscricao.equipe_id))) {
-    erros.equipe_id = 'Equipe selecionada não foi encontrada.';
+    erros.equipe_id = 'Academia selecionada não foi encontrada.';
   }
 
   // Seed (opcional)

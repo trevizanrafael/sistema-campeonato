@@ -11,7 +11,7 @@ async function mostrarRanking(req, res, next) {
     const resultado = await rankingService.buscarRanking(eventoId);
 
     return res.render('ranking/index', {
-      titulo: 'Ranking das equipes',
+      titulo: 'Ranking das academias',
       evento: resultado.evento,
       situacao: resultado.situacao,
       equipes: resultado.equipes,
@@ -32,7 +32,7 @@ async function mostrarEquipe(req, res, next) {
     const resultado = await rankingService.buscarDetalhesEquipe(eventoId, equipeId);
 
     return res.render('ranking/equipe', {
-      titulo: `${resultado.equipe.equipe_nome} — Detalhes da equipe`,
+      titulo: `${resultado.equipe.equipe_nome} — Detalhes da academia`,
       evento: resultado.evento,
       equipe: resultado.equipe,
       extrato: resultado.extrato,

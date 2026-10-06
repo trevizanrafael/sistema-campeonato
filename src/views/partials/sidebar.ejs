@@ -1,46 +1,93 @@
+<%#
+  Menu lateral.
+  - Fora de um campeonato: menu global (Início, Campeonatos, Academias, Faixas, Usuários).
+  - Dentro de /eventos/:id/...: menu DO campeonato, na ordem de trabalho
+    (Preparação -> Competição -> Controle), com contadores de pendências.
+  Cada item respeita as permissões do cargo (pode()).
+%>
+<% const caminho = typeof currentPath !== 'undefined' ? currentPath : ''; %>
+
 <aside class="sidebar" id="sidebar">
   <nav class="sidebar-nav" aria-label="Menu principal">
-    <a
-      href="/"
-      class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath === '/') ? 'active' : '' %>"
-    >
-      Início
-    </a>
+    <% if (eventoContexto) { %>
+      <% const base = '/eventos/' + eventoContexto.id; %>
+      <% const ativo = (sufixo) => caminho === base + sufixo || caminho.startsWith(base + sufixo + '/'); %>
+      <% const badges = eventoContexto.badges || {}; %>
 
-    <% if (pode('eventos.visualizar')) { %>
-      <a
-        href="/eventos"
-        class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/eventos')) ? 'active' : '' %>"
-      >
-        Eventos
+      <a href="/eventos" class="sidebar-back" id="sidebarVoltarCampeonatos">
+        <%- include("icone", { nome: "voltar" }) %>
+        Todos os campeonatos
       </a>
-    <% } %>
 
-    <% if (pode('equipes.gerenciar')) { %>
-      <a
-        href="/equipes"
-        class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/equipes')) ? 'active' : '' %>"
-      >
-        Equipes
-      </a>
-    <% } %>
+      <div class="sidebar-event-name" title="<%= eventoContexto.nome %>"><%= eventoContexto.nome %></div>
 
-    <% if (pode('faixas.gerenciar')) { %>
-      <a
-        href="/faixas"
-        class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/faixas')) ? 'active' : '' %>"
-      >
-        Faixas
+      <a href="<%= base %>" class="sidebar-link <%= (caminho === base || caminho === base + '/editar') ? 'active' : '' %>">
+        <%- include("icone", { nome: "visao" }) %>
+        <span class="sidebar-link__label">Visão geral</span>
       </a>
-    <% } %>
 
-    <% if (pode('usuarios.gerenciar')) { %>
-      <a
-        href="/usuarios"
-        class="sidebar-link <%= (typeof currentPath !== 'undefined' && currentPath.startsWith('/usuarios')) ? 'active' : '' %>"
-      >
-        Usuários
+      <% const preparacao = [
+        { perm: 'pontuacao.gerenciar', sufixo: '/pontuacao', icone: 'pontuacao', label: 'Pontuação' },
+        { perm: 'categorias.gerenciar', sufixo: '/categorias', icone: 'categorias', label: 'Categorias' },
+        { perm: 'inscricoes.gerenciar', sufixo: '/inscricoes', icone: 'inscricoes', label: 'Inscrições', badge: badges.inscricoes, badgeTitulo: 'inscrições sem categoria' },
+      ].filter((item) => pode(item.perm)); %>
+
+      <% const competicao = [
+        { perm: 'chaves.visualizar', sufixo: '/chaves', icone: 'chaves', label: 'Chaves', badge: badges.chaves, badgeTitulo: 'lutas prontas' },
+        { perm: 'ranking.visualizar', sufixo: '/ranking', icone: 'ranking', label: 'Ranking' },
+      ].filter((item) => pode(item.perm)); %>
+
+      <% const controle = [
+        { perm: 'auditoria.visualizar', sufixo: '/auditoria', icone: 'auditoria', label: 'Auditoria' },
+      ].filter((item) => pode(item.perm)); %>
+
+      <% [['Preparação', preparacao], ['Competição', competicao], ['Controle', controle]].forEach(function(secao) { %>
+        <% if (secao[1].length > 0) { %>
+          <div class="sidebar-section"><%= secao[0] %></div>
+          <% secao[1].forEach(function(item) { %>
+            <a href="<%= base + item.sufixo %>" class="sidebar-link <%= ativo(item.sufixo) ? 'active' : '' %>">
+              <%- include("icone", { nome: item.icone }) %>
+              <span class="sidebar-link__label"><%= item.label %></span>
+              <% if (item.badge) { %>
+                <span class="sidebar-badge" title="<%= item.badge %> <%= item.badgeTitulo %>"><%= item.badge %></span>
+              <% } %>
+            </a>
+          <% }); %>
+        <% } %>
+      <% }); %>
+    <% } else { %>
+      <a href="/" class="sidebar-link <%= caminho === '/' ? 'active' : '' %>">
+        <%- include("icone", { nome: "inicio" }) %>
+        <span class="sidebar-link__label">Início</span>
       </a>
+
+      <% if (pode('eventos.visualizar')) { %>
+        <a href="/eventos" class="sidebar-link <%= caminho.startsWith('/eventos') ? 'active' : '' %>">
+          <%- include("icone", { nome: "campeonatos" }) %>
+          <span class="sidebar-link__label">Campeonatos</span>
+        </a>
+      <% } %>
+
+      <% if (pode('equipes.gerenciar')) { %>
+        <a href="/equipes" class="sidebar-link <%= caminho.startsWith('/equipes') ? 'active' : '' %>">
+          <%- include("icone", { nome: "academias" }) %>
+          <span class="sidebar-link__label">Academias</span>
+        </a>
+      <% } %>
+
+      <% if (pode('faixas.gerenciar')) { %>
+        <a href="/faixas" class="sidebar-link <%= caminho.startsWith('/faixas') ? 'active' : '' %>">
+          <%- include("icone", { nome: "faixas" }) %>
+          <span class="sidebar-link__label">Faixas</span>
+        </a>
+      <% } %>
+
+      <% if (pode('usuarios.gerenciar')) { %>
+        <a href="/usuarios" class="sidebar-link <%= caminho.startsWith('/usuarios') ? 'active' : '' %>">
+          <%- include("icone", { nome: "usuarios" }) %>
+          <span class="sidebar-link__label">Usuários</span>
+        </a>
+      <% } %>
     <% } %>
   </nav>
 </aside>

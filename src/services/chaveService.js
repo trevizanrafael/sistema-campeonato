@@ -18,7 +18,7 @@ const auditoriaService = require('./auditoriaService');
 async function listarCategoriasEChaves(eventoId) {
   const evento = await eventoRepository.buscarPorId(eventoId);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   const categorias = await chaveRepository.listarPorEvento(eventoId);
@@ -28,7 +28,7 @@ async function listarCategoriasEChaves(eventoId) {
 async function buscarChave(eventoId, chaveId) {
   const evento = await eventoRepository.buscarPorId(eventoId);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   const chave = await chaveRepository.buscarPorIdNoEvento(chaveId, eventoId);
@@ -82,7 +82,7 @@ async function gerarChave(eventoId, categoriaId, usuarioId = null) {
     );
 
     if (catRes.rows.length === 0) {
-      throw new NotFoundError('Categoria não encontrada neste evento.');
+      throw new NotFoundError('Categoria não encontrada neste campeonato.');
     }
     const categoria = catRes.rows[0];
 

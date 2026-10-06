@@ -20,12 +20,12 @@ const {
 async function validarEventoExistente(eventoId, client = pool) {
   const validId = validarId(eventoId);
   if (!validId) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   const evento = await eventoRepository.buscarPorId(validId, client);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   return evento;
@@ -74,7 +74,7 @@ async function buscarCategoria(eventoId, categoriaId) {
   const validCatId = validarId(categoriaId);
 
   if (!validEventoId || !validCatId) {
-    throw new NotFoundError('Categoria não encontrada neste evento.');
+    throw new NotFoundError('Categoria não encontrada neste campeonato.');
   }
 
   await validarEventoExistente(validEventoId);
@@ -85,7 +85,7 @@ async function buscarCategoria(eventoId, categoriaId) {
   );
 
   if (!categoria) {
-    throw new NotFoundError('Categoria não encontrada neste evento.');
+    throw new NotFoundError('Categoria não encontrada neste campeonato.');
   }
 
   return categoria;
@@ -129,7 +129,7 @@ async function criarCategoria(eventoId, dados) {
 
   if (existente) {
     throw new ValidationError({
-      nome: 'Já existe uma categoria com este nome neste evento.',
+      nome: 'Já existe uma categoria com este nome neste campeonato.',
     });
   }
 
@@ -200,7 +200,7 @@ async function editarCategoria(eventoId, categoriaId, dados) {
 
     if (existente) {
       throw new ValidationError({
-        nome: 'Já existe uma categoria com este nome neste evento.',
+        nome: 'Já existe uma categoria com este nome neste campeonato.',
       });
     }
 
@@ -239,7 +239,7 @@ async function editarCategoria(eventoId, categoriaId, dados) {
 
   if (existente) {
     throw new ValidationError({
-      nome: 'Já existe uma categoria com este nome neste evento.',
+      nome: 'Já existe uma categoria com este nome neste campeonato.',
     });
   }
 
@@ -307,7 +307,7 @@ async function excluirCategoria(eventoId, categoriaId) {
   const validCatId = validarId(categoriaId);
 
   if (!validEventoId || !validCatId) {
-    throw new NotFoundError('Categoria não encontrada neste evento.');
+    throw new NotFoundError('Categoria não encontrada neste campeonato.');
   }
 
   await validarEventoExistente(validEventoId);
@@ -323,7 +323,7 @@ async function excluirCategoria(eventoId, categoriaId) {
     );
 
     if (!categoria) {
-      throw new NotFoundError('Categoria não encontrada neste evento.');
+      throw new NotFoundError('Categoria não encontrada neste campeonato.');
     }
 
     const dependencias = await categoriaRepository.contarDependencias(

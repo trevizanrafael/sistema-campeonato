@@ -1,6 +1,6 @@
 <% if (locals.chaveExistente) { %>
   <div class="alert alert-warning" style="margin-bottom: 24px; border: 1px solid #000; background: #f0f0f0; color: #000; padding: 12px 16px;">
-    <strong>Atencao:</strong> Esta categoria ja possui uma chave gerada. Somente o nome pode ser alterado. Os criterios de idade, peso, faixa e sexo estao bloqueados.
+    <strong>Atenção:</strong> Esta categoria já possui uma chave gerada. Somente o nome pode ser alterado. Os critérios de idade, peso, faixa e sexo estao bloqueados.
   </div>
 <% } %>
 
@@ -12,7 +12,7 @@
 
 <!-- Bloco 1: Identificacao -->
 <fieldset style="border: 1px solid #ccc; padding: 16px; margin-bottom: 20px;">
-  <legend style="font-weight: 600; padding: 0 8px;">Identificacao</legend>
+  <legend style="font-weight: 600; padding: 0 8px;">Identificação</legend>
 
   <div class="form-group" style="margin-bottom: 16px;">
     <label for="nome" class="form-label">
@@ -24,7 +24,7 @@
       name="nome"
       class="form-control <%= erros && erros.nome ? 'is-invalid' : '' %>"
       value="<%= categoria.nome || '' %>"
-      placeholder="Ex: Masculino Juvenil Azul ate 60 kg"
+      placeholder="Ex: Masculino Juvenil Azul até 60 kg"
       maxlength="200"
       required
       autofocus
@@ -33,7 +33,7 @@
       <p class="form-error"><%= erros.nome %></p>
     <% } %>
     <p class="form-help" style="font-size: 0.85rem; color: #666; margin-top: 4px;">
-      Nome visivel para identificacao e listagem nos paineis.
+      Nome visível para identificação e listagem nos paineis.
     </p>
   </div>
 
@@ -64,7 +64,7 @@
   <legend style="font-weight: 600; padding: 0 8px;">Idade (anos)</legend>
 
   <p class="form-help" style="font-size: 0.85rem; color: #666; margin-bottom: 12px;">
-    Limites inclusivos. Deixe em branco para nao limitar a idade inferior ou superior.
+    Limites inclusivos. Deixe em branco para não limitar a idade inferior ou superior.
   </p>
 
   <% if (erros && erros.idade) { %>
@@ -73,7 +73,7 @@
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
     <div class="form-group">
-      <label for="idade_minima" class="form-label">Idade minima</label>
+      <label for="idade_minima" class="form-label">Idade mínima</label>
       <input
         type="number"
         id="idade_minima"
@@ -83,7 +83,7 @@
         min="0"
         max="150"
         step="1"
-        placeholder="Sem minimo"
+        placeholder="Sem mínimo"
         <%= locals.chaveExistente ? 'disabled' : '' %>
       >
       <% if (erros && erros.idade_minima) { %>
@@ -92,7 +92,7 @@
     </div>
 
     <div class="form-group">
-      <label for="idade_maxima" class="form-label">Idade maxima</label>
+      <label for="idade_maxima" class="form-label">Idade máxima</label>
       <input
         type="number"
         id="idade_maxima"
@@ -102,7 +102,7 @@
         min="0"
         max="150"
         step="1"
-        placeholder="Sem maximo"
+        placeholder="Sem máximo"
         <%= locals.chaveExistente ? 'disabled' : '' %>
       >
       <% if (erros && erros.idade_maxima) { %>
@@ -117,7 +117,7 @@
   <legend style="font-weight: 600; padding: 0 8px;">Peso (kg)</legend>
 
   <p class="form-help" style="font-size: 0.85rem; color: #666; margin-bottom: 12px;">
-    Peso minimo exclusivo (deve estar acima do valor). Peso maximo inclusivo (pode ter ate o valor exato). Deixe em branco se nao houver limite.
+    Peso mínimo exclusivo (deve estar acima do valor). Peso máximo inclusivo (pode ter até o valor exato). Deixe em branco se não houver limite.
   </p>
 
   <% if (erros && erros.peso) { %>
@@ -126,7 +126,7 @@
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
     <div class="form-group">
-      <label for="peso_minimo" class="form-label">Peso minimo exclusivo (&gt;)</label>
+      <label for="peso_minimo" class="form-label">Peso mínimo exclusivo (&gt;)</label>
       <input
         type="number"
         id="peso_minimo"
@@ -136,7 +136,7 @@
         min="0"
         max="999.99"
         step="0.01"
-        placeholder="Sem minimo"
+        placeholder="Sem mínimo"
         <%= locals.chaveExistente ? 'disabled' : '' %>
       >
       <% if (erros && erros.peso_minimo) { %>
@@ -145,7 +145,7 @@
     </div>
 
     <div class="form-group">
-      <label for="peso_maximo" class="form-label">Peso maximo inclusivo (&le;)</label>
+      <label for="peso_maximo" class="form-label">Peso máximo inclusivo (&le;)</label>
       <input
         type="number"
         id="peso_maximo"
@@ -155,7 +155,7 @@
         min="0"
         max="999.99"
         step="0.01"
-        placeholder="Sem maximo"
+        placeholder="Sem máximo"
         <%= locals.chaveExistente ? 'disabled' : '' %>
       >
       <% if (erros && erros.peso_maximo) { %>
@@ -167,22 +167,22 @@
 
 <!-- Bloco 4: Graduacao / Faixas -->
 <fieldset style="border: 1px solid #ccc; padding: 16px; margin-bottom: 20px;">
-  <legend style="font-weight: 600; padding: 0 8px;">Graduacao (Faixas)</legend>
+  <legend style="font-weight: 600; padding: 0 8px;">Graduação (Faixas)</legend>
 
   <p class="form-help" style="font-size: 0.85rem; color: #666; margin-bottom: 12px;">
-    Limites de faixa inclusivos com base na ordem hierarquica. Se a categoria for de faixa unica, selecione a mesma faixa em ambos os campos.
+    Limites de faixa inclusivos com base na ordem hierárquica. Se a categoria for de faixa única, selecione a mesma faixa em ambos os campos.
   </p>
 
   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px;">
     <div class="form-group">
-      <label for="faixa_minima_id" class="form-label">Faixa minima</label>
+      <label for="faixa_minima_id" class="form-label">Faixa mínima</label>
       <select
         id="faixa_minima_id"
         name="faixa_minima_id"
         class="form-control <%= erros && erros.faixa_minima_id ? 'is-invalid' : '' %>"
         <%= locals.chaveExistente ? 'disabled' : '' %>
       >
-        <option value="">Sem limite minimo</option>
+        <option value="">Sem limite mínimo</option>
         <% if (locals.faixas && faixas.length > 0) { %>
           <% faixas.forEach((faixa) => { %>
             <option
@@ -200,14 +200,14 @@
     </div>
 
     <div class="form-group">
-      <label for="faixa_maxima_id" class="form-label">Faixa maxima</label>
+      <label for="faixa_maxima_id" class="form-label">Faixa máxima</label>
       <select
         id="faixa_maxima_id"
         name="faixa_maxima_id"
         class="form-control <%= erros && erros.faixa_maxima_id ? 'is-invalid' : '' %>"
         <%= locals.chaveExistente ? 'disabled' : '' %>
       >
-        <option value="">Sem limite maximo</option>
+        <option value="">Sem limite máximo</option>
         <% if (locals.faixas && faixas.length > 0) { %>
           <% faixas.forEach((faixa) => { %>
             <option

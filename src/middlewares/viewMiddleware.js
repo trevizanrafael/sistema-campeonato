@@ -6,6 +6,9 @@ function carregarDadosDasViews(req, res, next) {
 
   res.locals.currentPath = req.path;
 
+  // Preenchido por eventoContextoMiddleware nas rotas /eventos/:id/...
+  res.locals.eventoContexto = null;
+
   res.locals.titulo = null;
   res.locals.subtitulo = null;
 

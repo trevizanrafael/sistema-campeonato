@@ -16,14 +16,10 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos/<%= evento.id %>" class="button button-small button-outline">
-                &larr; Voltar para <%= evento.nome %>
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Chaves' }] }) %>
             <h1 class="page-title">Chaves de Luta</h1>
             <p class="page-subtitle">
-              Gerenciamento e sorteio de chaves eliminatorias por categoria para <strong><%= evento.nome %></strong>.
+              Gerenciamento e sorteio de chaves eliminatórias por categoria para <strong><%= evento.nome %></strong>.
             </p>
           </div>
         </div>
@@ -33,12 +29,12 @@
             <div class="card empty-state">
               <h2>Nenhuma categoria cadastrada</h2>
               <% if (pode('categorias.gerenciar')) { %>
-                <p>Cadastre categorias no evento antes de gerar as chaves de combate.</p>
+                <p>Cadastre categorias no campeonato antes de gerar as chaves de combate.</p>
                 <a href="/eventos/<%= evento.id %>/categorias/nova" class="button button-primary">
                   Cadastrar primeira categoria
                 </a>
               <% } else { %>
-                <p>Este campeonato ainda nao tem categorias. Aguarde o organizador configurar.</p>
+                <p>Este campeonato ainda não tem categorias. Aguarde o organizador configurar.</p>
               <% } %>
             </div>
           <% } else { %>
@@ -47,11 +43,11 @@
                 <thead>
                   <tr>
                     <th>Categoria</th>
-                    <th>Criterios</th>
+                    <th>Critérios</th>
                     <th style="text-align: center;">Confirmados</th>
-                    <th>Situacao</th>
+                    <th>Situação</th>
                     <th style="text-align: center;">Tamanho</th>
-                    <th style="text-align: right;">Acoes</th>
+                    <th style="text-align: right;">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -79,7 +75,7 @@
                             <span class="badge badge-neutral">Sem chave</span>
                           <% } %>
                         <% } else if (cat.chave_status === 'NAO_INICIADA') { %>
-                          <span class="badge badge-warning">Nao iniciada</span>
+                          <span class="badge badge-warning">Não iniciada</span>
                         <% } else if (cat.chave_status === 'EM_ANDAMENTO') { %>
                           <span class="badge badge-ativo">Em andamento</span>
                         <% } else if (cat.chave_status === 'FINALIZADA') { %>
@@ -89,7 +85,7 @@
                         <% } %>
                       </td>
                       <td style="text-align: center;">
-                        <%= cat.chave_tamanho ? `${cat.chave_tamanho} posicoes` : '—' %>
+                        <%= cat.chave_tamanho ? `${cat.chave_tamanho} posições` : '—' %>
                       </td>
                       <td style="text-align: right;">
                         <div style="display: inline-flex; gap: 8px; justify-content: flex-end; align-items: center;">
@@ -111,7 +107,7 @@
                               </span>
                             <% } else { %>
                               <span style="font-size: 12px; color: var(--color-text-muted);">
-                                Minimo 2 atletas
+                                Mínimo 2 atletas
                               </span>
                             <% } %>
                           <% } else { %>

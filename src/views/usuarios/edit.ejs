@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: titulo || "Editar Usuario"
+      titulo: titulo || "Editar Usuário"
     }) %>
   </head>
 
@@ -16,8 +16,8 @@
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Editar Usuario</h1>
-            <p class="page-subtitle">Atualize as informacoes do usuario.</p>
+            <h1 class="page-title">Editar Usuário</h1>
+            <p class="page-subtitle">Atualize as informações do usuário.</p>
           </div>
         </div>
 
@@ -48,7 +48,7 @@
               <%- include("_cargo", {
                 dados: dados,
                 bloqueado: proprioUsuario,
-                motivoBloqueio: "Voce nao pode alterar o seu proprio cargo. Peca para outro Administrador."
+                motivoBloqueio: "Você não pode alterar o seu próprio cargo. Peça para outro Administrador."
               }) %>
 
               <div class="form-actions">

@@ -16,21 +16,14 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a
-                href="/eventos/<%= evento.id %>"
-                class="button button-small button-outline"
-              >
-                &larr; Voltar para o evento
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Auditoria' }] }) %>
 
             <h1 class="page-title">
               Auditoria e Histórico
             </h1>
 
             <p class="page-subtitle">
-              Registro de todas as ações e alterações críticas realizadas no evento <strong><%= evento.nome %></strong>.
+              Registro de todas as ações e alterações críticas realizadas no campeonato <strong><%= evento.nome %></strong>.
             </p>
           </div>
         </div>
@@ -158,7 +151,7 @@
               <h2>Nenhum registro de auditoria encontrado</h2>
               <p>
                 <% if (filtros && filtros.acao) { %>
-                  Não foram encontradas ações do tipo selecionado para este evento.
+                  Não foram encontradas ações do tipo selecionado para este campeonato.
                 <% } else { %>
                   As ações críticas como geração de chaves, lançamentos de resultados e finalizações aparecerão aqui conforme forem realizadas.
                 <% } %>

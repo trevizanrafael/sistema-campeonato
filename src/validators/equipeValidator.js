@@ -13,7 +13,7 @@ function validarEquipe(dados) {
   const nome = dados.nome || '';
 
   if (!nome) {
-    erros.nome = 'Informe o nome da equipe.';
+    erros.nome = 'Informe o nome da academia.';
   } else if (nome.length < 2) {
     erros.nome = 'O nome deve possuir pelo menos 2 caracteres.';
   } else if (nome.length > 200) {
@@ -27,7 +27,7 @@ function validarId(id) {
   const numero = Number(id);
 
   if (!Number.isInteger(numero) || numero <= 0) {
-    throw new NotFoundError('Equipe não encontrada.');
+    throw new NotFoundError('Academia não encontrada.');
   }
 
   return numero;

@@ -28,8 +28,8 @@ async function index(req, res, next) {
       : await eventoRepository.listar({ limite: 5, offset: 0 });
 
     return res.render('home/index', {
-      titulo: 'Inicio',
-      subtitulo: 'Gerencie seus eventos e competicoes.',
+      titulo: 'Início',
+      subtitulo: 'Gerencie seus campeonatos e competições.',
       ultimoEvento,
       eventosRecentes,
     });

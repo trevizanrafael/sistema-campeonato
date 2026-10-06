@@ -185,7 +185,7 @@ async function calcularResumoEquipes(eventoId, chaveIdOrPodio, podioOrClient, ma
 
     listaResumo.push({
       equipe_id: Number(key),
-      equipe_nome: nomesEquipesMap.get(key) || `Equipe #${key}`,
+      equipe_nome: nomesEquipesMap.get(key) || `Academia #${key}`,
       pontos_atuais: pontos_anteriores,
       pontos_vitorias,
       pontos_colocacao,
@@ -244,7 +244,7 @@ async function calcularPreview(eventoId, chaveId) {
   return {
     evento: {
       id: chave.evento_id,
-      nome: chave.evento_nome || 'Evento',
+      nome: chave.evento_nome || 'Campeonato',
     },
     categoria: {
       id: chave.categoria_id,

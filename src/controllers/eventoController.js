@@ -13,7 +13,7 @@ async function listar(req, res, next) {
     });
 
     return res.render('eventos/index', {
-      titulo: 'Eventos',
+      titulo: 'Campeonatos',
       subtitulo: 'Gerencie os campeonatos cadastrados.',
       ...resultado,
     });
@@ -24,7 +24,7 @@ async function listar(req, res, next) {
 
 function mostrarCadastro(req, res) {
   return res.render('eventos/create', {
-    titulo: 'Novo evento',
+    titulo: 'Novo campeonato',
     evento: {
       nome: '',
       descricao: '',
@@ -37,12 +37,12 @@ async function cadastrar(req, res, next) {
   try {
     const usuarioId = req.session?.usuario?.id || null;
     const evento = await eventoService.criarEvento(req.body, usuarioId);
-    req.session.mensagemSucesso = 'Evento criado com sucesso.';
+    req.session.mensagemSucesso = 'Campeonato criado com sucesso.';
     return res.redirect(`/eventos/${evento.id}`);
   } catch (erro) {
     if (erro instanceof ValidationError) {
       return res.status(422).render('eventos/create', {
-        titulo: 'Novo evento',
+        titulo: 'Novo campeonato',
         evento: req.body,
         erros: erro.erros,
       });
@@ -53,12 +53,16 @@ async function cadastrar(req, res, next) {
 
 async function visualizar(req, res, next) {
   try {
-    const evento = await eventoService.buscarEventoComResumo(req.params.id);
+    const painel = await eventoService.montarPainel(req.params.id, res.locals.pode);
 
     return res.render('eventos/show', {
-      titulo: evento.nome,
-      subtitulo: 'Painel do evento',
-      evento,
+      titulo: painel.evento.nome,
+      subtitulo: 'Visão geral do campeonato',
+      evento: painel.evento,
+      etapas: painel.etapas,
+      proximoPasso: painel.proximoPasso,
+      pendencias: painel.pendencias,
+      numeros: painel.numeros,
     });
   } catch (erro) {
     if (erro instanceof NotFoundError) {
@@ -75,7 +79,7 @@ async function mostrarEdicao(req, res, next) {
     const evento = await eventoService.buscarEvento(req.params.id);
 
     return res.render('eventos/edit', {
-      titulo: 'Editar evento',
+      titulo: 'Editar campeonato',
       evento,
       erros: {},
     });
@@ -93,12 +97,12 @@ async function editar(req, res, next) {
   try {
     const usuarioId = req.session?.usuario?.id || null;
     const evento = await eventoService.editarEvento(req.params.id, req.body, usuarioId);
-    req.session.mensagemSucesso = 'Evento atualizado com sucesso.';
+    req.session.mensagemSucesso = 'Campeonato atualizado com sucesso.';
     return res.redirect('/eventos');
   } catch (erro) {
     if (erro instanceof ValidationError) {
       return res.status(422).render('eventos/edit', {
-        titulo: 'Editar evento',
+        titulo: 'Editar campeonato',
         evento: {
           id: req.params.id,
           ...req.body,
@@ -118,13 +122,13 @@ async function editar(req, res, next) {
 async function excluir(req, res, next) {
   try {
     await eventoService.excluirEvento(req.params.id);
-    req.session.mensagemSucesso = 'Evento excluído com sucesso.';
+    req.session.mensagemSucesso = 'Campeonato excluído com sucesso.';
     return res.redirect('/eventos');
   } catch (erro) {
     if (erro instanceof BusinessRuleError) {
       req.session.mensagemErro =
         erro.message ||
-        'O evento não pode ser excluído porque já possui dados vinculados.';
+        'O campeonato não pode ser excluído porque já possui dados vinculados.';
       return res.redirect(`/eventos/${req.params.id}`);
     }
     if (erro instanceof NotFoundError) {

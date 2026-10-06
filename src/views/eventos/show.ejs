@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: evento.nome || "Painel do Evento"
+      titulo: evento.nome || "Visão geral do campeonato"
     }) %>
   </head>
 
@@ -14,13 +14,11 @@
       <main class="main-content">
         <%- include("../partials/messages") %>
 
+        <% const base = '/eventos/' + evento.id; %>
+
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos" class="button button-small button-outline">
-                &larr; Voltar para eventos
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [] }) %>
 
             <h1 class="page-title"><%= evento.nome %></h1>
 
@@ -33,119 +31,99 @@
 
           <% if (pode('eventos.gerenciar')) { %>
             <a
-              href="/eventos/<%= evento.id %>/editar"
+              href="<%= base %>/editar"
               class="button button-outline"
+              id="botaoEditarCampeonato"
             >
-              Editar evento
+              Editar dados
             </a>
           <% } %>
         </div>
 
         <section class="page-content">
-          <div class="stats-grid">
-            <div class="card stat-card">
-              <span class="stat-label">Categorias</span>
-              <strong class="stat-value">
-                <%= evento.total_categorias %>
-              </strong>
-            </div>
+          <%# Etapas do campeonato %>
+          <ol class="etapas" aria-label="Etapas do campeonato">
+            <% etapas.forEach(function(etapa) { %>
+              <li class="etapa etapa-<%= etapa.status %>" <%- etapa.status === 'atual' ? 'aria-current="step"' : '' %>>
+                <span class="etapa-marcador">
+                  <% if (etapa.status === 'feito') { %>
+                    <%- include("../partials/icone", { nome: 'check' }) %>
+                  <% } else { %>
+                    <%= etapa.numero %>
+                  <% } %>
+                </span>
+                <span class="etapa-texto">
+                  <strong><%= etapa.titulo %></strong>
+                  <small><%= etapa.subtitulo %></small>
+                </span>
+              </li>
+            <% }); %>
+          </ol>
 
-            <div class="card stat-card">
-              <span class="stat-label">Inscricoes</span>
-              <strong class="stat-value">
-                <%= evento.total_inscricoes %>
-              </strong>
-            </div>
+          <div class="painel-grid">
+            <%# Próximo passo %>
+            <article class="card proximo-passo" id="cartaoProximoPasso">
+              <span class="painel-rotulo">Próximo passo</span>
+              <h2><%= proximoPasso.titulo %></h2>
+              <p><%= proximoPasso.texto %></p>
+              <% if (proximoPasso.path) { %>
+                <a
+                  href="<%= base + proximoPasso.path %>"
+                  class="button button-primary"
+                  id="botaoProximoPasso"
+                >
+                  <%= proximoPasso.acao %>
+                  <%- include("../partials/icone", { nome: 'seta' }) %>
+                </a>
+              <% } %>
+            </article>
 
-            <div class="card stat-card">
-              <span class="stat-label">Chaves</span>
-              <strong class="stat-value">
-                <%= evento.total_chaves %>
-              </strong>
-            </div>
-
-            <div class="card stat-card">
-              <span class="stat-label">Finalizadas</span>
-              <strong class="stat-value">
-                <%= evento.chaves_finalizadas %>
-              </strong>
-            </div>
+            <%# Pendências %>
+            <article class="card pendencias" id="cartaoPendencias">
+              <span class="painel-rotulo">Pendências</span>
+              <% if (pendencias.length === 0) { %>
+                <p class="pendencias-vazio">
+                  <%- include("../partials/icone", { nome: 'check' }) %>
+                  Tudo em ordem por aqui.
+                </p>
+              <% } else { %>
+                <ul>
+                  <% pendencias.forEach(function(pendencia) { %>
+                    <li>
+                      <a href="<%= base + pendencia.path %>">
+                        <%- include("../partials/icone", { nome: 'alerta' }) %>
+                        <span><%= pendencia.texto %></span>
+                        <%- include("../partials/icone", { nome: 'seta' }) %>
+                      </a>
+                    </li>
+                  <% }); %>
+                </ul>
+              <% } %>
+            </article>
           </div>
 
-          <div class="event-menu-grid">
-            <% if (pode('categorias.gerenciar')) { %>
-              <a
-                href="/eventos/<%= evento.id %>/categorias"
-                class="card event-menu-card"
-              >
-                <h2>Categorias</h2>
-                <p>Configure peso, idade e faixa.</p>
-              </a>
-            <% } %>
-
-            <% if (pode('inscricoes.gerenciar')) { %>
-              <a
-                href="/eventos/<%= evento.id %>/inscricoes"
-                class="card event-menu-card"
-              >
-                <h2>Inscricoes</h2>
-                <p>Cadastre e importe os competidores.</p>
-              </a>
-            <% } %>
-
-            <% if (pode('chaves.visualizar')) { %>
-              <a
-                href="/eventos/<%= evento.id %>/chaves"
-                class="card event-menu-card"
-              >
-                <h2>Chaves</h2>
-                <p>Gere e acompanhe as lutas.</p>
-              </a>
-            <% } %>
-
-            <% if (pode('ranking.visualizar')) { %>
-              <a
-                href="/eventos/<%= evento.id %>/ranking"
-                class="card event-menu-card"
-              >
-                <h2>Ranking</h2>
-                <p>Acompanhe os pontos das equipes.</p>
-              </a>
-            <% } %>
-
-            <% if (pode('pontuacao.gerenciar')) { %>
-              <a
-                href="/eventos/<%= evento.id %>/pontuacao"
-                class="card event-menu-card"
-              >
-                <h2>Pontuacao</h2>
-                <p>Configure os pontos do evento.</p>
-              </a>
-            <% } %>
-
-            <% if (pode('auditoria.visualizar')) { %>
-              <a
-                href="/eventos/<%= evento.id %>/auditoria"
-                class="card event-menu-card"
-              >
-                <h2>Auditoria</h2>
-                <p>Consulte o histórico de alterações.</p>
-              </a>
-            <% } %>
+          <%# Números rápidos %>
+          <div class="numeros-linha">
+            <% numeros.forEach(function(numero) { %>
+              <div class="numero-item">
+                <strong><%= numero.valor %></strong>
+                <span><%= numero.label %></span>
+              </div>
+            <% }); %>
           </div>
 
           <% if (pode('eventos.gerenciar')) { %>
           <section class="danger-zone">
-            <h2>Excluir evento</h2>
+            <h2>Excluir campeonato</h2>
 
             <p>
-              So e possivel excluir um evento que ainda nao possua categorias, inscricoes ou resultados.
+              Só é possível excluir um campeonato que ainda não possua categorias, inscrições ou resultados.
             </p>
 
             <form
-              action="/eventos/<%= evento.id %>/excluir"
+              action="<%= base %>/excluir"
               method="POST"
-              data-confirm="Deseja realmente excluir este evento?"
+              data-confirm="Deseja realmente excluir este campeonato?"
             >
               <input
                 type="hidden"
@@ -153,8 +131,8 @@
                 value="<%= csrfToken %>"
               >
 
-              <button type="submit" class="button button-danger">
-                Excluir evento
+              <button type="submit" class="button button-danger" id="botaoExcluirCampeonato">
+                Excluir campeonato
               </button>
             </form>
           </section>

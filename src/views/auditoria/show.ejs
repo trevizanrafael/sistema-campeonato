@@ -16,21 +16,14 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a
-                href="/eventos/<%= evento.id %>/auditoria"
-                class="button button-small button-outline"
-              >
-                &larr; Voltar para a lista de auditoria
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Auditoria', path: '/auditoria' }, { label: 'Registro #' + log.id }] }) %>
 
             <h1 class="page-title">
               Registro de Auditoria #<%= log.id %>
             </h1>
 
             <p class="page-subtitle">
-              Evento: <strong><%= evento.nome %></strong> &bull; Operação realizada em
+              Campeonato: <strong><%= evento.nome %></strong> &bull; Operação realizada em
               <%= new Date(log.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) %>
             </p>
           </div>

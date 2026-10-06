@@ -16,19 +16,12 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a
-                href="/eventos/<%= eventoId %>/chaves/<%= chaveId %>#match-<%= luta.id %>"
-                class="button button-small button-outline"
-              >
-                &larr; Voltar para a chave
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: luta.categoria_nome, path: '/chaves/' + chaveId }, { label: 'Corrigir resultado' }] }) %>
             <h1 class="page-title">
               Corrigir resultado — Luta #<%= luta.posicao_chave || luta.id %>
             </h1>
             <p class="page-subtitle">
-              Categoria: <strong><%= luta.categoria_nome %></strong> | Evento: <strong><%= luta.evento_nome %></strong>
+              Categoria: <strong><%= luta.categoria_nome %></strong> | Campeonato: <strong><%= luta.evento_nome %></strong>
             </p>
           </div>
         </div>

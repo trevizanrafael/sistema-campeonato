@@ -62,7 +62,7 @@ async function gerar(req, res, next) {
     const resultado = await chaveService.gerarChave(eventoId, categoriaId, usuarioId);
     let msg = 'Chave gerada com sucesso.';
     if (resultado.conflitosEquipe > 0) {
-      msg += ` Atenção: ${resultado.conflitosEquipe} confronto(s) de atletas da mesma equipe não puderam ser evitados na primeira rodada.`;
+      msg += ` Atenção: ${resultado.conflitosEquipe} confronto(s) de atletas da mesma academia não puderam ser evitados na primeira rodada.`;
     }
 
     req.session.mensagemSucesso = msg;
@@ -97,7 +97,7 @@ async function sortear(req, res, next) {
     const resultado = await chaveService.sortearNovamente(eventoId, chaveId, usuarioId);
     let msg = 'Chave sorteada novamente com sucesso.';
     if (resultado.conflitosEquipe > 0) {
-      msg += ` Atenção: ${resultado.conflitosEquipe} confronto(s) de atletas da mesma equipe não puderam ser evitados na primeira rodada.`;
+      msg += ` Atenção: ${resultado.conflitosEquipe} confronto(s) de atletas da mesma academia não puderam ser evitados na primeira rodada.`;
     }
 
     req.session.mensagemSucesso = msg;

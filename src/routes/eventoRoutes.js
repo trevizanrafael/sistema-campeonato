@@ -5,6 +5,7 @@ const {
   exigirPermissao,
   registrarUltimoEvento,
 } = require('../middlewares/authMiddleware');
+const { carregarContextoEvento } = require('../middlewares/eventoContextoMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 const router = express.Router();
@@ -18,8 +19,9 @@ router.get('/', podeVer, eventoController.listar);
 router.get('/novo', podeGerenciar, eventoController.mostrarCadastro);
 router.post('/', podeGerenciar, csrfProtection, eventoController.cadastrar);
 
-// Memoriza o último campeonato aberto (qualquer rota /eventos/:id/...)
-router.use('/:eventoId', registrarUltimoEvento);
+// Memoriza o último campeonato aberto e carrega o contexto (menu lateral/trilha)
+// para qualquer rota /eventos/:id/...
+router.use('/:eventoId', registrarUltimoEvento, carregarContextoEvento);
 
 router.get('/:id/editar', podeGerenciar, eventoController.mostrarEdicao);
 router.post('/:id', podeGerenciar, csrfProtection, eventoController.editar);

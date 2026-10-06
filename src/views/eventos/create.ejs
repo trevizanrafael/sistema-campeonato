@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: titulo || "Novo evento"
+      titulo: titulo || "Novo campeonato"
     }) %>
   </head>
 
@@ -16,7 +16,7 @@
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Novo evento</h1>
+            <h1 class="page-title">Novo campeonato</h1>
             <p class="page-subtitle">Cadastre um campeonato no sistema.</p>
           </div>
         </div>
@@ -41,7 +41,7 @@
                 </a>
 
                 <button type="submit" class="button button-primary">
-                  Criar evento
+                  Criar campeonato
                 </button>
               </div>
             </form>

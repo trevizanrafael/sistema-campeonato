@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: titulo || "Equipes"
+      titulo: titulo || "Academias"
     }) %>
   </head>
 
@@ -16,12 +16,12 @@
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Equipes</h1>
-            <p class="page-subtitle">Gerencie as equipes participantes.</p>
+            <h1 class="page-title">Academias</h1>
+            <p class="page-subtitle">Gerencie as academias participantes.</p>
           </div>
 
           <a href="/equipes/nova" class="button button-primary">
-            Nova equipe
+            Nova academia
           </a>
         </div>
 
@@ -31,9 +31,9 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th>Equipe</th>
-                    <th>Inscricoes</th>
-                    <th>Acoes</th>
+                    <th>Academia</th>
+                    <th>Inscrições</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
 
@@ -61,7 +61,7 @@
                             action="/equipes/<%= equipe.id %>/excluir"
                             method="POST"
                             style="display: inline;"
-                            data-confirm="Deseja excluir a equipe <%= equipe.nome %>?"
+                            data-confirm="Deseja excluir a academia <%= equipe.nome %>?"
                           >
                             <input
                               type="hidden"
@@ -85,10 +85,10 @@
             </div>
           <% } else { %>
             <div class="empty-state">
-              <h2>Nenhuma equipe cadastrada</h2>
-              <p>Cadastre as equipes participantes para vincular aos competidores.</p>
+              <h2>Nenhuma academia cadastrada</h2>
+              <p>Cadastre as academias participantes para vincular aos competidores.</p>
               <a href="/equipes/nova" class="button button-primary">
-                Cadastrar primeira equipe
+                Cadastrar primeira academia
               </a>
             </div>
           <% } %>

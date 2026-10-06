@@ -82,7 +82,7 @@ async function buscarDetalhesEquipe(eventoId, equipeId) {
   const equipeExiste = await rankingRepository.buscarEquipeNoEvento(evento.id, equipeId);
 
   if (!equipeExiste) {
-    throw new NotFoundError('Equipe não encontrada neste evento.');
+    throw new NotFoundError('Academia não encontrada neste campeonato.');
   }
 
   const { equipes } = await buscarRanking(evento.id);

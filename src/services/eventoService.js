@@ -1,6 +1,7 @@
 const pool = require('../config/database');
 const eventoRepository = require('../repositories/eventoRepository');
 const regraPontuacaoRepository = require('../repositories/regraPontuacaoRepository');
+const categoriaService = require('./categoriaService');
 const {
   normalizarEvento,
   validarEvento,
@@ -41,7 +42,7 @@ async function buscarEvento(id) {
   const validId = validarId(id);
   const evento = await eventoRepository.buscarPorId(validId);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
   return evento;
 }
@@ -50,9 +51,218 @@ async function buscarEventoComResumo(id) {
   const validId = validarId(id);
   const evento = await eventoRepository.buscarComResumo(validId);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
   return evento;
+}
+
+function plural(n, singular, pluralTexto) {
+  return `${n} ${n === 1 ? singular : pluralTexto}`;
+}
+
+/**
+ * Monta o painel do campeonato: etapas, cartão "próximo passo" e pendências.
+ * @param {number|string} id - id do evento
+ * @param {(permissao: string) => boolean} pode - checagem de permissão do usuário logado
+ */
+async function montarPainel(id, pode = () => true) {
+  const validId = validarId(id);
+  const evento = await eventoRepository.buscarPorId(validId);
+  if (!evento) {
+    throw new NotFoundError('Campeonato não encontrado.');
+  }
+
+  const p = await eventoRepository.buscarProgresso(validId);
+  const { categorias: categoriasComSobreposicao } = await categoriaService.listarCategorias(validId);
+  const sobreposicoes = categoriasComSobreposicao.filter((c) => c.temSobreposicao).length;
+
+  const chavesPossiveis = p.chaves_total + p.categorias_prontas_sem_chave;
+  const pontuacaoZerada = p.pontuacao_soma === 0;
+
+  // ---------- Etapas ----------
+  const etapas = [
+    {
+      titulo: 'Configuração',
+      subtitulo: p.categorias === 0
+        ? 'Nenhuma categoria'
+        : plural(p.categorias, 'categoria', 'categorias'),
+      feito: p.categorias > 0,
+    },
+    {
+      titulo: 'Inscrições',
+      subtitulo: p.inscricoes_sem_categoria > 0
+        ? `${plural(p.inscricoes_total, 'atleta', 'atletas')} · ${p.inscricoes_sem_categoria} sem categoria`
+        : plural(p.inscricoes_total, 'atleta', 'atletas'),
+      feito: p.inscricoes_confirmadas > 0 && p.inscricoes_sem_categoria === 0,
+    },
+    {
+      titulo: 'Chaves',
+      subtitulo: chavesPossiveis === 0
+        ? 'Nenhuma pronta'
+        : `${p.chaves_total} de ${chavesPossiveis} geradas`,
+      feito: p.chaves_total > 0 && p.categorias_prontas_sem_chave === 0,
+    },
+    {
+      titulo: 'Lutas',
+      subtitulo: p.lutas_total === 0
+        ? 'Nenhuma iniciada'
+        : `${p.lutas_finalizadas} de ${p.lutas_total} lutas`,
+      feito: p.chaves_total > 0
+        && p.chaves_nao_iniciadas === 0
+        && p.lutas_total > 0
+        && p.lutas_finalizadas === p.lutas_total,
+    },
+    {
+      titulo: 'Pódio e Ranking',
+      subtitulo: p.chaves_total === 0
+        ? 'Aguardando chaves'
+        : `${p.chaves_finalizadas} de ${chavesPossiveis} finalizadas`,
+      feito: p.chaves_total > 0
+        && p.categorias_prontas_sem_chave === 0
+        && p.chaves_finalizadas === p.chaves_total,
+    },
+  ];
+
+  let achouAtual = false;
+  etapas.forEach((etapa, i) => {
+    etapa.numero = i + 1;
+    if (etapa.feito) {
+      etapa.status = 'feito';
+    } else if (!achouAtual) {
+      etapa.status = 'atual';
+      achouAtual = true;
+    } else {
+      etapa.status = 'proximo';
+    }
+  });
+
+  // ---------- Próximo passo (primeira regra que se aplica e que o usuário pode executar) ----------
+  const regras = [
+    {
+      quando: p.categorias === 0,
+      permissao: 'categorias.gerenciar',
+      titulo: 'Cadastre as categorias',
+      texto: 'Defina faixa, idade e peso de cada categoria antes de receber inscrições.',
+      acao: 'Nova categoria',
+      path: '/categorias/nova',
+    },
+    {
+      quando: p.inscricoes_total === 0,
+      permissao: 'inscricoes.gerenciar',
+      titulo: 'Cadastre as inscrições',
+      texto: 'Adicione os atletas do campeonato. Eles serão encaixados nas categorias.',
+      acao: 'Nova inscrição',
+      path: '/inscricoes/nova',
+    },
+    {
+      quando: p.inscricoes_sem_categoria > 0,
+      permissao: 'inscricoes.gerenciar',
+      titulo: `${plural(p.inscricoes_sem_categoria, 'atleta está', 'atletas estão')} sem categoria`,
+      texto: 'Atletas sem categoria não entram em nenhuma chave. Resolva antes de gerar as chaves.',
+      acao: 'Resolver agora',
+      path: '/inscricoes?categoria_id=sem_categoria',
+    },
+    {
+      quando: p.categorias_prontas_sem_chave > 0,
+      permissao: 'chaves.gerar',
+      titulo: `Gerar chaves de ${plural(p.categorias_prontas_sem_chave, 'categoria', 'categorias')}`,
+      texto: 'Essas categorias já têm atletas confirmados suficientes para montar a chave.',
+      acao: 'Ir para as chaves',
+      path: '/chaves',
+    },
+    {
+      quando: p.chaves_nao_iniciadas > 0,
+      permissao: 'lutas.operar',
+      titulo: `Iniciar ${plural(p.chaves_nao_iniciadas, 'chave', 'chaves')}`,
+      texto: 'As chaves foram geradas, mas as lutas ainda não começaram.',
+      acao: 'Ir para as chaves',
+      path: '/chaves',
+    },
+    {
+      quando: p.lutas_prontas > 0,
+      permissao: 'lutas.operar',
+      titulo: `${plural(p.lutas_prontas, 'luta pronta', 'lutas prontas')} para começar`,
+      texto: 'Chame os atletas e lance o resultado assim que a luta terminar.',
+      acao: 'Ir para as lutas',
+      path: '/chaves',
+    },
+    {
+      quando: p.chaves_prontas_finalizar > 0,
+      permissao: 'lutas.operar',
+      titulo: `Finalizar ${plural(p.chaves_prontas_finalizar, 'categoria', 'categorias')}`,
+      texto: 'Todas as lutas terminaram. Confira o pódio e finalize para lançar os pontos no ranking.',
+      acao: 'Ir para as chaves',
+      path: '/chaves',
+    },
+    {
+      quando: p.chaves_total > 0 && p.chaves_finalizadas === p.chaves_total && p.categorias_prontas_sem_chave === 0,
+      permissao: 'ranking.visualizar',
+      titulo: 'Campeonato concluído',
+      texto: 'Todas as categorias foram finalizadas. Confira o ranking final das academias.',
+      acao: 'Ver ranking',
+      path: '/ranking',
+    },
+  ];
+
+  const regra = regras.find((r) => r.quando && pode(r.permissao));
+  const proximoPasso = regra
+    ? { titulo: regra.titulo, texto: regra.texto, acao: regra.acao, path: regra.path }
+    : {
+      titulo: 'Nada para fazer agora',
+      texto: 'Não há nenhuma ação pendente para o seu cargo neste momento.',
+      acao: null,
+      path: null,
+    };
+
+  // ---------- Pendências ----------
+  const pendencias = [];
+  if (p.inscricoes_sem_categoria > 0 && pode('inscricoes.gerenciar')) {
+    pendencias.push({
+      texto: `${plural(p.inscricoes_sem_categoria, 'atleta', 'atletas')} sem categoria`,
+      path: '/inscricoes?categoria_id=sem_categoria',
+    });
+  }
+  if (sobreposicoes > 0 && pode('categorias.gerenciar')) {
+    pendencias.push({
+      texto: `${plural(sobreposicoes, 'categoria se sobrepõe', 'categorias se sobrepõem')} a outra`,
+      path: '/categorias',
+    });
+  }
+  if (pontuacaoZerada && p.pontos_lancados === 0 && pode('pontuacao.gerenciar')) {
+    pendencias.push({
+      texto: 'Pontuação do ranking não configurada',
+      path: '/pontuacao',
+    });
+  }
+  if (p.categorias_um_atleta > 0 && pode('categorias.gerenciar')) {
+    pendencias.push({
+      texto: `${plural(p.categorias_um_atleta, 'categoria tem', 'categorias têm')} só 1 atleta (não gera chave)`,
+      path: '/categorias',
+    });
+  }
+  if (p.inscricoes_pendentes > 0 && pode('inscricoes.gerenciar')) {
+    pendencias.push({
+      texto: `${plural(p.inscricoes_pendentes, 'inscrição aguardando', 'inscrições aguardando')} confirmação`,
+      path: '/inscricoes?status=PENDENTE',
+    });
+  }
+
+  // ---------- Números ----------
+  const numeros = [
+    { label: 'Categorias', valor: p.categorias },
+    { label: 'Atletas', valor: p.inscricoes_total },
+    { label: 'Chaves', valor: p.chaves_total },
+    { label: 'Lutas finalizadas', valor: `${p.lutas_finalizadas}/${p.lutas_total}` },
+  ];
+
+  return {
+    evento,
+    etapas,
+    proximoPasso,
+    pendencias,
+    numeros,
+    progresso: p,
+  };
 }
 
 const auditoriaService = require('./auditoriaService');
@@ -78,7 +288,7 @@ async function criarEvento(dados, usuarioId = null) {
       acao: 'EVENTO_CRIADO',
       entidade: 'EVENTO',
       entidadeId: evento.id,
-      descricao: `Evento "${evento.nome}" criado.`,
+      descricao: `Campeonato "${evento.nome}" criado.`,
       dadosAnteriores: null,
       dadosNovos: {
         nome: evento.nome,
@@ -112,7 +322,7 @@ async function editarEvento(id, dados, usuarioId = null) {
 
     const eventoAnterior = await eventoRepository.buscarPorId(validId, client);
     if (!eventoAnterior) {
-      throw new NotFoundError('Evento não encontrado.');
+      throw new NotFoundError('Campeonato não encontrado.');
     }
 
     const eventoAtualizado = await eventoRepository.atualizar(validId, normalizado, client);
@@ -123,7 +333,7 @@ async function editarEvento(id, dados, usuarioId = null) {
       acao: 'EVENTO_EDITADO',
       entidade: 'EVENTO',
       entidadeId: validId,
-      descricao: `Evento "${eventoAtualizado.nome}" editado.`,
+      descricao: `Campeonato "${eventoAtualizado.nome}" editado.`,
       dadosAnteriores: {
         nome: eventoAnterior.nome,
         descricao: eventoAnterior.descricao,
@@ -154,7 +364,7 @@ async function excluirEvento(id) {
 
     const bloqueado = await eventoRepository.bloquearPorId(validId, client);
     if (!bloqueado) {
-      throw new NotFoundError('Evento não encontrado.');
+      throw new NotFoundError('Campeonato não encontrado.');
     }
 
     const dependencias = await eventoRepository.contarDependencias(validId, client);
@@ -165,7 +375,7 @@ async function excluirEvento(id) {
 
     if (possuiDependencias) {
       throw new BusinessRuleError(
-        'Este evento não pode ser excluído porque já possui categorias, inscrições ou resultados.'
+        'Este campeonato não pode ser excluído porque já possui categorias, inscrições ou resultados.'
       );
     }
 
@@ -184,6 +394,7 @@ module.exports = {
   listarEventos,
   buscarEvento,
   buscarEventoComResumo,
+  montarPainel,
   criarEvento,
   editarEvento,
   excluirEvento,

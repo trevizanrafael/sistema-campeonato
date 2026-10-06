@@ -10,8 +10,8 @@ async function listar(req, res, next) {
     const equipes = await equipeService.listarEquipes();
 
     return res.render('equipes/index', {
-      titulo: 'Equipes',
-      subtitulo: 'Gerencie as equipes participantes.',
+      titulo: 'Academias',
+      subtitulo: 'Gerencie as academias participantes.',
       equipes,
     });
   } catch (erro) {
@@ -21,7 +21,7 @@ async function listar(req, res, next) {
 
 function mostrarCadastro(req, res) {
   return res.render('equipes/create', {
-    titulo: 'Nova equipe',
+    titulo: 'Nova academia',
     equipe: {
       nome: '',
     },
@@ -32,19 +32,19 @@ function mostrarCadastro(req, res) {
 async function cadastrar(req, res, next) {
   try {
     await equipeService.criarEquipe(req.body);
-    req.session.mensagemSucesso = 'Equipe cadastrada com sucesso.';
+    req.session.mensagemSucesso = 'Academia cadastrada com sucesso.';
     return res.redirect('/equipes');
   } catch (erro) {
     if (erro instanceof ValidationError) {
       return res.status(422).render('equipes/create', {
-        titulo: 'Nova equipe',
+        titulo: 'Nova academia',
         equipe: req.body,
         erros: erro.erros,
       });
     }
     if (erro instanceof BusinessRuleError) {
       return res.status(422).render('equipes/create', {
-        titulo: 'Nova equipe',
+        titulo: 'Nova academia',
         equipe: req.body,
         erros: { nome: erro.message },
       });
@@ -58,7 +58,7 @@ async function mostrarEdicao(req, res, next) {
     const equipe = await equipeService.buscarEquipe(req.params.id);
 
     return res.render('equipes/edit', {
-      titulo: 'Editar equipe',
+      titulo: 'Editar academia',
       equipe,
       erros: {},
     });
@@ -75,12 +75,12 @@ async function mostrarEdicao(req, res, next) {
 async function editar(req, res, next) {
   try {
     await equipeService.editarEquipe(req.params.id, req.body);
-    req.session.mensagemSucesso = 'Equipe atualizada com sucesso.';
+    req.session.mensagemSucesso = 'Academia atualizada com sucesso.';
     return res.redirect('/equipes');
   } catch (erro) {
     if (erro instanceof ValidationError) {
       return res.status(422).render('equipes/edit', {
-        titulo: 'Editar equipe',
+        titulo: 'Editar academia',
         equipe: {
           id: req.params.id,
           ...req.body,
@@ -90,7 +90,7 @@ async function editar(req, res, next) {
     }
     if (erro instanceof BusinessRuleError) {
       return res.status(422).render('equipes/edit', {
-        titulo: 'Editar equipe',
+        titulo: 'Editar academia',
         equipe: {
           id: req.params.id,
           ...req.body,
@@ -110,13 +110,13 @@ async function editar(req, res, next) {
 async function excluir(req, res, next) {
   try {
     await equipeService.excluirEquipe(req.params.id);
-    req.session.mensagemSucesso = 'Equipe excluída com sucesso.';
+    req.session.mensagemSucesso = 'Academia excluída com sucesso.';
     return res.redirect('/equipes');
   } catch (erro) {
     if (erro instanceof BusinessRuleError) {
       req.session.mensagemErro =
         erro.message ||
-        'Esta equipe não pode ser excluída porque possui inscrições vinculadas.';
+        'Esta academia não pode ser excluída porque possui inscrições vinculadas.';
       return res.redirect('/equipes');
     }
     if (erro instanceof NotFoundError) {

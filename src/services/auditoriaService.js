@@ -7,8 +7,8 @@ const { NotFoundError } = require('../utils/errors');
  */
 
 const ACOES_INFO = {
-  EVENTO_CRIADO: { label: 'Evento criado', badge: 'badge-neutral' },
-  EVENTO_EDITADO: { label: 'Evento editado', badge: 'badge-neutral' },
+  EVENTO_CRIADO: { label: 'Campeonato criado', badge: 'badge-neutral' },
+  EVENTO_EDITADO: { label: 'Campeonato editado', badge: 'badge-neutral' },
   INSCRICAO_CRIADA: { label: 'Inscrição criada', badge: 'badge-neutral' },
   INSCRICAO_EDITADA: { label: 'Inscrição editada', badge: 'badge-neutral' },
   INSCRICAO_CANCELADA: { label: 'Inscrição cancelada', badge: 'badge-danger' },
@@ -97,7 +97,7 @@ async function registrar({
 async function listarAuditoria(eventoId, { acao = '', usuarioId = null, pagina = 1, limite = 25 } = {}) {
   const evento = await eventoRepository.buscarPorId(eventoId);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   const paginaNum = Math.max(1, parseInt(pagina, 10) || 1);
@@ -149,12 +149,12 @@ async function listarAuditoria(eventoId, { acao = '', usuarioId = null, pagina =
 async function buscarDetalhes(eventoId, logId) {
   const evento = await eventoRepository.buscarPorId(eventoId);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   const log = await auditoriaRepository.buscarPorIdNoEvento(logId, eventoId);
   if (!log) {
-    throw new NotFoundError('Registro de auditoria não encontrado neste evento.');
+    throw new NotFoundError('Registro de auditoria não encontrado neste campeonato.');
   }
 
   const infoAcao = ACOES_INFO[log.acao] || {

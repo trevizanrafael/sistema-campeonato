@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: titulo || "Eventos"
+      titulo: titulo || "Campeonatos"
     }) %>
   </head>
 
@@ -16,13 +16,13 @@
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Eventos</h1>
-            <p class="page-subtitle"><%= pode('eventos.gerenciar') ? 'Gerencie os campeonatos cadastrados.' : 'Escolha o campeonato em que voce vai trabalhar.' %></p>
+            <h1 class="page-title">Campeonatos</h1>
+            <p class="page-subtitle"><%= pode('eventos.gerenciar') ? 'Gerencie os campeonatos cadastrados.' : 'Escolha o campeonato em que você vai trabalhar.' %></p>
           </div>
 
           <% if (pode('eventos.gerenciar')) { %>
             <a href="/eventos/novo" class="button button-primary">
-              Novo evento
+              Novo campeonato
             </a>
           <% } %>
         </div>
@@ -34,7 +34,7 @@
               id="busca"
               name="busca"
               class="form-control"
-              placeholder="Pesquisar por nome ou descricao"
+              placeholder="Pesquisar por nome ou descrição"
               value="<%= typeof busca !== 'undefined' ? busca : '' %>"
             >
 
@@ -54,11 +54,11 @@
               <table class="table">
                 <thead>
                   <tr>
-                    <th>Evento</th>
+                    <th>Campeonato</th>
                     <th>Categorias</th>
-                    <th>Inscricoes</th>
+                    <th>Inscrições</th>
                     <th class="col-hide-mobile">Criado em</th>
-                    <th>Acoes</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
 
@@ -122,21 +122,21 @@
             <% if (typeof busca !== 'undefined' && busca) { %>
               <div class="empty-state">
                 <h2>Nenhum resultado encontrado</h2>
-                <p>Nao encontramos eventos correspondentes a pesquisa.</p>
+                <p>Não encontramos campeonatos correspondentes a pesquisa.</p>
                 <a href="/eventos" class="button button-outline">
                   Limpar pesquisa
                 </a>
               </div>
             <% } else { %>
               <div class="empty-state">
-                <h2>Nenhum evento cadastrado</h2>
+                <h2>Nenhum campeonato cadastrado</h2>
                 <% if (pode('eventos.gerenciar')) { %>
-                  <p>Crie o primeiro evento para comecar a cadastrar categorias e inscricoes.</p>
+                  <p>Crie o primeiro campeonato para começar a cadastrar categorias e inscrições.</p>
                   <a href="/eventos/novo" class="button button-primary">
-                    Criar primeiro evento
+                    Criar primeiro campeonato
                   </a>
                 <% } else { %>
-                  <p>Peca para um organizador cadastrar o campeonato.</p>
+                  <p>Peça para um organizador cadastrar o campeonato.</p>
                 <% } %>
               </div>
             <% } %>

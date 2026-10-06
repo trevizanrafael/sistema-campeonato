@@ -16,15 +16,11 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos/<%= evento.id %>" class="button button-small button-outline">
-                &larr; Voltar para o evento
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Categorias' }] }) %>
 
             <h1 class="page-title">Categorias</h1>
             <p class="page-subtitle">
-              Evento: <%= evento.nome %>
+              Campeonato: <%= evento.nome %>
             </p>
           </div>
 
@@ -47,10 +43,10 @@
                     <th>Idade</th>
                     <th>Peso</th>
                     <th>Faixas</th>
-                    <th>Inscricoes</th>
+                    <th>Inscrições</th>
                     <th>Chave</th>
                     <th>Conflito</th>
-                    <th>Acoes</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
 
@@ -82,7 +78,7 @@
                       </td>
 
                       <td>
-                        <%= Number(categoria.total_chaves) > 0 ? 'Sim' : 'Nao' %>
+                        <%= Number(categoria.total_chaves) > 0 ? 'Sim' : 'Não' %>
                       </td>
 
                       <td>
@@ -92,7 +88,7 @@
                             style="border: 1px solid #000; padding: 2px 6px; font-size: 0.75rem; background: #fff; cursor: help;"
                             title="Sobrepoe com: <%= categoria.sobreposicoes.join(', ') %>"
                           >
-                            Sobreposicao
+                            Sobreposição
                           </span>
                         <% } else { %>
                           <span style="color: #888; font-size: 0.85rem;">-</span>
@@ -123,7 +119,7 @@
                             <button
                               type="submit"
                               class="button button-small button-danger"
-                              <%= (Number(categoria.total_inscricoes) > 0 || Number(categoria.total_chaves) > 0) ? 'title="Categoria com inscricoes ou chaves nao pode ser excluida"' : '' %>
+                              <%= (Number(categoria.total_inscricoes) > 0 || Number(categoria.total_chaves) > 0) ? 'title="Categoria com inscrições ou chaves não pode ser excluída"' : '' %>
                             >
                               Excluir
                             </button>
@@ -138,7 +134,7 @@
           <% } else { %>
             <div class="empty-state">
               <h2>Nenhuma categoria cadastrada</h2>
-              <p>Cadastre as categorias de peso, idade e faixa para permitir as inscricoes no evento.</p>
+              <p>Cadastre as categorias de peso, idade e faixa para permitir as inscrições no campeonato.</p>
               <a
                 href="/eventos/<%= evento.id %>/categorias/nova"
                 class="button button-primary"

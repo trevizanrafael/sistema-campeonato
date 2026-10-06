@@ -15,12 +15,12 @@ const {
 async function validarEventoExistente(eventoId, client = pool) {
   const validId = validarId(eventoId);
   if (!validId) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   const evento = await eventoRepository.buscarPorId(validId, client);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   return evento;
@@ -94,7 +94,7 @@ async function atualizarConfiguracao(eventoId, body) {
 
     if (possuiLancamentos) {
       throw new BusinessRuleError(
-        'A pontuação não pode ser alterada porque o evento já possui lançamentos.'
+        'A pontuação não pode ser alterada porque o campeonato já possui lançamentos.'
       );
     }
 

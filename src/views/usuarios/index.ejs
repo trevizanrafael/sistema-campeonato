@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: titulo || "Usuarios"
+      titulo: titulo || "Usuários"
     }) %>
   </head>
 
@@ -16,22 +16,22 @@
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Usuarios</h1>
+            <h1 class="page-title">Usuários</h1>
             <p class="page-subtitle">Gerencie as pessoas que podem acessar o sistema.</p>
           </div>
 
           <a href="/usuarios/novo" class="button button-primary">
-            Novo usuario
+            Novo usuário
           </a>
         </div>
 
         <section class="page-content">
           <% if (usuarios.length === 0) { %>
             <%- include("../components/emptyState", {
-              titulo: "Nenhum usuario cadastrado",
-              mensagem: "Cadastre o primeiro usuario para comecar.",
+              titulo: "Nenhum usuário cadastrado",
+              mensagem: "Cadastre o primeiro usuário para começar.",
               acaoUrl: "/usuarios/novo",
-              acaoTexto: "Novo usuario"
+              acaoTexto: "Novo usuário"
             }) %>
           <% } else { %>
             <div class="table-container">
@@ -41,8 +41,8 @@
                     <th>Nome</th>
                     <th>E-mail</th>
                     <th>Cargo</th>
-                    <th>Situacao</th>
-                    <th>Acoes</th>
+                    <th>Situação</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -66,13 +66,13 @@
                           <a href="/usuarios/<%= u.id %>/senha" class="button button-outline button-small">Senha</a>
                           <% if (u.ativo) { %>
                             <form action="/usuarios/<%= u.id %>/desativar" method="POST" style="display:inline"
-                                  data-confirm="Deseja realmente desativar este usuario?">
+                                  data-confirm="Deseja realmente desativar este usuário?">
                               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                               <button type="submit" class="button button-danger button-small">Desativar</button>
                             </form>
                           <% } else { %>
                             <form action="/usuarios/<%= u.id %>/ativar" method="POST" style="display:inline"
-                                  data-confirm="Deseja realmente ativar este usuario?">
+                                  data-confirm="Deseja realmente ativar este usuário?">
                               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                               <button type="submit" class="button button-outline button-small">Ativar</button>
                             </form>

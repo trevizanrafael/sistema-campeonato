@@ -23,12 +23,12 @@ const auditoriaService = require('./auditoriaService');
 async function validarEventoExistente(eventoId, client = pool) {
   const validId = validarId(eventoId);
   if (!validId) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   const evento = await eventoRepository.buscarPorId(validId, client);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   return evento;
@@ -74,7 +74,7 @@ async function buscarInscricao(eventoId, inscricaoId) {
   const validInscricaoId = validarId(inscricaoId);
 
   if (!validEventoId || !validInscricaoId) {
-    throw new NotFoundError('Inscrição não encontrada neste evento.');
+    throw new NotFoundError('Inscrição não encontrada neste campeonato.');
   }
 
   await validarEventoExistente(validEventoId);
@@ -85,7 +85,7 @@ async function buscarInscricao(eventoId, inscricaoId) {
   );
 
   if (!inscricao) {
-    throw new NotFoundError('Inscrição não encontrada neste evento.');
+    throw new NotFoundError('Inscrição não encontrada neste campeonato.');
   }
 
   return inscricao;
@@ -230,7 +230,7 @@ async function processarCadastro(eventoId, dados, usuarioId = null) {
 
     if (!categoriaEscolhida) {
       throw new ValidationError({
-        categoria_id: 'Categoria selecionada não foi encontrada neste evento.',
+        categoria_id: 'Categoria selecionada não foi encontrada neste campeonato.',
       });
     }
 
@@ -395,7 +395,7 @@ async function processarEdicao(eventoId, inscricaoId, dados, usuarioId = null) {
 
     if (!categoriaEscolhida) {
       throw new ValidationError({
-        categoria_id: 'Categoria selecionada não foi encontrada neste evento.',
+        categoria_id: 'Categoria selecionada não foi encontrada neste campeonato.',
       });
     }
 
@@ -646,7 +646,7 @@ async function excluirInscricao(eventoId, inscricaoId, usuarioId = null) {
   const validInscricaoId = validarId(inscricaoId);
 
   if (!validEventoId || !validInscricaoId) {
-    throw new NotFoundError('Inscrição não encontrada neste evento.');
+    throw new NotFoundError('Inscrição não encontrada neste campeonato.');
   }
 
   await validarEventoExistente(validEventoId);
@@ -662,7 +662,7 @@ async function excluirInscricao(eventoId, inscricaoId, usuarioId = null) {
     );
 
     if (!inscricao) {
-      throw new NotFoundError('Inscrição não encontrada neste evento.');
+      throw new NotFoundError('Inscrição não encontrada neste campeonato.');
     }
 
     const emLuta = await inscricaoRepository.verificarParticipacaoEmLutas(
@@ -681,7 +681,7 @@ async function excluirInscricao(eventoId, inscricaoId, usuarioId = null) {
     );
     if (possuiPontos) {
       throw new BusinessRuleError(
-        'Esta inscrição não pode ser excluída porque já possui pontuação de equipe gerada.'
+        'Esta inscrição não pode ser excluída porque já possui pontuação de academia gerada.'
       );
     }
 

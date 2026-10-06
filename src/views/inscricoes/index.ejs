@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: "Inscricoes - " + evento.nome
+      titulo: "Inscrições - " + evento.nome
     }) %>
   </head>
 
@@ -16,15 +16,11 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos/<%= evento.id %>" class="button button-small button-outline">
-                &larr; Voltar para o evento
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Inscrições' }] }) %>
 
-            <h1 class="page-title">Inscricoes</h1>
+            <h1 class="page-title">Inscrições</h1>
             <p class="page-subtitle">
-              Evento: <%= evento.nome %>
+              Campeonato: <%= evento.nome %>
             </p>
           </div>
 
@@ -32,7 +28,7 @@
             href="/eventos/<%= evento.id %>/inscricoes/nova"
             class="button button-primary"
           >
-            Nova inscricao
+            Nova inscrição
           </a>
         </div>
 
@@ -70,7 +66,7 @@
                   id="busca"
                   name="busca"
                   class="form-control"
-                  placeholder="Nome, equipe ou categoria..."
+                  placeholder="Nome, academia ou categoria..."
                   value="<%= filtros.busca || '' %>"
                 >
               </div>
@@ -102,9 +98,9 @@
               </div>
 
               <div style="min-width: 150px;">
-                <label for="equipe_id" class="form-label" style="font-size: 0.85rem;">Equipe</label>
+                <label for="equipe_id" class="form-label" style="font-size: 0.85rem;">Academia</label>
                 <select id="equipe_id" name="equipe_id" class="form-control">
-                  <option value="">Todas as equipes</option>
+                  <option value="">Todas as academias</option>
                   <% if (locals.equipes && equipes.length > 0) { %>
                     <% equipes.forEach((eq) => { %>
                       <option value="<%= eq.id %>" <%= String(filtros.equipe_id) === String(eq.id) ? 'selected' : '' %>>
@@ -129,13 +125,13 @@
                 <thead>
                   <tr>
                     <th>Competidor</th>
-                    <th>Equipe</th>
+                    <th>Academia</th>
                     <th>Faixa</th>
                     <th>Idade</th>
                     <th>Peso</th>
                     <th>Categoria</th>
                     <th>Status</th>
-                    <th>Acoes</th>
+                    <th>Ações</th>
                   </tr>
                 </thead>
 
@@ -209,7 +205,7 @@
                             <a
                               href="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/editar"
                               class="button button-small button-outline"
-                              title="Inscricao em luta. Somente nome pode ser editado."
+                              title="Inscrição em luta. Somente nome pode ser editado."
                             >
                               Editar nome
                             </a>
@@ -225,7 +221,7 @@
                               action="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/reativar"
                               method="POST"
                               style="display: inline;"
-                              data-confirm="Deseja reativar a inscricao de <%= inscricao.nome %>?"
+                              data-confirm="Deseja reativar a inscrição de <%= inscricao.nome %>?"
                             >
                               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                               <button type="submit" class="button button-small button-outline">
@@ -237,7 +233,7 @@
                               action="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/excluir"
                               method="POST"
                               style="display: inline;"
-                              data-confirm="Deseja excluir permanentemente a inscricao de <%= inscricao.nome %>?"
+                              data-confirm="Deseja excluir permanentemente a inscrição de <%= inscricao.nome %>?"
                             >
                               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                               <button type="submit" class="button button-small button-danger">
@@ -256,7 +252,7 @@
                               action="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/cancelar"
                               method="POST"
                               style="display: inline;"
-                              data-confirm="Deseja cancelar a inscricao de <%= inscricao.nome %>?"
+                              data-confirm="Deseja cancelar a inscrição de <%= inscricao.nome %>?"
                             >
                               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                               <button type="submit" class="button button-small button-outline">
@@ -268,7 +264,7 @@
                               action="/eventos/<%= evento.id %>/inscricoes/<%= inscricao.id %>/excluir"
                               method="POST"
                               style="display: inline;"
-                              data-confirm="Deseja excluir permanentemente a inscricao de <%= inscricao.nome %>?"
+                              data-confirm="Deseja excluir permanentemente a inscrição de <%= inscricao.nome %>?"
                             >
                               <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                               <button type="submit" class="button button-small button-danger">
@@ -285,8 +281,8 @@
             </div>
           <% } else { %>
             <div class="empty-state">
-              <h2>Nenhuma inscricao encontrada</h2>
-              <p>Cadastre competidores manualmente para compor as categorias do evento.</p>
+              <h2>Nenhuma inscrição encontrada</h2>
+              <p>Cadastre competidores manualmente para compor as categorias do campeonato.</p>
               <a
                 href="/eventos/<%= evento.id %>/inscricoes/nova"
                 class="button button-primary"

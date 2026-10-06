@@ -477,3 +477,241 @@
     text-align: center;
   }
 }
+
+/* ==========================================================
+   Painel do campeonato (Visão geral): etapas, próximo passo,
+   pendências e números rápidos
+   ========================================================== */
+
+.etapas {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0;
+  margin: 0 0 24px;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.etapa {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px;
+  text-align: center;
+}
+
+/* Linha que liga uma etapa à próxima */
+.etapa:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 17px;
+  left: calc(50% + 22px);
+  right: calc(-50% + 22px);
+  height: 2px;
+  background: var(--color-border);
+}
+
+.etapa-feito:not(:last-child)::after {
+  background: var(--color-primary);
+}
+
+.etapa-marcador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.etapa-feito .etapa-marcador {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-surface);
+}
+
+.etapa-atual .etapa-marcador {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 5px var(--color-success-background);
+  transform: scale(1.08);
+}
+
+.etapa-texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.etapa-texto strong {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.etapa-proximo .etapa-texto strong {
+  color: var(--color-text-muted);
+}
+
+.etapa-texto small {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.painel-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.painel-rotulo {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.proximo-passo {
+  border-left: 4px solid var(--color-primary);
+}
+
+.proximo-passo h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.proximo-passo p {
+  margin: 0 0 18px;
+  color: var(--color-text-muted);
+}
+
+.proximo-passo .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.proximo-passo .button .icone {
+  transition: transform 150ms ease;
+}
+
+.proximo-passo .button:hover .icone {
+  transform: translateX(3px);
+}
+
+.pendencias ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pendencias a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-small);
+  background: var(--color-warning-background);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: 14px;
+  transition: background-color 150ms ease;
+}
+
+.pendencias a:hover {
+  background: var(--color-danger-background);
+}
+
+.pendencias a span {
+  flex: 1;
+}
+
+.pendencias a .icone:first-child {
+  color: var(--color-warning);
+  flex-shrink: 0;
+}
+
+.pendencias a .icone:last-child {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.pendencias-vazio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.numeros-linha {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-bottom: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.numero-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+  background: var(--color-surface);
+}
+
+.numero-item strong {
+  font-size: 22px;
+  color: var(--color-text);
+}
+
+.numero-item span {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 900px) {
+  .painel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .etapas {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .etapa {
+    flex-direction: row;
+    text-align: left;
+    padding: 0;
+  }
+
+  .etapa:not(:last-child)::after {
+    display: none;
+  }
+
+  .numeros-linha {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

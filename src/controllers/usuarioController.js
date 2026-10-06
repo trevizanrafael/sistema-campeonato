@@ -6,7 +6,7 @@ async function listar(req, res, next) {
   try {
     const usuarios = await usuarioService.listarUsuarios();
     return res.render('usuarios/index', {
-      titulo: 'Usuarios',
+      titulo: 'Usuários',
       usuarios,
     });
   } catch (erro) {
@@ -16,7 +16,7 @@ async function listar(req, res, next) {
 
 function mostrarCadastro(req, res) {
   return res.render('usuarios/create', {
-    titulo: 'Novo Usuario',
+    titulo: 'Novo Usuário',
     dados: { nome: '', email: '', senha: '', confirmar_senha: '', cargo: 'OPERADOR' },
     erros: [],
   });
@@ -29,7 +29,7 @@ async function cadastrar(req, res, next) {
     const erros = validarCriacao({ nome, email, senha, confirmar_senha, cargo });
     if (erros.length > 0) {
       return res.status(422).render('usuarios/create', {
-        titulo: 'Novo Usuario',
+        titulo: 'Novo Usuário',
         dados: { nome: nome || '', email: email || '', senha: '', confirmar_senha: '', cargo: cargo || '' },
         erros,
       });
@@ -37,12 +37,12 @@ async function cadastrar(req, res, next) {
 
     await usuarioService.criarUsuario({ nome, email, senha, cargo });
 
-    req.session.mensagemSucesso = 'Usuario cadastrado com sucesso.';
+    req.session.mensagemSucesso = 'Usuário cadastrado com sucesso.';
     return res.redirect('/usuarios');
   } catch (erro) {
     if (erro instanceof BusinessRuleError) {
       return res.status(422).render('usuarios/create', {
-        titulo: 'Novo Usuario',
+        titulo: 'Novo Usuário',
         dados: { nome: req.body.nome || '', email: req.body.email || '', senha: '', confirmar_senha: '', cargo: req.body.cargo || '' },
         erros: [erro.message],
       });
@@ -55,14 +55,14 @@ async function mostrarEdicao(req, res, next) {
   try {
     const usuario = await usuarioService.buscarUsuario(req.params.id);
     return res.render('usuarios/edit', {
-      titulo: 'Editar Usuario',
+      titulo: 'Editar Usuário',
       dados: { nome: usuario.nome, email: usuario.email, cargo: usuario.cargo },
       usuario,
       erros: [],
     });
   } catch (erro) {
     if (erro instanceof NotFoundError) {
-      return res.status(404).render('errors/404', { titulo: 'Nao encontrado' });
+      return res.status(404).render('errors/404', { titulo: 'Não encontrado' });
     }
     next(erro);
   }
@@ -77,7 +77,7 @@ async function editar(req, res, next) {
     if (erros.length > 0) {
       const usuario = await usuarioService.buscarUsuario(id);
       return res.status(422).render('usuarios/edit', {
-        titulo: 'Editar Usuario',
+        titulo: 'Editar Usuário',
         dados: { nome: nome || '', email: email || '', cargo: cargo || usuario.cargo },
         usuario,
         erros,
@@ -86,14 +86,14 @@ async function editar(req, res, next) {
 
     await usuarioService.editarUsuario(id, { nome, email, cargo }, req.session.usuario.id);
 
-    req.session.mensagemSucesso = 'Usuario atualizado com sucesso.';
+    req.session.mensagemSucesso = 'Usuário atualizado com sucesso.';
     return res.redirect('/usuarios');
   } catch (erro) {
     if (erro instanceof BusinessRuleError) {
       try {
         const usuario = await usuarioService.buscarUsuario(req.params.id);
         return res.status(422).render('usuarios/edit', {
-          titulo: 'Editar Usuario',
+          titulo: 'Editar Usuário',
           dados: { nome: req.body.nome || '', email: req.body.email || '', cargo: req.body.cargo || usuario.cargo },
           usuario,
           erros: [erro.message],
@@ -103,7 +103,7 @@ async function editar(req, res, next) {
       }
     }
     if (erro instanceof NotFoundError) {
-      return res.status(404).render('errors/404', { titulo: 'Nao encontrado' });
+      return res.status(404).render('errors/404', { titulo: 'Não encontrado' });
     }
     next(erro);
   }
@@ -120,7 +120,7 @@ function mostrarAlteracaoSenha(req, res, next) {
     })
     .catch((erro) => {
       if (erro instanceof NotFoundError) {
-        return res.status(404).render('errors/404', { titulo: 'Nao encontrado' });
+        return res.status(404).render('errors/404', { titulo: 'Não encontrado' });
       }
       next(erro);
     });
@@ -147,7 +147,7 @@ async function alterarSenha(req, res, next) {
     return res.redirect('/usuarios');
   } catch (erro) {
     if (erro instanceof NotFoundError) {
-      return res.status(404).render('errors/404', { titulo: 'Nao encontrado' });
+      return res.status(404).render('errors/404', { titulo: 'Não encontrado' });
     }
     next(erro);
   }
@@ -156,11 +156,11 @@ async function alterarSenha(req, res, next) {
 async function ativar(req, res, next) {
   try {
     await usuarioService.alterarStatus(req.params.id, true, req.session.usuario.id);
-    req.session.mensagemSucesso = 'Usuario ativado com sucesso.';
+    req.session.mensagemSucesso = 'Usuário ativado com sucesso.';
     return res.redirect('/usuarios');
   } catch (erro) {
     if (erro instanceof NotFoundError) {
-      return res.status(404).render('errors/404', { titulo: 'Nao encontrado' });
+      return res.status(404).render('errors/404', { titulo: 'Não encontrado' });
     }
     if (erro instanceof BusinessRuleError) {
       req.session.mensagemErro = erro.message;
@@ -173,11 +173,11 @@ async function ativar(req, res, next) {
 async function desativar(req, res, next) {
   try {
     await usuarioService.alterarStatus(req.params.id, false, req.session.usuario.id);
-    req.session.mensagemSucesso = 'Usuario desativado com sucesso.';
+    req.session.mensagemSucesso = 'Usuário desativado com sucesso.';
     return res.redirect('/usuarios');
   } catch (erro) {
     if (erro instanceof NotFoundError) {
-      return res.status(404).render('errors/404', { titulo: 'Nao encontrado' });
+      return res.status(404).render('errors/404', { titulo: 'Não encontrado' });
     }
     if (erro instanceof BusinessRuleError) {
       req.session.mensagemErro = erro.message;

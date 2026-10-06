@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: "Nova inscricao - " + evento.nome
+      titulo: "Nova inscrição - " + evento.nome
     }) %>
   </head>
 
@@ -16,15 +16,11 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos/<%= evento.id %>/inscricoes" class="button button-small button-outline">
-                &larr; Voltar para inscricoes
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Inscrições', path: '/inscricoes' }, { label: 'Nova inscrição' }] }) %>
 
-            <h1 class="page-title">Nova inscricao</h1>
+            <h1 class="page-title">Nova inscrição</h1>
             <p class="page-subtitle">
-              Evento: <%= evento.nome %>
+              Campeonato: <%= evento.nome %>
             </p>
           </div>
         </div>

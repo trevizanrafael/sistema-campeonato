@@ -14,7 +14,7 @@ async function listar(req, res, next) {
     );
 
     return res.render('inscricoes/index', {
-      titulo: 'Inscricoes',
+      titulo: 'Inscrições',
       evento: resultado.evento,
       inscricoes: resultado.inscricoes,
       resumo: resultado.resumo,
@@ -39,7 +39,7 @@ async function mostrarCadastro(req, res, next) {
       await inscricaoService.prepararFormulario(eventoId);
 
     return res.render('inscricoes/create', {
-      titulo: 'Nova inscricao',
+      titulo: 'Nova inscrição',
       evento,
       equipes,
       faixas,
@@ -98,7 +98,7 @@ async function cadastrar(req, res, next) {
           await inscricaoService.prepararFormulario(eventoId);
 
         return res.status(422).render('inscricoes/create', {
-          titulo: 'Nova inscricao',
+          titulo: 'Nova inscrição',
           evento,
           equipes,
           faixas,
@@ -124,7 +124,7 @@ async function mostrarEdicao(req, res, next) {
     const inscricao = await inscricaoService.buscarInscricao(eventoId, id);
 
     return res.render('inscricoes/edit', {
-      titulo: 'Editar inscricao',
+      titulo: 'Editar inscrição',
       evento,
       equipes,
       faixas,
@@ -189,7 +189,7 @@ async function editar(req, res, next) {
         } catch (_) {}
 
         return res.status(422).render('inscricoes/edit', {
-          titulo: 'Editar inscricao',
+          titulo: 'Editar inscrição',
           evento,
           equipes,
           faixas,

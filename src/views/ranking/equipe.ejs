@@ -2,7 +2,7 @@
 <html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: `${equipe.equipe_nome} - Detalhes da equipe - ${evento.nome}`,
+      titulo: `${equipe.equipe_nome} - Detalhes da academia - ${evento.nome}`,
       pagina: "ranking"
     }) %>
   </head>
@@ -17,21 +17,14 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a
-                href="/eventos/<%= evento.id %>/ranking"
-                class="button button-small button-outline"
-              >
-                &larr; Voltar para o ranking
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Ranking', path: '/ranking' }, { label: equipe.equipe_nome }] }) %>
 
             <h1 class="page-title">
               <%= equipe.equipe_nome %>
             </h1>
 
             <p class="page-subtitle">
-              Evento: <strong><%= evento.nome %></strong>
+              Campeonato: <strong><%= evento.nome %></strong>
             </p>
           </div>
         </div>
@@ -151,7 +144,7 @@
             </div>
           <% } else { %>
             <div class="empty-state">
-              <h2>Esta equipe ainda não conquistou pontos</h2>
+              <h2>Esta academia ainda não conquistou pontos</h2>
               <p>Os pontos por vitórias e colocações de pódio aparecerão aqui conforme as lutas e categorias forem finalizadas.</p>
             </div>
           <% } %>

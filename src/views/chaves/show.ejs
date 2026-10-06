@@ -17,15 +17,11 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos/<%= evento.id %>/chaves" class="button button-small button-outline">
-                &larr; Voltar para as chaves
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: categoria ? categoria.nome : chave.nome }] }) %>
             <div style="display: flex; align-items: center; gap: 12px;">
               <h1 class="page-title"><%= categoria ? categoria.nome : chave.nome %></h1>
               <% if (chave.status === 'NAO_INICIADA') { %>
-                <span class="badge badge-warning">Nao iniciada</span>
+                <span class="badge badge-warning">Não iniciada</span>
               <% } else if (chave.status === 'EM_ANDAMENTO') { %>
                 <span class="badge badge-ativo">Em andamento</span>
               <% } else if (chave.status === 'FINALIZADA') { %>
@@ -33,7 +29,7 @@
               <% } %>
             </div>
             <p class="page-subtitle">
-              Evento: <strong><%= evento.nome %></strong> | Chave eliminatoria de <strong><%= chave.tamanho %> posicoes</strong>
+              Campeonato: <strong><%= evento.nome %></strong> | Chave eliminatória de <strong><%= chave.tamanho %> posições</strong>
             </p>
           </div>
 
@@ -65,7 +61,7 @@
                 <button
                   type="submit"
                   class="button button-primary"
-                  onclick="return confirm('Deseja iniciar esta chave? A distribuicao ficara bloqueada e os byes avancarao automaticamente.');"
+                  onclick="return confirm('Deseja iniciar esta chave? A distribuição ficará bloqueada e os byes avançarão automaticamente.');"
                 >
                   Iniciar chave
                 </button>
@@ -97,7 +93,7 @@
                 </a>
               <% } else { %>
                 <span class="badge badge-neutral" style="padding: 8px 12px; font-size: 13px;">
-                  Chave bloqueada para alteracoes estruturais
+                  Chave bloqueada para alterações estruturais
                 </span>
               <% } %>
             <% } else if (chave.status === 'FINALIZADA' && pode('chaves.gerenciar')) { %>
@@ -140,7 +136,7 @@
                     </span>
                     <div style="margin-top: 6px;">
                       <strong style="display: block; font-size: 15px;"><%= chave.primeiro_lugar_nome %></strong>
-                      <small style="color: var(--color-text-muted);"><%= chave.primeiro_lugar_equipe_nome || 'Sem equipe' %></small>
+                      <small style="color: var(--color-text-muted);"><%= chave.primeiro_lugar_equipe_nome || 'Sem academia' %></small>
                     </div>
                   </div>
                 <% } %>
@@ -152,7 +148,7 @@
                     </span>
                     <div style="margin-top: 6px;">
                       <strong style="display: block; font-size: 15px;"><%= chave.segundo_lugar_nome %></strong>
-                      <small style="color: var(--color-text-muted);"><%= chave.segundo_lugar_equipe_nome || 'Sem equipe' %></small>
+                      <small style="color: var(--color-text-muted);"><%= chave.segundo_lugar_equipe_nome || 'Sem academia' %></small>
                     </div>
                   </div>
                 <% } %>
@@ -164,7 +160,7 @@
                     </span>
                     <div style="margin-top: 6px;">
                       <strong style="display: block; font-size: 15px;"><%= chave.terceiro_lugar_nome %></strong>
-                      <small style="color: var(--color-text-muted);"><%= chave.terceiro_lugar_equipe_nome || 'Sem equipe' %></small>
+                      <small style="color: var(--color-text-muted);"><%= chave.terceiro_lugar_equipe_nome || 'Sem academia' %></small>
                     </div>
                   </div>
                 <% } %>
@@ -173,7 +169,7 @@
           <% } %>
 
           <p class="bracket-mobile-tip">
-            Deslize horizontalmente para visualizar as proximas rodadas.
+            Deslize horizontalmente para visualizar as próximas rodadas.
           </p>
 
           <div class="bracket-scroll">

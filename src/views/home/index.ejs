@@ -94,14 +94,14 @@
           <% if (!ehOperador) { %>
             <div class="dashboard-grid" style="<%= ultimoEvento ? 'margin-top: 24px;' : '' %>">
               <a href="/eventos" class="card dashboard-card">
-                <h2>Eventos</h2>
+                <h2>Campeonatos</h2>
                 <p>Crie e gerencie campeonatos.</p>
               </a>
 
               <% if (pode('equipes.gerenciar')) { %>
                 <a href="/equipes" class="card dashboard-card">
-                  <h2>Equipes</h2>
-                  <p>Cadastre equipes participantes.</p>
+                  <h2>Academias</h2>
+                  <p>Cadastre academias participantes.</p>
                 </a>
               <% } %>
 
