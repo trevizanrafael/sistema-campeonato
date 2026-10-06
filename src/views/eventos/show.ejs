@@ -102,15 +102,21 @@
             </article>
           </div>
 
-          <%# Números rápidos %>
-          <div class="numeros-linha">
-            <% numeros.forEach(function(numero) { %>
-              <div class="numero-item">
-                <strong><%= numero.valor %></strong>
-                <span><%= numero.label %></span>
-              </div>
-            <% }); %>
-          </div>
+          <%# Atalhos para as áreas do campeonato (o menu lateral fica escondido no celular) %>
+          <% if (atalhos.length > 0) { %>
+            <nav class="atalhos-grid" aria-label="Áreas do campeonato">
+              <% atalhos.forEach(function(atalho) { %>
+                <a href="<%= base + atalho.path %>" class="card atalho-card" id="atalho-<%= atalho.icone %>">
+                  <span class="atalho-icone"><%- include("../partials/icone", { nome: atalho.icone }) %></span>
+                  <span class="atalho-texto">
+                    <strong><%= atalho.titulo %></strong>
+                    <small><%= atalho.resumo %></small>
+                  </span>
+                  <span class="atalho-seta"><%- include("../partials/icone", { nome: 'seta' }) %></span>
+                </a>
+              <% }); %>
+            </nav>
+          <% } %>
 
           <% if (pode('eventos.gerenciar')) { %>
           <section class="danger-zone">

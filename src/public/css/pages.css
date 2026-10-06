@@ -877,3 +877,228 @@
 .table-chaves .col-acoes .chave-nota {
   margin-top: 0;
 }
+
+/* ==========================================================
+   Atalhos do painel do campeonato
+   ========================================================== */
+
+.atalhos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.atalho-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.atalho-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+}
+
+.atalho-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: var(--color-background);
+  color: var(--color-primary);
+}
+
+.atalho-texto {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.atalho-texto strong {
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+.atalho-texto small {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.atalho-seta {
+  color: var(--color-text-muted);
+  transition: transform 150ms ease;
+}
+
+.atalho-card:hover .atalho-seta {
+  transform: translateX(3px);
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .atalhos-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .atalho-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .atalho-icone {
+    width: 34px;
+    height: 34px;
+  }
+
+  .atalho-seta {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .atalhos-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================
+   Celular: tabelas de Categorias, Inscrições e Chaves viram
+   cartões empilhados (sem scroll lateral)
+   ========================================================== */
+
+@media (max-width: 768px) {
+  table.table.table-categorias,
+  table.table.table-inscricoes,
+  table.table.table-chaves,
+  table.table.table-categorias tbody,
+  table.table.table-inscricoes tbody,
+  table.table.table-chaves tbody,
+  table.table.table-categorias tr,
+  table.table.table-inscricoes tr,
+  table.table.table-chaves tr,
+  table.table.table-categorias td,
+  table.table.table-inscricoes td,
+  table.table.table-chaves td {
+    display: block;
+    width: 100%;
+  }
+
+  table.table.table-categorias thead,
+  table.table.table-inscricoes thead,
+  table.table.table-chaves thead {
+    display: none;
+  }
+
+  table.table.table-categorias tr,
+  table.table.table-inscricoes tr,
+  table.table.table-chaves tr {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  table.table.table-categorias tr:last-child,
+  table.table.table-inscricoes tr:last-child,
+  table.table.table-chaves tr:last-child {
+    border-bottom: none;
+  }
+
+  table.table.table-categorias td,
+  table.table.table-inscricoes td,
+  table.table.table-chaves td {
+    position: relative;
+    padding: 4px 0;
+    border: none;
+    text-align: left;
+    white-space: normal;
+    background: transparent;
+  }
+
+  /* Linhas com rótulo à esquerda (2ª e 3ª colunas) */
+  table.table.table-categorias td:nth-child(2),
+  table.table.table-categorias td:nth-child(3),
+  table.table.table-inscricoes td:nth-child(2),
+  table.table.table-inscricoes td:nth-child(3),
+  table.table.table-chaves td:nth-child(2),
+  table.table.table-chaves td:nth-child(3) {
+    padding-left: 96px;
+    min-height: 28px;
+  }
+
+  table.table.table-categorias td:nth-child(2)::before,
+  table.table.table-categorias td:nth-child(3)::before,
+  table.table.table-inscricoes td:nth-child(2)::before,
+  table.table.table-inscricoes td:nth-child(3)::before,
+  table.table.table-chaves td:nth-child(2)::before,
+  table.table.table-chaves td:nth-child(3)::before {
+    position: absolute;
+    top: 6px;
+    left: 0;
+    width: 88px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  table.table.table-categorias td:nth-child(2)::before,
+  table.table.table-chaves td:nth-child(2)::before {
+    content: "Atletas";
+  }
+
+  table.table.table-categorias td:nth-child(3)::before,
+  table.table.table-chaves td:nth-child(3)::before {
+    content: "Situação";
+  }
+
+  table.table.table-inscricoes td:nth-child(2)::before {
+    content: "Categoria";
+  }
+
+  table.table.table-inscricoes td:nth-child(3)::before {
+    content: "Status";
+  }
+
+  table.table.table-categorias .col-num,
+  table.table.table-chaves .col-num {
+    text-align: left;
+  }
+
+  /* Ações: botões em linha, ocupando a largura */
+  table.table.table-categorias td.col-acoes,
+  table.table.table-inscricoes td.col-acoes,
+  table.table.table-chaves td.col-acoes {
+    padding-top: 10px;
+    text-align: left;
+    white-space: normal;
+  }
+
+  table.table.table-categorias .table-actions,
+  table.table.table-inscricoes .table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  table.table.table-chaves td.col-acoes .button,
+  table.table.table-chaves td.col-acoes form {
+    width: 100%;
+  }
+
+  table.table.table-chaves td.col-acoes .button {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .categoria-conflito-detalhe {
+    max-width: none;
+  }
+}

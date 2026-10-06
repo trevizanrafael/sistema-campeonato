@@ -63,6 +63,7 @@ async function visualizar(req, res, next) {
       proximoPasso: painel.proximoPasso,
       pendencias: painel.pendencias,
       numeros: painel.numeros,
+      atalhos: painel.atalhos,
     });
   } catch (erro) {
     if (erro instanceof NotFoundError) {

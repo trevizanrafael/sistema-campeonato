@@ -255,12 +255,61 @@ async function montarPainel(id, pode = () => true) {
     { label: 'Lutas finalizadas', valor: `${p.lutas_finalizadas}/${p.lutas_total}` },
   ];
 
+  // ---------- Atalhos (todas as áreas do campeonato, filtradas por cargo) ----------
+  const atalhos = [
+    {
+      permissao: 'categorias.gerenciar',
+      icone: 'categorias',
+      titulo: 'Categorias',
+      resumo: plural(p.categorias, 'categoria', 'categorias'),
+      path: '/categorias',
+    },
+    {
+      permissao: 'inscricoes.gerenciar',
+      icone: 'inscricoes',
+      titulo: 'Inscrições',
+      resumo: plural(p.inscricoes_total, 'atleta', 'atletas'),
+      path: '/inscricoes',
+    },
+    {
+      permissao: 'chaves.visualizar',
+      icone: 'chaves',
+      titulo: 'Chaves',
+      resumo: p.lutas_total > 0
+        ? `${plural(p.chaves_total, 'chave', 'chaves')} · ${p.lutas_finalizadas}/${p.lutas_total} lutas`
+        : plural(p.chaves_total, 'chave', 'chaves'),
+      path: '/chaves',
+    },
+    {
+      permissao: 'ranking.visualizar',
+      icone: 'ranking',
+      titulo: 'Ranking',
+      resumo: `${p.chaves_finalizadas} de ${chavesPossiveis} categorias finalizadas`,
+      path: '/ranking',
+    },
+    {
+      permissao: 'pontuacao.gerenciar',
+      icone: 'pontuacao',
+      titulo: 'Pontuação',
+      resumo: pontuacaoZerada ? 'Não configurada' : 'Configurada',
+      path: '/pontuacao',
+    },
+    {
+      permissao: 'auditoria.visualizar',
+      icone: 'auditoria',
+      titulo: 'Auditoria',
+      resumo: 'Histórico de alterações',
+      path: '/auditoria',
+    },
+  ].filter((a) => pode(a.permissao));
+
   return {
     evento,
     etapas,
     proximoPasso,
     pendencias,
     numeros,
+    atalhos,
     progresso: p,
   };
 }
