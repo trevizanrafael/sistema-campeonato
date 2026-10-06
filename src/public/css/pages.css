@@ -779,3 +779,47 @@
   font-size: 12px;
   line-height: 1.4;
 }
+
+/* ==========================================================
+   Lista de inscrições compacta (dados agrupados)
+   ========================================================== */
+
+.table-inscricoes {
+  width: 100%;
+}
+
+.table-inscricoes .col-acoes {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.inscricao-topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.inscricao-nome {
+  color: var(--color-text);
+}
+
+.inscricao-seed {
+  padding: 1px 6px;
+  background: var(--color-primary);
+  color: var(--color-surface);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.inscricao-academia {
+  display: block;
+  margin: 2px 0 6px;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.inscricao-cancelada {
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}

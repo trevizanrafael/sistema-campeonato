@@ -121,17 +121,13 @@
           <!-- Tabela de inscricoes -->
           <% if (inscricoes && inscricoes.length > 0) { %>
             <div class="table-container">
-              <table class="table">
+              <table class="table table-inscricoes">
                 <thead>
                   <tr>
                     <th>Competidor</th>
-                    <th>Academia</th>
-                    <th>Faixa</th>
-                    <th>Idade</th>
-                    <th>Peso</th>
                     <th>Categoria</th>
                     <th>Status</th>
-                    <th>Ações</th>
+                    <th class="col-acoes">Ações</th>
                   </tr>
                 </thead>
 
@@ -139,63 +135,40 @@
                   <% inscricoes.forEach((inscricao) => { %>
                     <tr>
                       <td>
-                        <strong><%= inscricao.nome %></strong>
-                        <% if (inscricao.seed) { %>
-                          <span style="font-size: 0.75rem; border: 1px solid #000; padding: 1px 4px; margin-left: 4px;">
-                            Seed #<%= inscricao.seed %>
-                          </span>
-                        <% } %>
-                        <div style="font-size: 0.8rem; color: #666;">
-                          <%= formatarSexo(inscricao.sexo) %>
+                        <div class="inscricao-topo">
+                          <strong class="inscricao-nome"><%= inscricao.nome %></strong>
+                          <% if (inscricao.seed) { %>
+                            <span class="inscricao-seed">Seed #<%= inscricao.seed %></span>
+                          <% } %>
                         </div>
-                      </td>
-
-                      <td>
-                        <%= inscricao.equipe_nome %>
-                      </td>
-
-                      <td>
-                        <%= inscricao.faixa_nome %>
-                      </td>
-
-                      <td>
-                        <%= inscricao.idade %> anos
-                      </td>
-
-                      <td>
-                        <%= Number(inscricao.peso).toFixed(2).replace('.', ',') %> kg
+                        <span class="inscricao-academia" title="Academia"><%= inscricao.equipe_nome %></span>
+                        <ul class="categoria-criterios" aria-label="Dados do competidor">
+                          <li title="Sexo"><%= formatarSexo(inscricao.sexo) %></li>
+                          <li title="Faixa"><%= inscricao.faixa_nome %></li>
+                          <li title="Idade"><%= inscricao.idade %> anos</li>
+                          <li title="Peso"><%= Number(inscricao.peso).toFixed(2).replace('.', ',') %> kg</li>
+                        </ul>
                       </td>
 
                       <td>
                         <% if (inscricao.categoria_id) { %>
                           <%= inscricao.categoria_nome %>
                         <% } else { %>
-                          <span
-                            class="badge"
-                            style="border: 1px solid #000; padding: 2px 6px; font-size: 0.75rem; background: #fff;"
-                          >
-                            Pendente - sem categoria
-                          </span>
+                          <span class="badge badge-warning">Sem categoria</span>
                         <% } %>
                       </td>
 
                       <td>
                         <% if (inscricao.status === 'CONFIRMADA') { %>
-                          <span style="font-weight: 600; border: 1px solid #000; padding: 2px 6px; font-size: 0.8rem;">
-                            CONFIRMADA
-                          </span>
+                          <span class="badge badge-success">Confirmada</span>
                         <% } else if (inscricao.status === 'PENDENTE') { %>
-                          <span style="border: 1px dashed #000; padding: 2px 6px; font-size: 0.8rem;">
-                            PENDENTE
-                          </span>
+                          <span class="badge badge-warning">Pendente</span>
                         <% } else if (inscricao.status === 'CANCELADA') { %>
-                          <span style="color: #666; text-decoration: line-through; font-size: 0.8rem;">
-                            CANCELADA
-                          </span>
+                          <span class="badge inscricao-cancelada">Cancelada</span>
+                        <% } else if (inscricao.status === 'DESCLASSIFICADA') { %>
+                          <span class="badge inscricao-cancelada">Desclassificada</span>
                         <% } else { %>
-                          <span style="font-size: 0.8rem;">
-                            <%= inscricao.status %>
-                          </span>
+                          <span class="badge"><%= inscricao.status %></span>
                         <% } %>
                       </td>
 
