@@ -823,3 +823,34 @@
   color: var(--color-text-muted);
   text-decoration: line-through;
 }
+
+/* ==========================================================
+   Lista de chaves compacta
+   ========================================================== */
+
+.table-chaves {
+  width: 100%;
+}
+
+.table-chaves .col-num {
+  width: 1%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.table-chaves .col-acoes {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.chave-nota {
+  display: block;
+  margin-top: 4px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.table-chaves .col-acoes .chave-nota {
+  margin-top: 0;
+}

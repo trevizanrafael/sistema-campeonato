@@ -39,38 +39,42 @@
             </div>
           <% } else { %>
             <div class="table-container">
-              <table class="table">
+              <table class="table table-chaves">
                 <thead>
                   <tr>
                     <th>Categoria</th>
-                    <th>Critérios</th>
-                    <th style="text-align: center;">Confirmados</th>
+                    <th class="col-num">Atletas</th>
                     <th>Situação</th>
-                    <th style="text-align: center;">Tamanho</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th class="col-acoes">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   <% categorias.forEach(function(cat) { %>
                     <tr>
                       <td>
-                        <strong><%= cat.categoria_nome %></strong>
+                        <strong class="categoria-nome"><%= cat.categoria_nome %></strong>
+                        <ul class="categoria-criterios" aria-label="Critérios da categoria">
+                          <li title="Sexo"><%= formatarSexo(cat.categoria_sexo) %></li>
+                          <li title="Faixa">
+                            <% if (cat.faixa_minima_nome) { %>
+                              <%= cat.faixa_minima_nome %><%= cat.faixa_maxima_nome && cat.faixa_maxima_nome !== cat.faixa_minima_nome ? ` a ${cat.faixa_maxima_nome}` : '' %>
+                            <% } else { %>
+                              Qualquer faixa
+                            <% } %>
+                          </li>
+                          <% if (cat.chave_tamanho) { %>
+                            <li title="Tamanho da chave"><%= cat.chave_tamanho %> posições</li>
+                          <% } %>
+                        </ul>
                       </td>
-                      <td style="font-size: 13px; color: var(--color-text-muted);">
-                        <%= cat.categoria_sexo || 'MISTO' %> |
-                        <% if (cat.faixa_minima_nome) { %>
-                          <%= cat.faixa_minima_nome %><%= cat.faixa_maxima_nome && cat.faixa_maxima_nome !== cat.faixa_minima_nome ? ` a ${cat.faixa_maxima_nome}` : '' %>
-                        <% } else { %>
-                          Livre
-                        <% } %>
-                      </td>
-                      <td style="text-align: center;">
+                      <td class="col-num">
                         <strong><%= cat.total_confirmados %></strong>
                       </td>
                       <td>
                         <% if (!cat.chave_id) { %>
                           <% if (cat.total_confirmados < 2) { %>
                             <span class="badge badge-neutral">Inscritos insuficientes</span>
+                            <small class="chave-nota">Mínimo 2 atletas confirmados</small>
                           <% } else { %>
                             <span class="badge badge-neutral">Sem chave</span>
                           <% } %>
@@ -84,41 +88,32 @@
                           <span class="badge badge-neutral"><%= cat.chave_status %></span>
                         <% } %>
                       </td>
-                      <td style="text-align: center;">
-                        <%= cat.chave_tamanho ? `${cat.chave_tamanho} posições` : '—' %>
-                      </td>
-                      <td style="text-align: right;">
-                        <div style="display: inline-flex; gap: 8px; justify-content: flex-end; align-items: center;">
-                          <% if (!cat.chave_id) { %>
-                            <% if (cat.total_confirmados >= 2 && pode('chaves.gerar')) { %>
-                              <form
-                                action="/eventos/<%= evento.id %>/categorias/<%= cat.categoria_id %>/chave/gerar"
-                                method="POST"
-                                style="display: inline;"
-                              >
-                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                                <button type="submit" class="button button-small button-primary">
-                                  Gerar chave
-                                </button>
-                              </form>
-                            <% } else if (cat.total_confirmados >= 2) { %>
-                              <span style="font-size: 12px; color: var(--color-text-muted);">
-                                Aguardando organizador gerar
-                              </span>
-                            <% } else { %>
-                              <span style="font-size: 12px; color: var(--color-text-muted);">
-                                Mínimo 2 atletas
-                              </span>
-                            <% } %>
-                          <% } else { %>
-                            <a
-                              href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
-                              class="button button-small button-outline"
+                      <td class="col-acoes">
+                        <% if (!cat.chave_id) { %>
+                          <% if (cat.total_confirmados >= 2 && pode('chaves.gerar')) { %>
+                            <form
+                              action="/eventos/<%= evento.id %>/categorias/<%= cat.categoria_id %>/chave/gerar"
+                              method="POST"
+                              style="display: inline;"
                             >
-                              Abrir chave
-                            </a>
+                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                              <button type="submit" class="button button-small button-primary">
+                                Gerar chave
+                              </button>
+                            </form>
+                          <% } else if (cat.total_confirmados >= 2) { %>
+                            <small class="chave-nota">Aguardando organizador gerar</small>
+                          <% } else { %>
+                            <span class="chave-nota">—</span>
                           <% } %>
-                        </div>
+                        <% } else { %>
+                          <a
+                            href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
+                            class="button button-small button-outline"
+                          >
+                            Abrir chave
+                          </a>
+                        <% } %>
                       </td>
                     </tr>
                   <% }); %>
