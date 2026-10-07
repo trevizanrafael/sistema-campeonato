@@ -272,6 +272,13 @@ async function montarPainel(id, pode = () => true) {
       path: '/inscricoes',
     },
     {
+      permissao: 'inscricoes.gerenciar',
+      icone: 'documento',
+      titulo: 'Inscrição por documento',
+      resumo: 'Importar planilha .xlsx',
+      path: '/inscricoes/documento',
+    },
+    {
       permissao: 'chaves.visualizar',
       icone: 'chaves',
       titulo: 'Chaves',

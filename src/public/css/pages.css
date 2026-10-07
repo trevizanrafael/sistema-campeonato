@@ -1403,3 +1403,410 @@
     height: 16px;
   }
 }
+
+/* ==========================================================
+   Cabeçalho de página com mais de uma ação
+   ========================================================== */
+
+.page-header__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .page-header__acoes {
+    width: 100%;
+    flex-direction: column-reverse;
+  }
+}
+
+/* ==========================================================
+   Inscrição por documento (planilha .xlsx)
+   ========================================================== */
+
+.doc-pagina {
+  --doc-acento: var(--brand-primary, var(--color-primary));
+  --doc-acento-suave: rgba(0, 0, 0, 0.035);
+
+  max-width: 760px;
+}
+
+[data-theme="araujo-jj-team"] .doc-pagina {
+  --doc-acento-suave: rgba(182, 0, 0, 0.06);
+}
+
+.doc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.doc-passo__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.doc-pagina .doc-passo__titulo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.doc-passo__linha .doc-passo__titulo {
+  margin-bottom: 0;
+}
+
+.doc-passo__numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--doc-acento);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.doc-modelo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--doc-acento);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.doc-modelo-link:hover {
+  text-decoration: underline;
+}
+
+.doc-modelo-link .icone {
+  width: 16px;
+  height: 16px;
+}
+
+/* Busca de academias (lupa dentro do campo) */
+.doc-busca {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.doc-busca .icone {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  z-index: 1;
+  color: var(--color-text-muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Especificidade maior que a do tema, que redefine o padding do .form-control */
+.doc-pagina .doc-busca .form-control {
+  padding-left: 40px;
+}
+
+/* Lista de academias */
+.doc-equipes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  max-height: 260px;
+  padding: 2px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.doc-equipe {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.doc-equipe:hover {
+  border-color: var(--color-text-muted);
+}
+
+.doc-equipe input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.doc-equipe:has(input:focus-visible) {
+  outline: 2px solid var(--doc-acento);
+  outline-offset: 2px;
+}
+
+.doc-equipe:has(input:checked) {
+  border-color: var(--doc-acento);
+  box-shadow: 0 0 0 1px var(--doc-acento);
+  background: var(--doc-acento-suave);
+}
+
+.doc-equipe__nome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-equipe__check {
+  display: inline-flex;
+  color: var(--doc-acento);
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+
+.doc-equipe:has(input:checked) .doc-equipe__check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.doc-equipes__nada,
+.doc-vazio {
+  grid-column: 1 / -1;
+  margin: 6px 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+/* Área de soltar o arquivo */
+.doc-dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 140px;
+  padding: 20px 16px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-background);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.doc-dropzone:hover,
+.doc-dropzone:focus-within {
+  border-color: var(--color-text-muted);
+}
+
+.doc-dropzone.is-arrastando {
+  border-color: var(--doc-acento);
+  background: var(--doc-acento-suave);
+}
+
+.doc-dropzone.is-preenchida {
+  border-style: solid;
+  border-color: var(--doc-acento);
+  background: var(--color-surface);
+}
+
+.doc-dropzone input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.doc-dropzone__icone {
+  display: inline-flex;
+  color: var(--doc-acento);
+  transition: transform 200ms ease;
+}
+
+.doc-dropzone__icone .icone {
+  width: 28px;
+  height: 28px;
+}
+
+.doc-dropzone:hover .doc-dropzone__icone,
+.doc-dropzone.is-arrastando .doc-dropzone__icone {
+  transform: translateY(-2px);
+}
+
+.doc-dropzone__titulo {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: 15px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-dropzone__sub {
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.doc-enviar {
+  align-self: flex-start;
+  min-width: 160px;
+}
+
+.doc-enviar.is-enviando {
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* Resultado da importação */
+.doc-resultado {
+  margin-bottom: 16px;
+  border-left-width: 4px;
+  animation: doc-entrar 220ms ease-out;
+}
+
+.doc-resultado--sucesso {
+  border-left-color: var(--doc-acento);
+}
+
+.doc-resultado--erro {
+  border-left-color: #b60000;
+}
+
+@keyframes doc-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.doc-resultado__topo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.doc-resultado__icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--doc-acento);
+  color: #ffffff;
+}
+
+.doc-resultado--erro .doc-resultado__icone {
+  background: #b60000;
+}
+
+.doc-pagina .doc-resultado__topo h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.doc-resultado__topo p {
+  margin: 2px 0 0;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.doc-aviso {
+  margin: 0 0 14px;
+  padding: 8px 12px;
+  border-left: 3px solid #d9a400;
+  background: #fff8e1;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.doc-aviso a {
+  margin-left: 4px;
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+/* Erros por linha */
+.doc-erros {
+  display: grid;
+  gap: 8px;
+  max-height: 360px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.doc-erros li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+}
+
+.doc-erros strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.doc-erros__msg {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.doc-linha {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: var(--radius-small);
+  background: #fdeaea;
+  color: #8a1c1c;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.doc-alerta {
+  border-left: 4px solid #b60000;
+}
+
+@media (max-width: 768px) {
+  .doc-equipes {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-enviar,
+  .doc-resultado .button {
+    width: 100%;
+  }
+}

@@ -24,12 +24,24 @@
             </p>
           </div>
 
-          <a
-            href="/eventos/<%= evento.id %>/inscricoes/nova"
-            class="button button-primary"
-          >
-            Nova inscrição
-          </a>
+          <div class="page-header__acoes">
+            <a
+              href="/eventos/<%= evento.id %>/inscricoes/documento"
+              class="button button-outline"
+              id="botaoInscricaoDocumento"
+            >
+              <%- include("../partials/icone", { nome: "documento" }) %>
+              Inscrição por documento
+            </a>
+
+            <a
+              href="/eventos/<%= evento.id %>/inscricoes/nova"
+              class="button button-primary"
+              id="botaoNovaInscricao"
+            >
+              Nova inscrição
+            </a>
+          </div>
         </div>
 
         <section class="page-content">

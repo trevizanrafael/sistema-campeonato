@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
+  <head>
+    <%- include("../partials/head", {
+      titulo: "Inscrição por documento - " + evento.nome
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <% const base = '/eventos/' + evento.id; %>
+      <% const selecionada = equipeSelecionada ? String(equipeSelecionada) : ''; %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Inscrições', path: '/inscricoes' }, { label: 'Inscrição por documento' }] }) %>
+            <h1 class="page-title">Inscrição por documento</h1>
+          </div>
+        </div>
+
+        <section class="page-content doc-pagina">
+          <%# ---------- Importação concluída ---------- %>
+          <% if (resultado) { %>
+            <div class="card doc-resultado doc-resultado--sucesso" id="resultadoImportacao" role="status">
+              <div class="doc-resultado__topo">
+                <span class="doc-resultado__icone"><%- include("../partials/icone", { nome: "check" }) %></span>
+                <div>
+                  <h2><%= resultado.resumo.total %> <%= resultado.resumo.total === 1 ? 'atleta inscrito' : 'atletas inscritos' %></h2>
+                  <p><%= resultado.equipe.nome %></p>
+                </div>
+              </div>
+
+              <% if (resultado.resumo.pendentes > 0) { %>
+                <p class="doc-aviso">
+                  <%= resultado.resumo.pendentes %> <%= resultado.resumo.pendentes === 1 ? 'ficou' : 'ficaram' %> sem categoria.
+                  <a href="<%= base %>/inscricoes?categoria_id=sem_categoria&equipe_id=<%= resultado.equipe.id %>">Resolver</a>
+                </p>
+              <% } %>
+
+              <a href="<%= base %>/inscricoes?equipe_id=<%= resultado.equipe.id %>" class="button button-primary" id="botaoVerInscricoesEquipe">
+                Ver inscrições
+              </a>
+            </div>
+          <% } %>
+
+          <%# ---------- Planilha com erros ---------- %>
+          <% if (errosLinhas) { %>
+            <div class="card doc-resultado doc-resultado--erro" id="errosImportacao" role="alert">
+              <div class="doc-resultado__topo">
+                <span class="doc-resultado__icone"><%- include("../partials/icone", { nome: "alerta" }) %></span>
+                <div>
+                  <h2>Nada foi importado</h2>
+                  <p>Corrija <%= errosLinhas.erros.length === 1 ? 'a linha abaixo' : 'as linhas abaixo' %> e envie de novo.</p>
+                </div>
+              </div>
+
+              <ul class="doc-erros">
+                <% errosLinhas.erros.forEach((erro) => { %>
+                  <li>
+                    <span class="doc-linha">Linha <%= erro.linha %></span>
+                    <div>
+                      <strong><%= erro.nome || '(sem nome)' %></strong>
+                      <% erro.mensagens.forEach((mensagem) => { %>
+                        <span class="doc-erros__msg"><%= mensagem %></span>
+                      <% }) %>
+                    </div>
+                  </li>
+                <% }) %>
+              </ul>
+            </div>
+          <% } %>
+
+          <% if (erros && (erros.geral || erros.arquivo || erros.equipe_id)) { %>
+            <div class="alert alert-danger doc-alerta" role="alert" id="alertaImportacao">
+              <%= erros.arquivo || erros.equipe_id || erros.geral %>
+            </div>
+          <% } %>
+
+          <form
+            action="<%= base %>/inscricoes/documento"
+            method="POST"
+            enctype="multipart/form-data"
+            class="card doc-form"
+            id="formInscricaoDocumento"
+            novalidate
+          >
+            <%# O token precisa vir antes do arquivo (lido pelo upload) %>
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+            <%# ---------- 1. Academia ---------- %>
+            <div class="doc-passo">
+              <h2 class="doc-passo__titulo"><span class="doc-passo__numero">1</span> Academia</h2>
+
+              <% if (equipes.length === 0) { %>
+                <p class="doc-vazio">
+                  Nenhuma academia cadastrada.
+                  <% if (pode('equipes.gerenciar')) { %><a href="/equipes/nova">Cadastrar</a><% } %>
+                </p>
+              <% } else { %>
+                <% if (equipes.length > 6) { %>
+                  <div class="doc-busca">
+                    <%- include("../partials/icone", { nome: "busca" }) %>
+                    <input
+                      type="search"
+                      class="form-control"
+                      id="buscaAcademia"
+                      placeholder="Buscar academia"
+                      autocomplete="off"
+                      aria-label="Buscar academia"
+                    >
+                  </div>
+                <% } %>
+
+                <div class="doc-equipes" id="listaAcademias" role="radiogroup" aria-label="Academias">
+                  <% equipes.forEach((equipe) => { %>
+                    <label class="doc-equipe" data-nome="<%= equipe.nome.toLowerCase() %>">
+                      <input
+                        type="radio"
+                        name="equipe_id"
+                        value="<%= equipe.id %>"
+                        id="academia-<%= equipe.id %>"
+                        <%= selecionada === String(equipe.id) ? 'checked' : '' %>
+                      >
+                      <span class="doc-equipe__nome"><%= equipe.nome %></span>
+                      <span class="doc-equipe__check" aria-hidden="true"><%- include("../partials/icone", { nome: "check" }) %></span>
+                    </label>
+                  <% }) %>
+                  <p class="doc-equipes__nada" id="academiaNaoEncontrada" hidden>Nenhuma academia encontrada.</p>
+                </div>
+              <% } %>
+            </div>
+
+            <%# ---------- 2. Planilha ---------- %>
+            <div class="doc-passo">
+              <div class="doc-passo__linha">
+                <h2 class="doc-passo__titulo"><span class="doc-passo__numero">2</span> Planilha</h2>
+                <a href="<%= base %>/inscricoes/documento/modelo.xlsx" class="doc-modelo-link" id="botaoBaixarModelo" download>
+                  <%- include("../partials/icone", { nome: "download" }) %>
+                  Baixar modelo
+                </a>
+              </div>
+
+              <label class="doc-dropzone" id="dropzonePlanilha" for="arquivoPlanilha">
+                <input
+                  type="file"
+                  name="arquivo"
+                  id="arquivoPlanilha"
+                  accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                  required
+                >
+                <span class="doc-dropzone__icone"><%- include("../partials/icone", { nome: "upload" }) %></span>
+                <span class="doc-dropzone__titulo" data-padrao="Arraste ou clique para escolher">Arraste ou clique para escolher</span>
+                <span class="doc-dropzone__sub">Nome, Peso, Faixa, Idade, Sexo</span>
+              </label>
+            </div>
+
+            <button type="submit" class="button button-primary button-large doc-enviar" id="botaoImportar" <%= equipes.length === 0 ? 'disabled' : '' %>>
+              <span>Importar</span>
+            </button>
+          </form>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+    <script src="/js/inscricao-documento.js" defer></script>
+  </body>
+</html>

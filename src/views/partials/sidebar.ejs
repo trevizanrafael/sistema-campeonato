@@ -29,7 +29,8 @@
       <% const preparacao = [
         { perm: 'pontuacao.gerenciar', sufixo: '/pontuacao', icone: 'pontuacao', label: 'Pontuação' },
         { perm: 'categorias.gerenciar', sufixo: '/categorias', icone: 'categorias', label: 'Categorias' },
-        { perm: 'inscricoes.gerenciar', sufixo: '/inscricoes', icone: 'inscricoes', label: 'Inscrições', badge: badges.inscricoes, badgeTitulo: 'inscrições sem categoria' },
+        { perm: 'inscricoes.gerenciar', sufixo: '/inscricoes', icone: 'inscricoes', label: 'Inscrições', badge: badges.inscricoes, badgeTitulo: 'inscrições sem categoria', exceto: '/inscricoes/documento' },
+        { perm: 'inscricoes.gerenciar', sufixo: '/inscricoes/documento', icone: 'documento', label: 'Inscrição por documento' },
       ].filter((item) => pode(item.perm)); %>
 
       <% const competicao = [
@@ -45,7 +46,7 @@
         <% if (secao[1].length > 0) { %>
           <div class="sidebar-section"><%= secao[0] %></div>
           <% secao[1].forEach(function(item) { %>
-            <a href="<%= base + item.sufixo %>" class="sidebar-link <%= ativo(item.sufixo) ? 'active' : '' %>">
+            <a href="<%= base + item.sufixo %>" class="sidebar-link <%= ativo(item.sufixo) && !(item.exceto && ativo(item.exceto)) ? 'active' : '' %>">
               <%- include("icone", { nome: item.icone }) %>
               <span class="sidebar-link__label"><%= item.label %></span>
               <% if (item.badge) { %>
