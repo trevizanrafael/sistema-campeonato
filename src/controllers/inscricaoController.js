@@ -79,6 +79,7 @@ async function cadastrar(req, res, next) {
     }
 
     req.session.mensagemSucesso = resultado.mensagem;
+    if (resultado.aviso) req.session.mensagemAviso = resultado.aviso;
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {
@@ -166,6 +167,7 @@ async function editar(req, res, next) {
     }
 
     req.session.mensagemSucesso = resultado.mensagem;
+    if (resultado.aviso) req.session.mensagemAviso = resultado.aviso;
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {
@@ -241,6 +243,7 @@ async function reativar(req, res, next) {
   try {
     const resultado = await inscricaoService.reativarInscricao(eventoId, id, usuarioId);
     req.session.mensagemSucesso = resultado.mensagem;
+    if (resultado.aviso) req.session.mensagemAviso = resultado.aviso;
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {

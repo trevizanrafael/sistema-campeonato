@@ -3,6 +3,9 @@ const assert = require('node:assert/strict');
 const {
   inscricaoCompativelComCategoria,
   buscarCategoriasCompativeis,
+  buscarCategoriasDisponiveis,
+  avisoChaveGerada,
+  avisoChaveIniciada,
 } = require('../../src/services/classificacaoService');
 
 describe('Unit Tests: Classificação de Atletas e Categorias', () => {
@@ -80,5 +83,38 @@ describe('Unit Tests: Classificação de Atletas e Categorias', () => {
     const compMedio = buscarCategoriasCompativeis(atletaMedio, categorias);
     assert.equal(compMedio.length, 1);
     assert.equal(compMedio[0].id, 20);
+  });
+});
+
+describe('Unit Tests: Categorias com chave já gerada/iniciada', () => {
+  const base = {
+    sexo: 'MASCULINO', idade_minima: 18, idade_maxima: 30,
+    peso_minimo: 60, peso_maximo: 80, faixa_minima_ordem: 1, faixa_maxima_ordem: 5,
+  };
+  const atleta = { sexo: 'MASCULINO', idade: 20, peso: 70, faixa_ordem: 2 };
+
+  it('não oferece categorias com chave em andamento ou finalizada', () => {
+    const categorias = [
+      { ...base, id: 1, nome: 'Andamento', chave_status: 'EM_ANDAMENTO' },
+      { ...base, id: 2, nome: 'Gerada', chave_status: 'NAO_INICIADA' },
+      { ...base, id: 3, nome: 'Sem chave', chave_status: null },
+      { ...base, id: 4, nome: 'Finalizada', chave_status: 'FINALIZADA' },
+    ];
+
+    const { disponiveis, bloqueadas } = buscarCategoriasDisponiveis(atleta, categorias);
+    assert.deepEqual(disponiveis.map((c) => c.id), [2, 3]);
+    assert.deepEqual(bloqueadas.map((c) => c.id), [1, 4]);
+  });
+
+  it('avisa para sortear novamente só quando a chave foi gerada e não começou', () => {
+    assert.match(avisoChaveGerada({ nome: 'X', chave_status: 'NAO_INICIADA' }), /Sortear novamente/);
+    assert.equal(avisoChaveGerada({ nome: 'X', chave_status: null }), null);
+    assert.equal(avisoChaveGerada(null), null);
+  });
+
+  it('avisa quando o atleta ficou sem categoria por chave iniciada', () => {
+    assert.equal(avisoChaveIniciada([]), null);
+    assert.match(avisoChaveIniciada([{ nome: 'X' }]), /já começou/);
+    assert.match(avisoChaveIniciada([{ nome: 'X' }, { nome: 'Y' }]), /já começaram/);
   });
 });

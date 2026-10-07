@@ -75,6 +75,11 @@
                         <%= formatarIntervaloFaixa(categoria) %> &middot;
                         <%= formatarSexo(categoria.sexo) %>
                       </span>
+                      <% if (categoria.chave_status === 'NAO_INICIADA') { %>
+                        <span style="display: block; margin-top: 6px; font-size: 0.8rem; font-weight: 600; color: #78350f;">
+                          Chave já gerada: será preciso sortear novamente para incluir o atleta.
+                        </span>
+                      <% } %>
                     </div>
                   </label>
                 <% }) %>

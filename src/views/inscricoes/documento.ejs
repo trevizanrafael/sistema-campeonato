@@ -38,8 +38,17 @@
 
               <% if (resultado.resumo.pendentes > 0) { %>
                 <p class="doc-aviso">
-                  <%= resultado.resumo.pendentes %> <%= resultado.resumo.pendentes === 1 ? 'ficou' : 'ficaram' %> sem categoria.
+                  <%= resultado.resumo.pendentes %> <%= resultado.resumo.pendentes === 1 ? 'ficou' : 'ficaram' %> sem categoria<% if (resultado.resumo.pendentesPorChave > 0) { %>
+                    (<%= resultado.resumo.pendentesPorChave %> porque a chave já começou)<% } %>.
                   <a href="<%= base %>/inscricoes?categoria_id=sem_categoria&equipe_id=<%= resultado.equipe.id %>">Resolver</a>
+                </p>
+              <% } %>
+
+              <% if (resultado.resumo.categoriasParaSortear.length > 0) { %>
+                <p class="doc-aviso">
+                  Chave já gerada em <strong><%= resultado.resumo.categoriasParaSortear.join(', ') %></strong>.
+                  Use "Sortear novamente" para incluir os novos atletas.
+                  <a href="<%= base %>/chaves">Ir para chaves</a>
                 </p>
               <% } %>
 

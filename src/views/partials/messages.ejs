@@ -9,3 +9,9 @@
     <%= mensagemErro %>
   </div>
 <% } %>
+
+<% if (typeof mensagemAviso !== 'undefined' && mensagemAviso) { %>
+  <div class="alert alert-warning alert-aviso" role="alert">
+    <%= mensagemAviso %>
+  </div>
+<% } %>

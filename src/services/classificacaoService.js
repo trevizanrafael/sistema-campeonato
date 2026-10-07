@@ -168,8 +168,55 @@ function buscarCategoriasCompativeis(inscricao, categorias) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Situação da chave da categoria (categoria.chave_status vem do repositório)
+// ---------------------------------------------------------------------------
+
+const STATUS_CHAVE_INICIADA = new Set(['EM_ANDAMENTO', 'FINALIZADA']);
+
+/** A chave já começou: não dá mais para incluir atletas nessa categoria. */
+function chaveJaIniciada(categoria) {
+  return Boolean(categoria) && STATUS_CHAVE_INICIADA.has(categoria.chave_status);
+}
+
+/** A chave foi gerada mas não começou: dá para incluir sorteando novamente. */
+function chaveGeradaNaoIniciada(categoria) {
+  return Boolean(categoria) && categoria.chave_status === 'NAO_INICIADA';
+}
+
+/**
+ * Categorias compatíveis separadas entre as que ainda aceitam o atleta
+ * e as que já estão com a chave em andamento/finalizada.
+ */
+function buscarCategoriasDisponiveis(inscricao, categorias) {
+  const compativeis = buscarCategoriasCompativeis(inscricao, categorias);
+
+  return {
+    disponiveis: compativeis.filter((c) => !chaveJaIniciada(c)),
+    bloqueadas: compativeis.filter((c) => chaveJaIniciada(c)),
+  };
+}
+
+function avisoChaveGerada(categoria) {
+  if (!chaveGeradaNaoIniciada(categoria)) return null;
+  return `A chave de "${categoria.nome}" já foi gerada. Use "Sortear novamente" nela para incluir o atleta.`;
+}
+
+function avisoChaveIniciada(bloqueadas) {
+  if (!bloqueadas || bloqueadas.length === 0) return null;
+  const nomes = bloqueadas.map((c) => `"${c.nome}"`).join(', ');
+  return bloqueadas.length === 1
+    ? `A chave de ${nomes} já começou, então o atleta ficou sem categoria (Pendente).`
+    : `As chaves de ${nomes} já começaram, então o atleta ficou sem categoria (Pendente).`;
+}
+
 module.exports = {
   inscricaoCompativelComCategoria,
   categoriasSeSobrepoem,
   buscarCategoriasCompativeis,
+  chaveJaIniciada,
+  chaveGeradaNaoIniciada,
+  buscarCategoriasDisponiveis,
+  avisoChaveGerada,
+  avisoChaveIniciada,
 };

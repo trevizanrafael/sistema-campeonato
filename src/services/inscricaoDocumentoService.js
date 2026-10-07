@@ -23,7 +23,10 @@ const {
   validarInscricao,
   validarId,
 } = require('../validators/inscricaoValidator');
-const { buscarCategoriasCompativeis } = require('./classificacaoService');
+const {
+  buscarCategoriasDisponiveis,
+  chaveGeradaNaoIniciada,
+} = require('./classificacaoService');
 const { NotFoundError, ValidationError } = require('../utils/errors');
 const auditoriaService = require('./auditoriaService');
 
@@ -405,22 +408,25 @@ function validarLinhas(linhas, contexto) {
 }
 
 function classificar(linha, categorias) {
-  const compativeis = buscarCategoriasCompativeis(
+  const { disponiveis, bloqueadas } = buscarCategoriasDisponiveis(
     { ...linha.dados, faixa_ordem: Number(linha.faixa.ordem) },
     categorias
   );
 
-  if (compativeis.length === 1) {
-    return { categoria: compativeis[0], status: 'CONFIRMADA', motivo: null };
+  if (disponiveis.length === 1) {
+    return { categoria: disponiveis[0], status: 'CONFIRMADA', motivo: null, porChave: false };
+  }
+
+  let motivo = `Compatível com ${disponiveis.length} categorias`;
+  if (disponiveis.length === 0) {
+    motivo = bloqueadas.length > 0 ? 'Chave da categoria já começou' : 'Nenhuma categoria compatível';
   }
 
   return {
     categoria: null,
     status: 'PENDENTE',
-    motivo:
-      compativeis.length === 0
-        ? 'Nenhuma categoria compatível'
-        : `Compatível com ${compativeis.length} categorias — escolha na tela de inscrições`,
+    motivo,
+    porChave: disponiveis.length === 0 && bloqueadas.length > 0,
   };
 }
 
@@ -475,12 +481,16 @@ async function importarPlanilha(eventoId, equipeId, buffer, usuarioId = null) {
 
   const client = await pool.connect();
   const importadas = [];
+  const categoriasParaSortear = new Set();
+  let pendentesPorChave = 0;
 
   try {
     await client.query('BEGIN');
 
     for (const linha of linhas) {
-      const { categoria, status, motivo } = classificar(linha, categorias);
+      const { categoria, status, motivo, porChave } = classificar(linha, categorias);
+      if (porChave) pendentesPorChave++;
+      if (chaveGeradaNaoIniciada(categoria)) categoriasParaSortear.add(categoria.nome);
 
       const inscricao = await inscricaoRepository.criar(
         {
@@ -544,6 +554,8 @@ async function importarPlanilha(eventoId, equipeId, buffer, usuarioId = null) {
       total: importadas.length,
       confirmadas: importadas.filter((i) => i.status === 'CONFIRMADA').length,
       pendentes: importadas.filter((i) => i.status === 'PENDENTE').length,
+      pendentesPorChave,
+      categoriasParaSortear: Array.from(categoriasParaSortear),
     },
   };
 }

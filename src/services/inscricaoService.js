@@ -11,7 +11,10 @@ const {
 } = require('../validators/inscricaoValidator');
 const {
   inscricaoCompativelComCategoria,
-  buscarCategoriasCompativeis,
+  buscarCategoriasDisponiveis,
+  chaveJaIniciada,
+  avisoChaveGerada,
+  avisoChaveIniciada,
 } = require('./classificacaoService');
 const {
   NotFoundError,
@@ -243,6 +246,12 @@ async function processarCadastro(eventoId, dados, usuarioId = null) {
       });
     }
 
+    if (chaveJaIniciada(categoriaEscolhida)) {
+      throw new ValidationError({
+        geral: `A chave de "${categoriaEscolhida.nome}" já começou e não aceita novos atletas. Confira os dados e cadastre novamente.`,
+      });
+    }
+
     const inscricao = await persistirCriacaoComAuditoria(
       {
         ...normalizado,
@@ -259,16 +268,17 @@ async function processarCadastro(eventoId, dados, usuarioId = null) {
       inscricao,
       categoria: categoriaEscolhida,
       mensagem: `Inscrição cadastrada e classificada em "${categoriaEscolhida.nome}".`,
+      aviso: avisoChaveGerada(categoriaEscolhida),
     };
   }
 
-  // Classificação automática padrão
-  const compativeis = buscarCategoriasCompativeis(
+  // Classificação automática padrão (ignora categorias com chave já iniciada)
+  const { disponiveis, bloqueadas } = buscarCategoriasDisponiveis(
     atletaClassificacao,
     categorias
   );
 
-  if (compativeis.length === 0) {
+  if (disponiveis.length === 0) {
     const inscricao = await persistirCriacaoComAuditoria(
       {
         ...normalizado,
@@ -284,13 +294,15 @@ async function processarCadastro(eventoId, dados, usuarioId = null) {
       tipo: 'CRIADA',
       inscricao,
       categoria: null,
-      mensagem:
-        'Inscrição cadastrada, mas nenhuma categoria compatível foi encontrada. Status definido como Pendente.',
+      mensagem: bloqueadas.length > 0
+        ? 'Inscrição cadastrada como Pendente.'
+        : 'Inscrição cadastrada, mas nenhuma categoria compatível foi encontrada. Status definido como Pendente.',
+      aviso: avisoChaveIniciada(bloqueadas),
     };
   }
 
-  if (compativeis.length === 1) {
-    const categoriaEncontrada = compativeis[0];
+  if (disponiveis.length === 1) {
+    const categoriaEncontrada = disponiveis[0];
     const inscricao = await persistirCriacaoComAuditoria(
       {
         ...normalizado,
@@ -307,6 +319,7 @@ async function processarCadastro(eventoId, dados, usuarioId = null) {
       inscricao,
       categoria: categoriaEncontrada,
       mensagem: `Inscrição cadastrada e classificada em "${categoriaEncontrada.nome}".`,
+      aviso: avisoChaveGerada(categoriaEncontrada),
     };
   }
 
@@ -315,7 +328,7 @@ async function processarCadastro(eventoId, dados, usuarioId = null) {
     tipo: 'ESCOLHER_CATEGORIA',
     evento,
     dados: normalizado,
-    categoriasCompativeis: compativeis,
+    categoriasCompativeis: disponiveis,
   };
 }
 
@@ -408,6 +421,12 @@ async function processarEdicao(eventoId, inscricaoId, dados, usuarioId = null) {
       });
     }
 
+    if (chaveJaIniciada(categoriaEscolhida)) {
+      throw new ValidationError({
+        geral: `A chave de "${categoriaEscolhida.nome}" já começou e não aceita novos atletas. Confira os dados e salve novamente.`,
+      });
+    }
+
     const atualizada = await persistirEdicaoComAuditoria(
       inscricaoAtual,
       {
@@ -424,11 +443,12 @@ async function processarEdicao(eventoId, inscricaoId, dados, usuarioId = null) {
       inscricao: atualizada,
       categoria: categoriaEscolhida,
       mensagem: `Inscrição atualizada e classificada em "${categoriaEscolhida.nome}".`,
+      aviso: avisoChaveGerada(categoriaEscolhida),
     };
   }
 
-  // Reclassificação automática
-  const compativeis = buscarCategoriasCompativeis(
+  // Reclassificação automática (ignora categorias com chave já iniciada)
+  const { disponiveis: compativeis, bloqueadas } = buscarCategoriasDisponiveis(
     atletaClassificacao,
     categorias
   );
@@ -449,8 +469,10 @@ async function processarEdicao(eventoId, inscricaoId, dados, usuarioId = null) {
       tipo: 'CRIADA',
       inscricao: atualizada,
       categoria: null,
-      mensagem:
-        'Inscrição atualizada, mas não há categoria compatível com os novos dados. Status definido como Pendente.',
+      mensagem: bloqueadas.length > 0
+        ? 'Inscrição atualizada como Pendente.'
+        : 'Inscrição atualizada, mas não há categoria compatível com os novos dados. Status definido como Pendente.',
+      aviso: avisoChaveIniciada(bloqueadas),
     };
   }
 
@@ -472,6 +494,7 @@ async function processarEdicao(eventoId, inscricaoId, dados, usuarioId = null) {
       inscricao: atualizada,
       categoria: categoriaEncontrada,
       mensagem: `Inscrição atualizada e classificada em "${categoriaEncontrada.nome}".`,
+      aviso: avisoChaveGerada(categoriaEncontrada),
     };
   }
 
@@ -498,6 +521,7 @@ async function processarEdicao(eventoId, inscricaoId, dados, usuarioId = null) {
       inscricao: atualizada,
       categoria: atualAindaCompativel,
       mensagem: `Inscrição atualizada e mantida na categoria "${atualAindaCompativel.nome}".`,
+      aviso: avisoChaveGerada(atualAindaCompativel),
     };
   }
 
@@ -573,19 +597,24 @@ async function reativarInscricao(eventoId, inscricaoId, usuarioId = null) {
     faixa_ordem: faixaOrdem,
   };
 
-  const compativeis = buscarCategoriasCompativeis(
+  // Categorias com chave já iniciada não recebem o atleta reativado
+  const { disponiveis: compativeis, bloqueadas } = buscarCategoriasDisponiveis(
     atletaClassificacao,
     categorias
   );
 
   let novaCategoriaId = null;
   let novoStatus = 'PENDENTE';
-  let mensagem = 'Inscrição reativada, mas nenhuma categoria compatível foi encontrada. Status definido como Pendente.';
+  let mensagem = bloqueadas.length > 0
+    ? 'Inscrição reativada como Pendente.'
+    : 'Inscrição reativada, mas nenhuma categoria compatível foi encontrada. Status definido como Pendente.';
+  let aviso = avisoChaveIniciada(bloqueadas);
 
   if (compativeis.length === 1) {
     novaCategoriaId = compativeis[0].id;
     novoStatus = 'CONFIRMADA';
     mensagem = `Inscrição reativada e classificada em "${compativeis[0].nome}".`;
+    aviso = avisoChaveGerada(compativeis[0]);
   } else if (compativeis.length > 1) {
     // Se a categoria anterior ainda for compatível, mantém ela; senão pega a primeira
     const anterior = compativeis.find(
@@ -595,6 +624,7 @@ async function reativarInscricao(eventoId, inscricaoId, usuarioId = null) {
     novaCategoriaId = escolhida.id;
     novoStatus = 'CONFIRMADA';
     mensagem = `Inscrição reativada e classificada em "${escolhida.nome}".`;
+    aviso = avisoChaveGerada(escolhida);
   }
 
   const client = await pool.connect();
@@ -632,6 +662,7 @@ async function reativarInscricao(eventoId, inscricaoId, usuarioId = null) {
     return {
       inscricao,
       mensagem,
+      aviso,
     };
   } catch (erro) {
     await client.query('ROLLBACK');
