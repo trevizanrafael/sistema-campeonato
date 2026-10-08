@@ -4,7 +4,7 @@
   "description": "Seguinte vou fazer um sistema de controle de campeonato de JIUJITSU",
   "main": "src/app.js",
   "scripts": {
-    "dev": "node --watch src/app.js",
+    "dev": "node --watch --watch-path=.env src/app.js",
     "migrate": "node src/config/migrate.js",
     "create-admin": "node scripts/createAdmin.js",
     "db:setup": "npm run migrate && npm run create-admin",

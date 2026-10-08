@@ -25,6 +25,7 @@ const router = express.Router();
 
 router.get('/login', exigirVisitante, authController.mostrarLogin);
 router.post('/login', exigirVisitante, loginLimiter, csrfProtection, authController.entrar);
-router.post('/logout', exigirAutenticacao, csrfProtection, authController.sair);
+router.get('/logout', authController.sair);
+router.post('/logout', authController.sair);
 
 module.exports = router;

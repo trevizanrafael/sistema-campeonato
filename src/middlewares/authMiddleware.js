@@ -6,7 +6,6 @@ async function exigirAutenticacao(req, res, next) {
     const usuarioSessao = req.session.usuario;
 
     if (!usuarioSessao) {
-      req.session.returnTo = req.originalUrl;
       return res.redirect('/login');
     }
 
@@ -37,7 +36,6 @@ function exigirPermissao(permissao) {
     const usuario = res.locals.usuarioLogado;
 
     if (!usuario) {
-      req.session.returnTo = req.originalUrl;
       return res.redirect('/login');
     }
 
