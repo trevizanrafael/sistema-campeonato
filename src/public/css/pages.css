@@ -740,6 +740,55 @@
 }
 
 /* ==========================================================
+   Tabela de campeonatos (sem scroll lateral)
+   ========================================================== */
+
+.table-eventos {
+  width: 100%;
+}
+
+.table-eventos th,
+.table-eventos td {
+  white-space: normal;
+}
+
+.table-eventos .col-campeonato {
+  width: auto;
+}
+
+.table-eventos .col-num {
+  width: 1%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.table-eventos .col-hide-mobile {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.table-eventos .col-acoes {
+  width: 1%;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.table-eventos .col-acoes .table-actions {
+  justify-content: flex-end;
+}
+
+.table-eventos .table-description {
+  max-width: 520px;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+/* ==========================================================
    Lista de categorias compacta (critérios agrupados)
    ========================================================== */
 
