@@ -41,6 +41,31 @@
           </div>
 
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <% if (chave.status === 'FINALIZADA') { %>
+              <button
+                type="button"
+                class="button button-outline btn-abrir-modal-print"
+                id="btnImprimirChave"
+                data-url="/eventos/<%= evento.id %>/chaves/<%= chave.id %>"
+                data-nome="<%= categoria ? categoria.nome : chave.nome %>"
+                title="Opções de impressão (Chave finalizada)"
+              >
+                <%- include("../partials/icone", { nome: 'documento' }) %>
+                Imprimir Chave (PDF)
+              </button>
+            <% } else { %>
+              <a
+                href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/imprimir"
+                target="_blank"
+                class="button button-outline"
+                id="btnImprimirChave"
+                title="Abrir versão de impressão e salvar em PDF"
+              >
+                <%- include("../partials/icone", { nome: 'documento' }) %>
+                Imprimir Chave (PDF)
+              </a>
+            <% } %>
+
             <% if (chave.chave_rapida_id) { %>
               <a href="/eventos/<%= evento.id %>/chaves-rapidas/<%= chave.chave_rapida_id %>" class="button button-outline">
                 Ver Inscrições
@@ -188,8 +213,18 @@
             <div
               class="bracket"
               id="bracket"
-              style="--round-count: <%= rodadas.length %>; min-height: <%= alturaMinima %>px;"
+              data-round-count="<%= rodadas.length %>"
+              data-min-height="<%= alturaMinima %>"
             >
+              <script>
+                (function() {
+                  var b = document.getElementById('bracket');
+                  if (b) {
+                    if (b.dataset.roundCount) b.style.setProperty('--round-count', b.dataset.roundCount);
+                    if (b.dataset.minHeight) b.style.minHeight = b.dataset.minHeight + 'px';
+                  }
+                })();
+              </script>
               <svg
                 class="bracket-connections"
                 id="bracketConnections"
@@ -382,6 +417,7 @@
         </form>
       </dialog>
 
+      <%- include("./modal-impressao") %>
       <%- include("../partials/footer") %>
     </div>
 

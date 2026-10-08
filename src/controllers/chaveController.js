@@ -54,6 +54,34 @@ async function mostrar(req, res, next) {
   }
 }
 
+async function imprimir(req, res, next) {
+  try {
+    const { eventoId, chaveId } = req.params;
+    const dados = await chaveVisualizacaoService.buscarVisualizacao(eventoId, chaveId);
+
+    // Permitir resultados apenas se a chave estiver FINALIZADA e solicitado com_resultado=true
+    const comResultado = req.query.com_resultado === 'true' && dados.chave.status === 'FINALIZADA';
+
+    return res.render('chaves/print', {
+      titulo: `Chave — ${dados.categoria ? dados.categoria.nome : dados.chave.nome} — ${dados.evento.nome}`,
+      evento: dados.evento,
+      categoria: dados.categoria,
+      chave: dados.chave,
+      rodadas: dados.rodadas,
+      alturaMinima: dados.alturaMinima,
+      comResultado,
+      layout: false,
+    });
+  } catch (erro) {
+    if (erro instanceof NotFoundError || erro.statusCode === 404) {
+      return res.status(404).render('errors/404', {
+        titulo: 'Página não encontrada',
+      });
+    }
+    next(erro);
+  }
+}
+
 async function gerar(req, res, next) {
   const { eventoId, categoriaId } = req.params;
   const usuarioId = req.session?.usuario?.id || null;
@@ -184,6 +212,7 @@ async function excluir(req, res, next) {
 module.exports = {
   listar,
   mostrar,
+  imprimir,
   gerar,
   sortear,
   iniciar,

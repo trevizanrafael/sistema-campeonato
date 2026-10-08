@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    <%= categoria ? categoria.nome : chave.nome %> — <%= evento.nome %> — Chave de Lutas
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ==========================================================================
+         IDENTIDADE VISUAL OFICIAL ARAÚJO JJ TEAM — IMPRESSÃO DE CHAVE DE LUTAS
+         Preto (#111113), Carvão (#18181b), Vermelho (#b60000) e Branco (#ffffff)
+         ========================================================================== */
+
+    @page {
+      size: A4 landscape;
+      margin: 12mm 14mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #111113;
+      background: #ffffff;
+      font-size: 11px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Barra de Ações Superior (Oculta na impressão) */
+    .print-toolbar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+      background: #111113;
+      color: #ffffff;
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 3px solid #b60000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .print-toolbar-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toolbar-badge {
+      background: #b60000;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    .toolbar-hint {
+      font-size: 12px;
+      color: #a1a1aa;
+    }
+
+    .print-toolbar-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-toolbar-print {
+      background: #b60000;
+      color: #ffffff;
+      border: none;
+      padding: 8px 18px;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-toolbar-print:hover {
+      background: #960000;
+    }
+
+    .btn-toolbar-close {
+      background: transparent;
+      color: #ffffff;
+      border: 1px solid #3f3f46;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+
+    .btn-toolbar-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Folha da Chave (Área Imprimível) */
+    .sheet-container {
+      padding: 30px 48px;
+      display: flex;
+      justify-content: center;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+
+    .sheet {
+      background: #ffffff;
+      width: 100%;
+      max-width: 1400px;
+      padding: 0 12px;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    /* Faixa Superior da Marca Araújo JJ */
+    .brand-top-stripe {
+      display: flex;
+      height: 4px;
+      width: 100%;
+      margin-bottom: 14px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .brand-stripe-black {
+      background: #111113;
+      flex: 3;
+    }
+
+    .brand-stripe-red {
+      background: #b60000;
+      flex: 1;
+    }
+
+    /* Cabeçalho Oficial */
+    .print-header {
+      border-bottom: 2px solid #111113;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .print-header-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex: 1;
+    }
+
+    .brand-logo-img {
+      height: 52px;
+      width: 52px;
+      object-fit: contain;
+    }
+
+    .brand-title-divider {
+      width: 2px;
+      height: 40px;
+      background: #e2e8f0;
+    }
+
+    .print-title-area h1 {
+      margin: 0 0 2px 0;
+      font-size: 18px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.3px;
+      color: #111113;
+      line-height: 1.15;
+    }
+
+    .print-title-area h2 {
+      margin: 0 0 4px 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+    }
+
+    .print-meta-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      font-size: 10px;
+    }
+
+    .print-tag {
+      display: inline-block;
+      padding: 2px 7px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 3px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #1e293b;
+      letter-spacing: 0.02em;
+    }
+
+    .print-tag-rapida {
+      background: #fef3c7;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    .print-tag-resultado {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #b60000;
+    }
+
+    .print-tag-branco {
+      background: #111113;
+      border-color: #111113;
+      color: #ffffff;
+    }
+
+    /* Tabela de Preenchimento da Mesa / Tatame */
+    .print-table-mesa {
+      display: grid;
+      grid-template-columns: 80px 140px 140px;
+      gap: 10px;
+      font-size: 10px;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    .mesa-field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .mesa-field label {
+      font-size: 8.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #64748b;
+      letter-spacing: 0.04em;
+    }
+
+    .mesa-field .field-line {
+      border-bottom: 1px dashed #475569;
+      height: 14px;
+    }
+
+    /* Estrutura do Bracket */
+    .bracket-outer {
+      position: relative;
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .print-bracket {
+      --round-width: 255px;
+      --round-gap: 55px;
+
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(var(--round-count, 1), var(--round-width));
+      gap: var(--round-gap);
+      min-width: max-content;
+      min-height: 480px;
+      padding: 6px 0 10px 0;
+    }
+
+    .bracket-connections {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 1;
+    }
+
+    .bracket-round {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .bracket-round-header {
+      text-align: center;
+      padding: 4px 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 2px solid #b60000;
+      margin-bottom: 12px;
+      color: #111113;
+    }
+
+    .bracket-matches-col {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: space-around;
+      gap: 14px;
+    }
+
+    /* Card de Luta para Impressão */
+    .print-match-card {
+      position: relative;
+      width: var(--round-width);
+      background: #ffffff;
+      border: 1.5px solid #18181b;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .print-match-header {
+      background: #18181b;
+      color: #ffffff;
+      border-bottom: 1px solid #27272a;
+      padding: 4px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .print-match-header .match-tag-status {
+      color: #f87171;
+      font-weight: 700;
+      font-size: 8.5px;
+    }
+
+    /* Linhas dos Competidores */
+    .print-competitor-row {
+      padding: 5px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      min-height: 36px;
+      background: #ffffff;
+      border-left: 3px solid transparent;
+      transition: background 0.15s ease;
+    }
+
+    .print-competitor-row+.print-competitor-row {
+      border-top: 1px solid #e2e8f0;
+    }
+
+    /* Estilo quando for o vencedor da luta */
+    .print-competitor-row.is-winner {
+      background: #fff5f5;
+      border-left-color: #b60000;
+    }
+
+    .competitor-info {
+      flex: 1;
+      overflow: hidden;
+      line-height: 1.25;
+    }
+
+    .competitor-name {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .print-competitor-row.is-winner .competitor-name {
+      color: #111113;
+      font-weight: 800;
+    }
+
+    .competitor-team {
+      display: block;
+      font-size: 9.5px;
+      color: #64748b;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .competitor-bye {
+      font-style: italic;
+      color: #94a3b8;
+      font-size: 9.5px;
+      font-weight: 600;
+    }
+
+    .competitor-blank-line {
+      display: block;
+      width: 100%;
+      height: 16px;
+      border-bottom: 1px dashed #94a3b8;
+      margin: 2px 0;
+    }
+
+    /* Badge de VENCEDOR (no modo com resultados) */
+    .badge-vencedor {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      background: #b60000;
+      color: #ffffff;
+      font-size: 8.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-radius: 3px;
+      white-space: nowrap;
+      box-shadow: 0 1px 2px rgba(182, 0, 0, 0.2);
+    }
+
+    /* Rodapé / Bloco de Pódio Oficial */
+    .print-footer-podium {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 2px solid #111113;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 20px;
+      font-size: 10px;
+    }
+
+    .podium-boxes {
+      display: flex;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .podium-box {
+      border: 1.5px solid #18181b;
+      border-radius: 6px;
+      padding: 6px 10px;
+      flex: 1;
+      background: #ffffff;
+    }
+
+    .podium-box.podium-campeao {
+      border-color: #b60000;
+      background: #fffafa;
+    }
+
+    .podium-box-title {
+      font-weight: 800;
+      font-size: 9.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 3px;
+      color: #111113;
+      letter-spacing: 0.02em;
+    }
+
+    .podium-campeao .podium-box-title {
+      color: #b60000;
+      border-bottom-color: #fca5a5;
+    }
+
+    .podium-content-filled {
+      line-height: 1.3;
+    }
+
+    .podium-content-filled strong {
+      display: block;
+      font-size: 11px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .podium-content-filled small {
+      display: block;
+      font-size: 9px;
+      color: #64748b;
+    }
+
+    .podium-blank-line {
+      border-bottom: 1px dashed #64748b;
+      height: 16px;
+      margin-bottom: 3px;
+    }
+
+    .signature-area {
+      min-width: 220px;
+      text-align: center;
+    }
+
+    .signature-line {
+      border-bottom: 1.5px solid #111113;
+      height: 26px;
+      margin-bottom: 4px;
+    }
+
+    /* Regras Específicas de Impressão (@media print) */
+    @media print {
+
+      html,
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+      }
+
+      .print-toolbar {
+        display: none !important;
+      }
+
+      .sheet-container {
+        padding: 8mm 16mm !important;
+        margin: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        display: block !important;
+      }
+
+      .sheet {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .bracket-outer {
+        overflow: visible !important;
+        padding: 0 !important;
+      }
+
+      .print-header {
+        border-bottom: 2px solid #000000 !important;
+      }
+
+      .print-match-card {
+        border-color: #000000 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+
+      .print-match-header {
+        background: #000000 !important;
+        color: #ffffff !important;
+      }
+
+      .badge-vencedor {
+        background: #000000 !important;
+        color: #ffffff !important;
+        border: 1px solid #000000 !important;
+      }
+
+      .bracket-connections path {
+        stroke: #000000 !important;
+        stroke-width: 2px !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Barra de Controle Superior (Oculta na impressão) -->
+  <div class="print-toolbar">
+    <div class="print-toolbar-info">
+      <span class="toolbar-badge">
+        <%= comResultado ? 'Com Resultados' : 'Sem Resultados (Em Branco)' %>
+      </span>
+      <strong>Araújo JJ Team — Documento Oficial de Chaveamento</strong>
+      <span class="toolbar-hint">| Formato: A4 Paisagem (Landscape)</span>
+    </div>
+
+    <div class="print-toolbar-actions">
+      <button type="button" class="btn-toolbar-print" onclick="window.print();" id="btnDispararImpressao">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        Imprimir / Salvar em PDF
+      </button>
+
+      <a href="javascript:window.close();" class="btn-toolbar-close">
+        Fechar
+      </a>
+    </div>
+  </div>
+
+  <!-- Área da Folha Imprimível -->
+  <div class="sheet-container">
+    <div class="sheet">
+      <!-- Faixa de Assinatura Araújo JJ -->
+      <div class="brand-top-stripe">
+        <div class="brand-stripe-black"></div>
+        <div class="brand-stripe-red"></div>
+      </div>
+
+      <!-- Cabeçalho Oficial -->
+      <header class="print-header">
+        <div class="print-header-brand">
+          <img src="/themes/araujo-jj-team/assets/logos/logo-symbol.png" alt="Araújo JJ Team" class="brand-logo-img"
+            onerror="this.style.display='none'">
+          <div class="brand-title-divider"></div>
+          <div class="print-title-area">
+            <h1>
+              <%= categoria ? categoria.nome : chave.nome %>
+            </h1>
+            <h2>Campeonato: <strong>
+                <%= evento.nome %>
+              </strong></h2>
+
+            <div class="print-meta-tags">
+              <% if (chave.chave_rapida_id) { %>
+                <span class="print-tag print-tag-rapida">Chave Rápida</span>
+                <% } %>
+                  <span class="print-tag">Chave de <%= chave.tamanho %> posições</span>
+                  <% if (comResultado) { %>
+                    <span class="print-tag print-tag-resultado">Resultados Oficiais</span>
+                    <% } else { %>
+                      <span class="print-tag print-tag-branco">Chave em Branco</span>
+                      <% } %>
+                        <span class="print-tag">Emitido em <%= new Date().toLocaleDateString('pt-BR') %> às <%= new
+                              Date().toLocaleTimeString('pt-BR', { hour: '2-digit' , minute: '2-digit' }) %></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos para preenchimento da mesa / tatame -->
+        <div class="print-table-mesa">
+          <div class="mesa-field">
+            <label>Tatame</label>
+            <div class="field-line"></div>
+          </div>
+          <div class="mesa-field">
+            <label>Árbitro Central</label>
+            <div class="field-line"></div>
+          </div>
+          <div class="mesa-field">
+            <label>Mesário / Placar</label>
+            <div class="field-line"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Diagrama Gráfico do Chaveamento -->
+      <%
+        const numeroPorAtleta = new Map();
+        let contadorAtleta = 0;
+        if (!comResultado && rodadas && rodadas[0]) {
+          rodadas[0].lutas.forEach(function(l) {
+            if (l.competidor1 && l.competidor1.tipo === 'COMPETIDOR') {
+              const k1 = l.competidor1.id || l.competidor1.nome;
+              if (!numeroPorAtleta.has(k1)) {
+                numeroPorAtleta.set(k1, ++contadorAtleta);
+              }
+            }
+            if (l.competidor2 && l.competidor2.tipo === 'COMPETIDOR') {
+              const k2 = l.competidor2.id || l.competidor2.nome;
+              if (!numeroPorAtleta.has(k2)) {
+                numeroPorAtleta.set(k2, ++contadorAtleta);
+              }
+            }
+          });
+        }
+      %>
+        <div class="bracket-outer">
+          <div class="print-bracket" id="bracket" data-round-count="<%= rodadas.length %>">
+            <svg class="bracket-connections" id="bracketConnections" aria-hidden="true"></svg>
+
+            <% rodadas.forEach(function(rodada) { %>
+              <section class="bracket-round">
+                <div class="bracket-round-header">
+                  <%= rodada.nome %>
+                </div>
+
+                <div class="bracket-matches-col">
+                  <% rodada.lutas.forEach(function(luta) { %>
+                    <article class="print-match-card" id="match-<%= luta.id %>" data-match-id="<%= luta.id %>"
+                      data-next-match-id="<%= luta.proxima_luta_id || '' %>">
+                      <div class="print-match-header">
+                        <span>LUTA #<%= luta.posicao %></span>
+                        <% if (comResultado && luta.status === 'FINALIZADA') { %>
+                          <span class="match-tag-status">
+                            <%= luta.tipo_resultado ? luta.tipo_resultado : 'Finalizada' %>
+                          </span>
+                        <% } %>
+                      </div>
+
+                      <!-- Competidor 1 -->
+                      <%
+                        const mostrarSlot1 = comResultado || rodada.numero === 1;
+                        const c1Vencedor = comResultado && Boolean(luta.competidor1 && luta.competidor1.vencedor);
+                        const numAtleta1 = (!comResultado && luta.competidor1) ? numeroPorAtleta.get(luta.competidor1.id || luta.competidor1.nome) : null;
+                      %>
+                      <div class="print-competitor-row <%= c1Vencedor ? 'is-winner' : '' %>">
+                        <div class="competitor-info">
+                          <% if (!mostrarSlot1) { %>
+                            <div class="competitor-blank-line"></div>
+                          <% } else if (luta.competidor1.tipo === 'COMPETIDOR') { %>
+                            <span class="competitor-name"><%= numAtleta1 ? `${numAtleta1}. ` : '' %><%= luta.competidor1.nome %></span>
+                            <span class="competitor-team"><%= luta.competidor1.equipe || 'Sem academia' %></span>
+                          <% } else if (luta.competidor1.tipo === 'BYE') { %>
+                            <span class="competitor-bye">[ AVANÇO POR BYE ]</span>
+                          <% } else { %>
+                            <div class="competitor-blank-line"></div>
+                          <% } %>
+                        </div>
+
+                        <% if (c1Vencedor) { %>
+                          <span class="badge-vencedor">Vencedor</span>
+                        <% } %>
+                      </div>
+
+                      <!-- Competidor 2 -->
+                      <%
+                        const mostrarSlot2 = comResultado || rodada.numero === 1;
+                        const c2Vencedor = comResultado && Boolean(luta.competidor2 && luta.competidor2.vencedor);
+                        const numAtleta2 = (!comResultado && luta.competidor2) ? numeroPorAtleta.get(luta.competidor2.id || luta.competidor2.nome) : null;
+                      %>
+                      <div class="print-competitor-row <%= c2Vencedor ? 'is-winner' : '' %>">
+                        <div class="competitor-info">
+                          <% if (!mostrarSlot2) { %>
+                            <div class="competitor-blank-line"></div>
+                          <% } else if (luta.competidor2.tipo === 'COMPETIDOR') { %>
+                            <span class="competitor-name"><%= numAtleta2 ? `${numAtleta2}. ` : '' %><%= luta.competidor2.nome %></span>
+                            <span class="competitor-team"><%= luta.competidor2.equipe || 'Sem academia' %></span>
+                          <% } else if (luta.competidor2.tipo === 'BYE') { %>
+                            <span class="competitor-bye">[ AVANÇO POR BYE ]</span>
+                          <% } else { %>
+                            <div class="competitor-blank-line"></div>
+                          <% } %>
+                        </div>
+
+                        <% if (c2Vencedor) { %>
+                          <span class="badge-vencedor">Vencedor</span>
+                        <% } %>
+                      </div>
+                    </article>
+                    <% }); %>
+                </div>
+              </section>
+              <% }); %>
+          </div>
+        </div>
+
+        <!-- Bloco do Pódio Oficial -->
+        <footer class="print-footer-podium">
+          <div class="podium-boxes">
+            <!-- 1º Lugar -->
+            <div class="podium-box podium-campeao">
+              <span class="podium-box-title">1º Lugar (Campeão)</span>
+              <% if (comResultado && chave.primeiro_lugar_nome) { %>
+                <div class="podium-content-filled">
+                  <strong>
+                    <%= chave.primeiro_lugar_nome %>
+                  </strong>
+                  <small>Academia: <%= chave.primeiro_lugar_equipe_nome || 'Sem academia' %></small>
+                </div>
+                <% } else { %>
+                  <div class="podium-blank-line"></div>
+                  <small style="color: #64748b; font-size: 8.5px;">Academia: ________________________</small>
+                  <% } %>
+            </div>
+
+            <!-- 2º Lugar -->
+            <div class="podium-box">
+              <span class="podium-box-title">2º Lugar (Vice-Campeão)</span>
+              <% if (comResultado && chave.segundo_lugar_nome) { %>
+                <div class="podium-content-filled">
+                  <strong>
+                    <%= chave.segundo_lugar_nome %>
+                  </strong>
+                  <small>Academia: <%= chave.segundo_lugar_equipe_nome || 'Sem academia' %></small>
+                </div>
+                <% } else { %>
+                  <div class="podium-blank-line"></div>
+                  <small style="color: #64748b; font-size: 8.5px;">Academia: ________________________</small>
+                  <% } %>
+            </div>
+
+            <!-- 3º Lugar -->
+            <div class="podium-box">
+              <span class="podium-box-title">3º Lugar (Bronze)</span>
+              <% if (comResultado && chave.terceiro_lugar_nome) { %>
+                <div class="podium-content-filled">
+                  <strong>
+                    <%= chave.terceiro_lugar_nome %>
+                  </strong>
+                  <small>Academia: <%= chave.terceiro_lugar_equipe_nome || 'Sem academia' %></small>
+                </div>
+                <% } else { %>
+                  <div class="podium-blank-line"></div>
+                  <small style="color: #64748b; font-size: 8.5px;">Academia: ________________________</small>
+                  <% } %>
+            </div>
+          </div>
+
+          <div class="signature-area">
+            <div class="signature-line"></div>
+            <span
+              style="font-size: 9.5px; font-weight: 700; text-transform: uppercase; color: #111113; letter-spacing: 0.04em;">Assinatura
+              do Árbitro Geral</span>
+          </div>
+        </footer>
+    </div>
+  </div>
+
+  <!-- Script de cálculo dos conectores SVG -->
+  <script>
+    function desenharConexoes() {
+      const bracket = document.getElementById('bracket');
+      const svg = document.getElementById('bracketConnections');
+
+      if (!bracket || !svg) return;
+
+      if (bracket.dataset.roundCount) {
+        bracket.style.setProperty('--round-count', bracket.dataset.roundCount);
+      }
+
+      svg.innerHTML = '';
+      svg.removeAttribute('viewBox');
+      svg.removeAttribute('preserveAspectRatio');
+      svg.style.width = '';
+      svg.style.height = '';
+
+      const bracketRect = bracket.getBoundingClientRect();
+
+      const lutas = bracket.querySelectorAll('[data-next-match-id]');
+
+      lutas.forEach((luta) => {
+        const proximaId = luta.dataset.nextMatchId;
+        if (!proximaId) return;
+
+        const proxima = document.getElementById(`match-${proximaId}`);
+        if (!proxima) return;
+
+        const origemRect = luta.getBoundingClientRect();
+        const destinoRect = proxima.getBoundingClientRect();
+
+        const x1 = Math.round(origemRect.right - bracketRect.left);
+        const y1 = Math.round(origemRect.top - bracketRect.top + origemRect.height / 2);
+
+        const x2 = Math.round(destinoRect.left - bracketRect.left);
+        const y2 = Math.round(destinoRect.top - bracketRect.top + destinoRect.height / 2);
+
+        const meioX = Math.round((x1 + x2) / 2);
+
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', `M ${x1} ${y1} H ${meioX} V ${y2} H ${x2}`);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', '#18181b');
+        path.setAttribute('stroke-width', '1.8');
+        path.setAttribute('stroke-linecap', 'round');
+
+        svg.appendChild(path);
+      });
+    }
+
+    window.addEventListener('load', desenharConexoes);
+    window.addEventListener('beforeprint', desenharConexoes);
+    window.addEventListener('resize', desenharConexoes);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(desenharConexoes);
+    }
+    setTimeout(desenharConexoes, 50);
+    setTimeout(desenharConexoes, 200);
+  </script>
+</body>
+
+</html>

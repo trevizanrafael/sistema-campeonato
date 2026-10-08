@@ -26,6 +26,9 @@ router.post(
 // Abrir visualização da chave
 router.get('/chaves/:chaveId', podeVer, chaveController.mostrar);
 
+// Versão de impressão/PDF da chave
+router.get('/chaves/:chaveId/imprimir', podeVer, chaveController.imprimir);
+
 // Sortear novamente (apenas se NAO_INICIADA)
 router.post(
   '/chaves/:chaveId/sortear',

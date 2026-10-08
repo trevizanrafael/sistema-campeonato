@@ -1,0 +1,115 @@
+<!-- Modal de Escolha de Formato de Impressão (Chave Finalizada) -->
+<dialog id="modalImpressaoChave" class="modal-dialog-chave">
+  <div class="modal-impressao-box">
+    <div class="modal-impressao-header">
+      <div class="modal-impressao-header-info">
+        <div class="modal-impressao-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+        </div>
+        <div>
+          <h3 id="modalImpressaoTitulo" class="modal-impressao-title" style="color: #ffffff !important;">Opções de Impressão da Chave</h3>
+          <p id="modalImpressaoSubtitulo" class="modal-impressao-subtitle" style="color: #d4d4d8 !important;">Esta chave está finalizada. Selecione o modelo que deseja imprimir ou salvar em PDF:</p>
+        </div>
+      </div>
+      <button type="button" class="modal-impressao-close" onclick="fecharModalImpressao()" aria-label="Fechar modal">&times;</button>
+    </div>
+
+    <div class="modal-impressao-body">
+      <div class="modal-impressao-grid">
+        <!-- Opção A: Sem Resultados (Chave em Branco) -->
+        <a id="linkModalSemResultado" href="#" target="_blank" onclick="fecharModalImpressao()" class="opcao-impressao-card">
+          <div class="opcao-card-header">
+            <span class="opcao-tag tag-em-branco">Chave em Branco</span>
+          </div>
+          <h4 class="opcao-card-title">Sem Resultados (Para Anotação)</h4>
+          <p class="opcao-card-desc">
+            Exibe apenas os atletas e confrontos sorteados da <strong>1ª fase</strong>. As fases seguintes e o pódio saem <strong>em branco</strong> para anotação manual na mesa.
+          </p>
+          <div class="opcao-card-footer">
+            <span class="opcao-card-action">Gerar Chave em Branco &rarr;</span>
+          </div>
+        </a>
+
+        <!-- Opção B: Com Resultados (Chave Completa) -->
+        <a id="linkModalComResultado" href="#" target="_blank" onclick="fecharModalImpressao()" class="opcao-impressao-card opcao-destaque">
+          <div class="opcao-card-header">
+            <span class="opcao-tag tag-resultado">Resultados Oficiais</span>
+          </div>
+          <h4 class="opcao-card-title">Com Resultados (Chave Completa)</h4>
+          <p class="opcao-card-desc">
+            Exibe o chaveamento completo com o avanço de todos os atletas até a final, indicação clara do <strong>Vencedor</strong> em cada luta e o <strong>Pódio</strong> preenchido.
+          </p>
+          <div class="opcao-card-footer">
+            <span class="opcao-card-action">Gerar Chave com Resultados &rarr;</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="modal-impressao-footer">
+      <button type="button" class="button button-outline" onclick="fecharModalImpressao()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  function abrirModalImpressao(baseUrl, nomeChave) {
+    var modal = document.getElementById('modalImpressaoChave');
+    if (!modal) return;
+
+    var linkSem = document.getElementById('linkModalSemResultado');
+    var linkCom = document.getElementById('linkModalComResultado');
+    var subtitulo = document.getElementById('modalImpressaoSubtitulo');
+
+    if (linkSem) linkSem.href = baseUrl + '/imprimir?com_resultado=false';
+    if (linkCom) linkCom.href = baseUrl + '/imprimir?com_resultado=true';
+
+    if (subtitulo && nomeChave) {
+      subtitulo.textContent = 'A chave "' + nomeChave + '" está finalizada. Selecione o formato desejado para o documento:';
+    }
+
+    if (typeof modal.showModal === 'function') {
+      modal.showModal();
+    } else {
+      modal.setAttribute('open', 'true');
+    }
+  }
+
+  function fecharModalImpressao() {
+    var modal = document.getElementById('modalImpressaoChave');
+    if (!modal) return;
+    if (typeof modal.close === 'function') {
+      modal.close();
+    } else {
+      modal.removeAttribute('open');
+    }
+  }
+
+  // Fechar ao clicar no backdrop e capturar cliques em botões com data-url
+  document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.getElementById('modalImpressaoChave');
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          fecharModalImpressao();
+        }
+      });
+    }
+
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('.btn-abrir-modal-print');
+      if (btn) {
+        e.preventDefault();
+        var url = btn.getAttribute('data-url');
+        var nome = btn.getAttribute('data-nome');
+        abrirModalImpressao(url, nome);
+      }
+    });
+  });
+</script>

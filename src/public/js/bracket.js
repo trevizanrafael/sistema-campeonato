@@ -10,6 +10,13 @@ function desenharConexoes() {
     return;
   }
 
+  if (bracket.dataset.roundCount) {
+    bracket.style.setProperty('--round-count', bracket.dataset.roundCount);
+  }
+  if (bracket.dataset.minHeight) {
+    bracket.style.minHeight = bracket.dataset.minHeight + 'px';
+  }
+
   svg.innerHTML = '';
 
   const bracketRect = bracket.getBoundingClientRect();

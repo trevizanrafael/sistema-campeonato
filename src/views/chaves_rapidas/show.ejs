@@ -48,6 +48,28 @@
               <a href="/eventos/<%= evento.id %>/chaves/<%= chaveRapida.chave_id %>" class="button button-primary">
                 Abrir Chave de Lutas
               </a>
+              <% if (chaveRapida.chave_status === 'FINALIZADA') { %>
+                <button
+                  type="button"
+                  class="button button-outline btn-abrir-modal-print"
+                  id="btnImprimirChaveRapida"
+                  data-url="/eventos/<%= evento.id %>/chaves/<%= chaveRapida.chave_id %>"
+                  data-nome="<%= chaveRapida.nome %>"
+                  title="Opções de impressão (Chave finalizada)"
+                >
+                  <%- include("../partials/icone", { nome: 'documento' }) %> Imprimir Chave (PDF)
+                </button>
+              <% } else { %>
+                <a
+                  href="/eventos/<%= evento.id %>/chaves/<%= chaveRapida.chave_id %>/imprimir"
+                  target="_blank"
+                  class="button button-outline"
+                  id="btnImprimirChaveRapida"
+                  title="Imprimir chave em branco"
+                >
+                  <%- include("../partials/icone", { nome: 'documento' }) %> Imprimir Chave (PDF)
+                </a>
+              <% } %>
             <% } %>
 
             <% if (!chaveIniciada) { %>
@@ -209,6 +231,7 @@
         </section>
       </main>
 
+      <%- include("../chaves/modal-impressao") %>
       <%- include("../partials/footer") %>
     </div>
 

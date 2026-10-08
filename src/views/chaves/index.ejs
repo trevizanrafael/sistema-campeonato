@@ -100,7 +100,7 @@
                           <% } %>
                         </td>
                         <td class="col-acoes" style="text-align: right;">
-                          <div style="display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
+                          <div class="chaves-acoes-group">
                             <% if (!cat.chave_id) { %>
                               <a
                                 href="/eventos/<%= evento.id %>/chaves-rapidas/<%= cat.chave_rapida_id %>"
@@ -124,13 +124,33 @@
                             <% } else { %>
                               <a
                                 href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
-                                class="button button-small button-outline"
+                                class="button button-small button-primary"
                               >
                                 Abrir chave
                               </a>
+                              <% if (cat.chave_status === 'FINALIZADA') { %>
+                                <button
+                                  type="button"
+                                  class="button button-small button-outline btn-abrir-modal-print"
+                                  data-url="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
+                                  data-nome="<%= cat.categoria_nome || '' %>"
+                                  title="Opções de impressão (Chave finalizada)"
+                                >
+                                  PDF
+                                </button>
+                              <% } else { %>
+                                <a
+                                  href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>/imprimir"
+                                  target="_blank"
+                                  class="button button-small button-outline"
+                                  title="Imprimir chave em branco"
+                                >
+                                  PDF
+                                </a>
+                              <% } %>
                               <a
                                 href="/eventos/<%= evento.id %>/chaves-rapidas/<%= cat.chave_rapida_id %>"
-                                class="button button-small button-ghost"
+                                class="button button-small button-outline"
                                 title="Ver atletas inscritos"
                               >
                                 Inscritos
@@ -198,12 +218,34 @@
                               <span class="chave-nota">—</span>
                             <% } %>
                           <% } else { %>
-                            <a
-                              href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
-                              class="button button-small button-outline"
-                            >
-                              Abrir chave
-                            </a>
+                            <div class="chaves-acoes-group">
+                              <a
+                                href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
+                                class="button button-small button-primary"
+                              >
+                                Abrir chave
+                              </a>
+                              <% if (cat.chave_status === 'FINALIZADA') { %>
+                                <button
+                                   type="button"
+                                   class="button button-small button-outline btn-abrir-modal-print"
+                                   data-url="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
+                                   data-nome="<%= cat.categoria_nome || '' %>"
+                                   title="Opções de impressão (Chave finalizada)"
+                                 >
+                                   PDF
+                                 </button>
+                              <% } else { %>
+                                <a
+                                  href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>/imprimir"
+                                  target="_blank"
+                                  class="button button-small button-outline"
+                                  title="Imprimir chave em branco"
+                                >
+                                  PDF
+                                </a>
+                              <% } %>
+                            </div>
                           <% } %>
                         </td>
                       </tr>
@@ -216,6 +258,7 @@
         </section>
       </main>
 
+      <%- include("./modal-impressao") %>
       <%- include("../partials/footer") %>
     </div>
 
