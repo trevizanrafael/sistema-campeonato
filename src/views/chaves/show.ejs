@@ -22,8 +22,11 @@
               <%- include("../partials/icone", { nome: 'voltar' }) %>
               Voltar para chaves
             </a>
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
               <h1 class="page-title"><%= categoria ? categoria.nome : chave.nome %></h1>
+              <% if (chave.chave_rapida_id) { %>
+                <span class="badge badge-warning" style="font-weight: 700;">Chave Rápida</span>
+              <% } %>
               <% if (chave.status === 'NAO_INICIADA') { %>
                 <span class="badge badge-warning">Não iniciada</span>
               <% } else if (chave.status === 'EM_ANDAMENTO') { %>
@@ -38,6 +41,11 @@
           </div>
 
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <% if (chave.chave_rapida_id) { %>
+              <a href="/eventos/<%= evento.id %>/chaves-rapidas/<%= chave.chave_rapida_id %>" class="button button-outline">
+                Ver Inscrições
+              </a>
+            <% } %>
             <% if (chave.status === 'NAO_INICIADA') { %>
               <% if (pode('chaves.gerar')) { %>
               <form

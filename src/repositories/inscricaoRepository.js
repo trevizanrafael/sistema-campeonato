@@ -40,6 +40,7 @@ async function listarPorEvento(eventoId, filtros = {}, client = pool) {
     JOIN faixas f ON f.id = i.faixa_id
     LEFT JOIN categorias c ON c.id = i.categoria_id
     WHERE i.evento_id = $1
+      AND i.chave_rapida_id IS NULL
   `;
 
   const params = [eventoId];

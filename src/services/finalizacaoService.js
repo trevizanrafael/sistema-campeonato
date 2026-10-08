@@ -1,5 +1,6 @@
 const pool = require('../config/database');
 const chaveRepository = require('../repositories/chaveRepository');
+const chaveRapidaRepository = require('../repositories/chaveRapidaRepository');
 const lutaRepository = require('../repositories/lutaRepository');
 const pontoEquipeRepository = require('../repositories/pontoEquipeRepository');
 const regraPontuacaoRepository = require('../repositories/regraPontuacaoRepository');
@@ -308,8 +309,8 @@ async function finalizarCategoria(eventoId, chaveId, usuarioId = null) {
     // 5. Recalcular pódio dentro da transação
     const podio = await calcularPodio(chave, finalLuta, client);
 
-    // 6. Criar pontos de colocação se pontos > 0
-    if (podio.primeiro.pontos > 0) {
+    // 6. Criar pontos de colocação se pontos > 0 e se competidor tiver equipe
+    if (podio.primeiro.pontos > 0 && podio.primeiro.equipe_id) {
       await pontoEquipeRepository.criarPontoColocacao(
         {
           evento_id: eventoId,
@@ -324,7 +325,7 @@ async function finalizarCategoria(eventoId, chaveId, usuarioId = null) {
       );
     }
 
-    if (podio.segundo.pontos > 0) {
+    if (podio.segundo.pontos > 0 && podio.segundo.equipe_id) {
       await pontoEquipeRepository.criarPontoColocacao(
         {
           evento_id: eventoId,
@@ -339,7 +340,7 @@ async function finalizarCategoria(eventoId, chaveId, usuarioId = null) {
       );
     }
 
-    if (podio.terceiro && podio.terceiro.pontos > 0) {
+    if (podio.terceiro && podio.terceiro.pontos > 0 && podio.terceiro.equipe_id) {
       await pontoEquipeRepository.criarPontoColocacao(
         {
           evento_id: eventoId,
@@ -364,6 +365,10 @@ async function finalizarCategoria(eventoId, chaveId, usuarioId = null) {
       },
       client
     );
+
+    if (chave.chave_rapida_id) {
+      await chaveRapidaRepository.atualizarStatus(chave.chave_rapida_id, 'FINALIZADA', client);
+    }
 
     await auditoriaService.registrar({
       usuarioId,
@@ -426,6 +431,10 @@ async function reabrirCategoria(eventoId, chaveId, usuarioId = null) {
       chaveId,
       client
     );
+
+    if (chave.chave_rapida_id) {
+      await chaveRapidaRepository.atualizarStatus(chave.chave_rapida_id, 'EM_ANDAMENTO', client);
+    }
 
     await auditoriaService.registrar({
       usuarioId,

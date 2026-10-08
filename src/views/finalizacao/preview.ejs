@@ -46,9 +46,13 @@
                     <%= index + 1 %>º lugar
                   </span>
                   <strong style="font-size: 16px;"><%= colocado.nome %></strong>
-                  <span style="font-size: 13px; color: var(--color-text-muted);"><%= colocado.equipe_nome %></span>
+                  <span style="font-size: 13px; color: var(--color-text-muted);"><%= colocado.equipe_nome || 'Sem academia (Avulso)' %></span>
                   <span class="podium-points" style="font-size: 13px; font-weight: 700; border: 1px dashed var(--color-border); padding: 4px 8px; border-radius: 2px; margin-top: 4px;">
-                    +<%= colocado.pontos %> <%= colocado.pontos === 1 ? 'ponto' : 'pontos' %>
+                    <% if (colocado.equipe_id) { %>
+                      +<%= colocado.pontos %> <%= colocado.pontos === 1 ? 'ponto' : 'pontos' %>
+                    <% } else { %>
+                      Não pontua equipe
+                    <% } %>
                   </span>
                 </div>
               <% }) %>

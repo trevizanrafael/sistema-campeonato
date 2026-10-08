@@ -19,103 +19,195 @@
             <%- include("../partials/trilha", { itens: [{ label: 'Chaves' }] }) %>
             <h1 class="page-title">Chaves de Luta</h1>
             <p class="page-subtitle">
-              Gerenciamento e sorteio de chaves eliminatórias por categoria para <strong><%= evento.nome %></strong>.
+              Gerenciamento e sorteio de chaves eliminatórias por categoria e chaves rápidas para <strong><%= evento.nome %></strong>.
             </p>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <% if (pode('chaves.gerar')) { %>
+              <a href="/eventos/<%= evento.id %>/chaves-rapidas/nova" class="button button-primary">
+                + Nova Chave Rápida
+              </a>
+            <% } %>
           </div>
         </div>
 
         <section class="page-content">
           <% if (!categorias || categorias.length === 0) { %>
             <div class="card empty-state">
-              <h2>Nenhuma categoria cadastrada</h2>
-              <% if (pode('categorias.gerenciar')) { %>
-                <p>Cadastre categorias no campeonato antes de gerar as chaves de combate.</p>
-                <a href="/eventos/<%= evento.id %>/categorias/nova" class="button button-primary">
-                  Cadastrar primeira categoria
-                </a>
-              <% } else { %>
-                <p>Este campeonato ainda não tem categorias. Aguarde o organizador configurar.</p>
-              <% } %>
+              <h2>Nenhuma categoria ou chave cadastrada</h2>
+              <p>Cadastre categorias no campeonato ou crie uma chave rápida avulsa.</p>
+              <div style="display: flex; gap: 12px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
+                <% if (pode('categorias.gerenciar')) { %>
+                  <a href="/eventos/<%= evento.id %>/categorias/nova" class="button button-outline">
+                    Cadastrar primeira categoria
+                  </a>
+                <% } %>
+                <% if (pode('chaves.gerar')) { %>
+                  <a href="/eventos/<%= evento.id %>/chaves-rapidas/nova" class="button button-primary">
+                    + Nova Chave Rápida
+                  </a>
+                <% } %>
+              </div>
             </div>
           <% } else { %>
             <div class="table-container">
               <table class="table table-chaves">
                 <thead>
                   <tr>
-                    <th>Categoria</th>
+                    <th>Categoria / Chave</th>
                     <th class="col-num">Atletas</th>
                     <th>Situação</th>
-                    <th class="col-acoes">Ações</th>
+                    <th class="col-acoes" style="text-align: right;">Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   <% categorias.forEach(function(cat) { %>
-                    <tr>
-                      <td>
-                        <strong class="categoria-nome"><%= cat.categoria_nome %></strong>
-                        <ul class="categoria-criterios" aria-label="Critérios da categoria">
-                          <li title="Sexo"><%= formatarSexo(cat.categoria_sexo) %></li>
-                          <li title="Faixa">
-                            <% if (cat.faixa_minima_nome) { %>
-                              <%= cat.faixa_minima_nome %><%= cat.faixa_maxima_nome && cat.faixa_maxima_nome !== cat.faixa_minima_nome ? ` a ${cat.faixa_maxima_nome}` : '' %>
-                            <% } else { %>
-                              Qualquer faixa
+                    <% if (cat.is_rapida) { %>
+                      <!-- Linha de Chave Rápida -->
+                      <tr style="background: rgba(237, 137, 54, 0.03);">
+                        <td>
+                          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <strong class="categoria-nome"><%= cat.categoria_nome %></strong>
+                            <span class="badge badge-warning" style="font-weight: 700; font-size: 11px;">Chave Rápida</span>
+                          </div>
+                          <ul class="categoria-criterios" aria-label="Critérios da chave rápida">
+                            <li title="Tipo">Inscrição avulsa / Sem restrições</li>
+                            <% if (cat.chave_tamanho) { %>
+                              <li title="Tamanho da chave"><%= cat.chave_tamanho %> posições</li>
                             <% } %>
-                          </li>
-                          <% if (cat.chave_tamanho) { %>
-                            <li title="Tamanho da chave"><%= cat.chave_tamanho %> posições</li>
-                          <% } %>
-                        </ul>
-                      </td>
-                      <td class="col-num">
-                        <strong><%= cat.total_confirmados %></strong>
-                      </td>
-                      <td>
-                        <% if (!cat.chave_id) { %>
-                          <% if (cat.total_confirmados < 2) { %>
-                            <span class="badge badge-neutral">Inscritos insuficientes</span>
-                            <small class="chave-nota">Mínimo 2 atletas confirmados</small>
+                          </ul>
+                        </td>
+                        <td class="col-num">
+                          <strong><%= cat.total_confirmados %></strong>
+                        </td>
+                        <td>
+                          <% if (!cat.chave_id) { %>
+                            <% if (cat.total_confirmados < 2) { %>
+                              <span class="badge badge-neutral">Inscritos insuficientes</span>
+                              <small class="chave-nota">Mínimo 2 atletas</small>
+                            <% } else { %>
+                              <span class="badge badge-neutral">Sem chave gerada</span>
+                            <% } %>
+                          <% } else if (cat.chave_status === 'NAO_INICIADA') { %>
+                            <span class="badge badge-warning">Não iniciada</span>
+                          <% } else if (cat.chave_status === 'EM_ANDAMENTO') { %>
+                            <span class="badge badge-ativo">Em andamento</span>
+                          <% } else if (cat.chave_status === 'FINALIZADA') { %>
+                            <span class="badge badge-success">Finalizada</span>
                           <% } else { %>
-                            <span class="badge badge-neutral">Sem chave</span>
+                            <span class="badge badge-neutral"><%= cat.chave_status %></span>
                           <% } %>
-                        <% } else if (cat.chave_status === 'NAO_INICIADA') { %>
-                          <span class="badge badge-warning">Não iniciada</span>
-                        <% } else if (cat.chave_status === 'EM_ANDAMENTO') { %>
-                          <span class="badge badge-ativo">Em andamento</span>
-                        <% } else if (cat.chave_status === 'FINALIZADA') { %>
-                          <span class="badge badge-success">Finalizada</span>
-                        <% } else { %>
-                          <span class="badge badge-neutral"><%= cat.chave_status %></span>
-                        <% } %>
-                      </td>
-                      <td class="col-acoes">
-                        <% if (!cat.chave_id) { %>
-                          <% if (cat.total_confirmados >= 2 && pode('chaves.gerar')) { %>
-                            <form
-                              action="/eventos/<%= evento.id %>/categorias/<%= cat.categoria_id %>/chave/gerar"
-                              method="POST"
-                              style="display: inline;"
+                        </td>
+                        <td class="col-acoes" style="text-align: right;">
+                          <div style="display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap;">
+                            <% if (!cat.chave_id) { %>
+                              <a
+                                href="/eventos/<%= evento.id %>/chaves-rapidas/<%= cat.chave_rapida_id %>"
+                                class="button button-small button-outline"
+                              >
+                                Inscritos (<%= cat.total_confirmados %>)
+                              </a>
+
+                              <% if (cat.total_confirmados >= 2 && pode('chaves.gerar')) { %>
+                                <form
+                                  action="/eventos/<%= evento.id %>/chaves-rapidas/<%= cat.chave_rapida_id %>/gerar"
+                                  method="POST"
+                                  style="display: inline;"
+                                >
+                                  <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                  <button type="submit" class="button button-small button-primary">
+                                    Gerar chave
+                                  </button>
+                                </form>
+                              <% } %>
+                            <% } else { %>
+                              <a
+                                href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
+                                class="button button-small button-outline"
+                              >
+                                Abrir chave
+                              </a>
+                              <a
+                                href="/eventos/<%= evento.id %>/chaves-rapidas/<%= cat.chave_rapida_id %>"
+                                class="button button-small button-ghost"
+                                title="Ver atletas inscritos"
+                              >
+                                Inscritos
+                              </a>
+                            <% } %>
+                          </div>
+                        </td>
+                      </tr>
+                    <% } else { %>
+                      <!-- Linha de Categoria Regular -->
+                      <tr>
+                        <td>
+                          <strong class="categoria-nome"><%= cat.categoria_nome %></strong>
+                          <ul class="categoria-criterios" aria-label="Critérios da categoria">
+                            <li title="Sexo"><%= formatarSexo(cat.categoria_sexo) %></li>
+                            <li title="Faixa">
+                              <% if (cat.faixa_minima_nome) { %>
+                                <%= cat.faixa_minima_nome %><%= cat.faixa_maxima_nome && cat.faixa_maxima_nome !== cat.faixa_minima_nome ? ` a ${cat.faixa_maxima_nome}` : '' %>
+                              <% } else { %>
+                                Qualquer faixa
+                              <% } %>
+                            </li>
+                            <% if (cat.chave_tamanho) { %>
+                              <li title="Tamanho da chave"><%= cat.chave_tamanho %> posições</li>
+                            <% } %>
+                          </ul>
+                        </td>
+                        <td class="col-num">
+                          <strong><%= cat.total_confirmados %></strong>
+                        </td>
+                        <td>
+                          <% if (!cat.chave_id) { %>
+                            <% if (cat.total_confirmados < 2) { %>
+                              <span class="badge badge-neutral">Inscritos insuficientes</span>
+                              <small class="chave-nota">Mínimo 2 atletas confirmados</small>
+                            <% } else { %>
+                              <span class="badge badge-neutral">Sem chave</span>
+                            <% } %>
+                          <% } else if (cat.chave_status === 'NAO_INICIADA') { %>
+                            <span class="badge badge-warning">Não iniciada</span>
+                          <% } else if (cat.chave_status === 'EM_ANDAMENTO') { %>
+                            <span class="badge badge-ativo">Em andamento</span>
+                          <% } else if (cat.chave_status === 'FINALIZADA') { %>
+                            <span class="badge badge-success">Finalizada</span>
+                          <% } else { %>
+                            <span class="badge badge-neutral"><%= cat.chave_status %></span>
+                          <% } %>
+                        </td>
+                        <td class="col-acoes" style="text-align: right;">
+                          <% if (!cat.chave_id) { %>
+                            <% if (cat.total_confirmados >= 2 && pode('chaves.gerar')) { %>
+                              <form
+                                action="/eventos/<%= evento.id %>/categorias/<%= cat.categoria_id %>/chave/gerar"
+                                method="POST"
+                                style="display: inline;"
+                              >
+                                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                <button type="submit" class="button button-small button-primary">
+                                  Gerar chave
+                                </button>
+                              </form>
+                            <% } else if (cat.total_confirmados >= 2) { %>
+                              <small class="chave-nota">Aguardando organizador gerar</small>
+                            <% } else { %>
+                              <span class="chave-nota">—</span>
+                            <% } %>
+                          <% } else { %>
+                            <a
+                              href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
+                              class="button button-small button-outline"
                             >
-                              <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-                              <button type="submit" class="button button-small button-primary">
-                                Gerar chave
-                              </button>
-                            </form>
-                          <% } else if (cat.total_confirmados >= 2) { %>
-                            <small class="chave-nota">Aguardando organizador gerar</small>
-                          <% } else { %>
-                            <span class="chave-nota">—</span>
+                              Abrir chave
+                            </a>
                           <% } %>
-                        <% } else { %>
-                          <a
-                            href="/eventos/<%= evento.id %>/chaves/<%= cat.chave_id %>"
-                            class="button button-small button-outline"
-                          >
-                            Abrir chave
-                          </a>
-                        <% } %>
-                      </td>
-                    </tr>
+                        </td>
+                      </tr>
+                    <% } %>
                   <% }); %>
                 </tbody>
               </table>

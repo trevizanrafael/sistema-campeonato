@@ -1,6 +1,7 @@
 const pool = require('../config/database');
 const eventoRepository = require('../repositories/eventoRepository');
 const chaveRepository = require('../repositories/chaveRepository');
+const chaveRapidaRepository = require('../repositories/chaveRapidaRepository');
 const lutaRepository = require('../repositories/lutaRepository');
 const regraPontuacaoRepository = require('../repositories/regraPontuacaoRepository');
 const chaveGeneratorService = require('./chaveGeneratorService');
@@ -22,7 +23,26 @@ async function listarCategoriasEChaves(eventoId) {
   }
 
   const categorias = await chaveRepository.listarPorEvento(eventoId);
-  return { evento, categorias };
+  const chavesRapidas = await chaveRapidaRepository.listarPorEvento(eventoId);
+
+  const itensRapidos = chavesRapidas.map((cr) => ({
+    is_rapida: true,
+    chave_rapida_id: cr.id,
+    categoria_id: null,
+    categoria_nome: cr.nome,
+    categoria_sexo: null,
+    faixa_minima_nome: null,
+    faixa_maxima_nome: null,
+    total_confirmados: cr.total_inscritos || 0,
+    chave_id: cr.chave_id,
+    chave_status: cr.chave_status || cr.status,
+    chave_tamanho: cr.chave_tamanho,
+    chave_created_at: cr.created_at,
+  }));
+
+  const todasChaves = [...categorias, ...itensRapidos];
+
+  return { evento, categorias: todasChaves, categoriasOriginais: categorias, chavesRapidas };
 }
 
 async function buscarChave(eventoId, chaveId) {
@@ -215,12 +235,14 @@ async function sortearNovamente(eventoId, chaveId, usuarioId = null) {
     const chaveRes = await client.query(
       `SELECT
          ch.*,
-         c.evento_id,
+         COALESCE(c.evento_id, cr.evento_id) AS evento_id,
          c.id AS categoria_id,
-         c.nome AS categoria_nome
+         COALESCE(c.nome, cr.nome) AS categoria_nome,
+         cr.id AS chave_rapida_id
        FROM chaves ch
-       JOIN categorias c ON c.id = ch.categoria_id
-       WHERE ch.id = $1 AND c.evento_id = $2
+       LEFT JOIN categorias c ON c.id = ch.categoria_id
+       LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+       WHERE ch.id = $1 AND COALESCE(c.evento_id, cr.evento_id) = $2
        FOR UPDATE OF ch`,
       [chaveId, eventoId]
     );
@@ -234,27 +256,45 @@ async function sortearNovamente(eventoId, chaveId, usuarioId = null) {
       throw new BusinessRuleError('Uma chave já iniciada não pode ser sorteada novamente.');
     }
 
-    const categoriaId = chaveAtual.categoria_id;
-
     // 2. Buscar inscrições confirmadas atuais
-    const inscritosRes = await client.query(
-      `SELECT
-         i.id,
-         i.nome,
-         i.equipe_id,
-         i.seed,
-         e.nome AS equipe_nome
-       FROM inscricoes i
-       JOIN equipes e ON e.id = i.equipe_id
-       WHERE i.evento_id = $1
-         AND i.categoria_id = $2
-         AND i.status = 'CONFIRMADA'
-       ORDER BY i.nome
-       FOR SHARE`,
-      [eventoId, categoriaId]
-    );
+    let inscritos;
+    if (chaveAtual.chave_rapida_id) {
+      const inscritosRes = await client.query(
+        `SELECT
+           i.id,
+           i.nome,
+           i.equipe_id,
+           i.seed,
+           e.nome AS equipe_nome
+         FROM inscricoes i
+         LEFT JOIN equipes e ON e.id = i.equipe_id
+         WHERE i.evento_id = $1
+           AND i.chave_rapida_id = $2
+           AND i.status = 'CONFIRMADA'
+         ORDER BY i.nome`,
+        [eventoId, chaveAtual.chave_rapida_id]
+      );
+      inscritos = inscritosRes.rows;
+    } else {
+      const inscritosRes = await client.query(
+        `SELECT
+           i.id,
+           i.nome,
+           i.equipe_id,
+           i.seed,
+           e.nome AS equipe_nome
+         FROM inscricoes i
+         JOIN equipes e ON e.id = i.equipe_id
+         WHERE i.evento_id = $1
+           AND i.categoria_id = $2
+           AND i.status = 'CONFIRMADA'
+         ORDER BY i.nome
+         FOR SHARE`,
+        [eventoId, chaveAtual.categoria_id]
+      );
+      inscritos = inscritosRes.rows;
+    }
 
-    const inscritos = inscritosRes.rows;
     if (inscritos.length < 2) {
       throw new BusinessRuleError('São necessários pelo menos dois competidores confirmados para gerar a chave.');
     }
@@ -270,7 +310,8 @@ async function sortearNovamente(eventoId, chaveId, usuarioId = null) {
     // 5. Inserir nova chave
     const novaChave = await chaveRepository.criar(
       {
-        categoria_id: categoriaId,
+        categoria_id: chaveAtual.categoria_id || null,
+        chave_rapida_id: chaveAtual.chave_rapida_id || null,
         nome: chaveAtual.nome,
         tamanho: resultadoCalculo.tamanho,
         status: 'NAO_INICIADA',
@@ -360,11 +401,13 @@ async function iniciarChave(eventoId, chaveId, usuarioId = null) {
     const chaveRes = await client.query(
       `SELECT
          ch.*,
-         c.evento_id,
-         c.id AS categoria_id
+         COALESCE(c.evento_id, cr.evento_id) AS evento_id,
+         c.id AS categoria_id,
+         cr.id AS chave_rapida_id
        FROM chaves ch
-       JOIN categorias c ON c.id = ch.categoria_id
-       WHERE ch.id = $1 AND c.evento_id = $2
+       LEFT JOIN categorias c ON c.id = ch.categoria_id
+       LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+       WHERE ch.id = $1 AND COALESCE(c.evento_id, cr.evento_id) = $2
        FOR UPDATE OF ch`,
       [chaveId, eventoId]
     );
@@ -387,6 +430,9 @@ async function iniciarChave(eventoId, chaveId, usuarioId = null) {
 
     // 3. Atualizar status da chave para EM_ANDAMENTO
     await chaveRepository.atualizarStatus(chaveId, 'EM_ANDAMENTO', client);
+    if (chave.chave_rapida_id) {
+      await chaveRapidaRepository.atualizarStatus(chave.chave_rapida_id, 'EM_ANDAMENTO', client);
+    }
 
     // 4. Buscar lutas da 1ª rodada
     const lutasR1 = await lutaRepository.buscarPrimeiraRodada(chaveId, client);
@@ -410,7 +456,7 @@ async function iniciarChave(eventoId, chaveId, usuarioId = null) {
             [vencedorId]
           );
 
-          if (atRes.rows.length > 0) {
+          if (atRes.rows.length > 0 && atRes.rows[0].equipe_id) {
             const equipeId = atRes.rows[0].equipe_id;
 
             await client.query(
@@ -472,10 +518,12 @@ async function excluirChave(eventoId, chaveId, usuarioId = null) {
     const chaveRes = await client.query(
       `SELECT
          ch.*,
-         c.evento_id
+         COALESCE(c.evento_id, cr.evento_id) AS evento_id,
+         cr.id AS chave_rapida_id
        FROM chaves ch
-       JOIN categorias c ON c.id = ch.categoria_id
-       WHERE ch.id = $1 AND c.evento_id = $2
+       LEFT JOIN categorias c ON c.id = ch.categoria_id
+       LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+       WHERE ch.id = $1 AND COALESCE(c.evento_id, cr.evento_id) = $2
        FOR UPDATE OF ch`,
       [chaveId, eventoId]
     );
@@ -491,6 +539,9 @@ async function excluirChave(eventoId, chaveId, usuarioId = null) {
 
     // 2. Excluir chave (cascateia lutas)
     await chaveRepository.excluir(chaveId, client);
+    if (chave.chave_rapida_id) {
+      await chaveRapidaRepository.atualizarStatus(chave.chave_rapida_id, 'NAO_INICIADA', client);
+    }
 
     await auditoriaService.registrar({
       usuarioId,

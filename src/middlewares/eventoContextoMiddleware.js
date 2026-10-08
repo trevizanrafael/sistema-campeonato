@@ -29,14 +29,16 @@ async function carregarContextoEvento(req, res, next) {
            FROM inscricoes i
            WHERE i.evento_id = e.id
              AND i.categoria_id IS NULL
+             AND i.chave_rapida_id IS NULL
              AND i.status NOT IN ('CANCELADA', 'DESCLASSIFICADA')
          ) AS inscricoes_sem_categoria,
          (
            SELECT COUNT(*)::INTEGER
            FROM lutas l
            JOIN chaves ch ON ch.id = l.chave_id
-           JOIN categorias c ON c.id = ch.categoria_id
-           WHERE c.evento_id = e.id
+           LEFT JOIN categorias c ON c.id = ch.categoria_id
+           LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+           WHERE COALESCE(c.evento_id, cr.evento_id) = e.id
              AND ch.status = 'EM_ANDAMENTO'
              AND l.status = 'PRONTA'
          ) AS lutas_prontas

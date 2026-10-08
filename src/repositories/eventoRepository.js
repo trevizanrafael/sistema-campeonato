@@ -91,9 +91,9 @@ async function buscarComResumo(id) {
       (
         SELECT COUNT(*)::INTEGER
         FROM chaves ch
-        JOIN categorias c
-          ON c.id = ch.categoria_id
-        WHERE c.evento_id = e.id
+        LEFT JOIN categorias c ON c.id = ch.categoria_id
+        LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+        WHERE COALESCE(c.evento_id, cr.evento_id) = e.id
           AND ch.status = 'FINALIZADA'
       ) AS chaves_finalizadas
 
@@ -139,8 +139,9 @@ async function buscarProgresso(id) {
         COUNT(*) FILTER (WHERE l.status = 'PRONTA')::INTEGER AS prontas
       FROM lutas l
       JOIN chaves ch ON ch.id = l.chave_id
-      JOIN categorias c ON c.id = ch.categoria_id
-      WHERE c.evento_id = $1
+      LEFT JOIN categorias c ON c.id = ch.categoria_id
+      LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+      WHERE COALESCE(c.evento_id, cr.evento_id) = $1
         AND ch.status IN ('EM_ANDAMENTO', 'FINALIZADA')
         AND l.status <> 'CANCELADA'
         AND COALESCE(l.tipo_resultado, '') <> 'BYE'
@@ -151,6 +152,7 @@ async function buscarProgresso(id) {
         COUNT(*) FILTER (WHERE i.status = 'CONFIRMADA')::INTEGER AS confirmadas,
         COUNT(*) FILTER (
           WHERE i.categoria_id IS NULL
+            AND i.chave_rapida_id IS NULL
             AND i.status NOT IN ('CANCELADA', 'DESCLASSIFICADA')
         )::INTEGER AS sem_categoria,
         COUNT(*) FILTER (

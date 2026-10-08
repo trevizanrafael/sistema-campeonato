@@ -37,9 +37,13 @@ router.use('/:eventoId/categorias', categoriaRoutes);
 router.use('/:eventoId/inscricoes', inscricaoRoutes);
 
 const chaveRoutes = require('./chaveRoutes');
+const chaveRapidaRoutes = require('./chaveRapidaRoutes');
 
 // Rotas aninhadas de chaves e sorteios (Fase 11)
 router.use('/:eventoId', chaveRoutes);
+
+// Rotas aninhadas de chaves rápidas
+router.use('/:eventoId/chaves-rapidas', chaveRapidaRoutes);
 
 const rankingRoutes = require('./rankingRoutes');
 
