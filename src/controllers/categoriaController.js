@@ -62,7 +62,10 @@ async function cadastrar(req, res, next) {
       req.session.mensagemSucesso = 'Categoria criada com sucesso.';
     }
 
-    return res.redirect(`/eventos/${eventoId}/categorias`);
+    return req.session.save((erroSalvar) => {
+      if (erroSalvar) return next(erroSalvar);
+      return res.redirect(`/eventos/${eventoId}/categorias`);
+    });
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {
       return res.status(404).render('errors/404', {
@@ -138,7 +141,10 @@ async function editar(req, res, next) {
       req.session.mensagemSucesso = 'Categoria atualizada com sucesso.';
     }
 
-    return res.redirect(`/eventos/${eventoId}/categorias`);
+    return req.session.save((erroSalvar) => {
+      if (erroSalvar) return next(erroSalvar);
+      return res.redirect(`/eventos/${eventoId}/categorias`);
+    });
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {
       return res.status(404).render('errors/404', {
@@ -188,7 +194,10 @@ async function excluir(req, res, next) {
   try {
     await categoriaService.excluirCategoria(eventoId, id);
     req.session.mensagemSucesso = 'Categoria excluída com sucesso.';
-    return res.redirect(`/eventos/${eventoId}/categorias`);
+    return req.session.save((erroSalvar) => {
+      if (erroSalvar) return next(erroSalvar);
+      return res.redirect(`/eventos/${eventoId}/categorias`);
+    });
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {
       return res.status(404).render('errors/404', {
@@ -201,7 +210,10 @@ async function excluir(req, res, next) {
       erro.statusCode === 409
     ) {
       req.session.mensagemErro = erro.message;
-      return res.redirect(`/eventos/${eventoId}/categorias`);
+      return req.session.save((erroSalvar) => {
+        if (erroSalvar) return next(erroSalvar);
+        return res.redirect(`/eventos/${eventoId}/categorias`);
+      });
     }
 
     next(erro);

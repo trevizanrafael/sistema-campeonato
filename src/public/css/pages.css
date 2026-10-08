@@ -789,6 +789,37 @@
 }
 
 /* ==========================================================
+   Tabela de resumo de pontuação por academia (sem scroll lateral)
+   ========================================================== */
+
+.table-resumo-pontuacao {
+  width: 100%;
+}
+
+.table-resumo-pontuacao th,
+.table-resumo-pontuacao td {
+  white-space: normal;
+}
+
+.table-resumo-pontuacao .col-academia {
+  width: auto;
+}
+
+.table-resumo-pontuacao .col-num {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.table-resumo-pontuacao .col-novos {
+  color: var(--color-primary, #111);
+}
+
+.table-resumo-pontuacao .col-total {
+  font-weight: 700;
+}
+
+/* ==========================================================
    Lista de categorias compacta (critérios agrupados)
    ========================================================== */
 
@@ -1028,18 +1059,22 @@
   table.table.table-inscricoes,
   table.table.table-chaves,
   table.table.table-eventos,
+  table.table.table-resumo-pontuacao,
   table.table.table-categorias tbody,
   table.table.table-inscricoes tbody,
   table.table.table-chaves tbody,
   table.table.table-eventos tbody,
+  table.table.table-resumo-pontuacao tbody,
   table.table.table-categorias tr,
   table.table.table-inscricoes tr,
   table.table.table-chaves tr,
   table.table.table-eventos tr,
+  table.table.table-resumo-pontuacao tr,
   table.table.table-categorias td,
   table.table.table-inscricoes td,
   table.table.table-chaves td,
-  table.table.table-eventos td {
+  table.table.table-eventos td,
+  table.table.table-resumo-pontuacao td {
     display: block;
     width: 100%;
   }
@@ -1047,14 +1082,16 @@
   table.table.table-categorias thead,
   table.table.table-inscricoes thead,
   table.table.table-chaves thead,
-  table.table.table-eventos thead {
+  table.table.table-eventos thead,
+  table.table.table-resumo-pontuacao thead {
     display: none;
   }
 
   table.table.table-categorias tr,
   table.table.table-inscricoes tr,
   table.table.table-chaves tr,
-  table.table.table-eventos tr {
+  table.table.table-eventos tr,
+  table.table.table-resumo-pontuacao tr {
     padding: 14px 16px;
     border-bottom: 1px solid var(--color-border);
   }
@@ -1062,14 +1099,16 @@
   table.table.table-categorias tr:last-child,
   table.table.table-inscricoes tr:last-child,
   table.table.table-chaves tr:last-child,
-  table.table.table-eventos tr:last-child {
+  table.table.table-eventos tr:last-child,
+  table.table.table-resumo-pontuacao tr:last-child {
     border-bottom: none;
   }
 
   table.table.table-categorias td,
   table.table.table-inscricoes td,
   table.table.table-chaves td,
-  table.table.table-eventos td {
+  table.table.table-eventos td,
+  table.table.table-resumo-pontuacao td {
     position: relative;
     padding: 4px 0;
     border: none;
@@ -1194,6 +1233,42 @@
 
   .categoria-conflito-detalhe {
     max-width: none;
+  }
+
+  /* Resumo de pontuação por academia (mobile) */
+  table.table.table-resumo-pontuacao td.col-academia {
+    font-size: 16px;
+    font-weight: 700;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 6px;
+  }
+
+  table.table.table-resumo-pontuacao td.col-num {
+    padding-left: 175px;
+    min-height: 26px;
+    text-align: left;
+  }
+
+  table.table.table-resumo-pontuacao td.col-num::before {
+    content: attr(data-label);
+    position: absolute;
+    top: 4px;
+    left: 0;
+    width: 165px;
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  table.table.table-resumo-pontuacao td.col-total {
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--color-border);
+    font-size: 15px;
+    font-weight: 700;
   }
 }
 

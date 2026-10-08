@@ -68,32 +68,36 @@
 
             <% if (resumoEquipes && resumoEquipes.length > 0) { %>
               <div class="table-container">
-                <table class="table">
+                <table class="table table-resumo-pontuacao">
                   <thead>
                     <tr>
-                      <th>Academia</th>
-                      <th style="text-align: right;">Pontos anteriores</th>
-                      <th style="text-align: right;">Vitórias nesta chave</th>
-                      <th style="text-align: right;">Pódio</th>
-                      <th style="text-align: right;">Novos pontos</th>
-                      <th style="text-align: right;">Total após finalizar</th>
+                      <th class="col-academia">Academia</th>
+                      <th class="col-num">Anterior</th>
+                      <th class="col-num">Vitórias</th>
+                      <th class="col-num">Pódio</th>
+                      <th class="col-num">+ Novos</th>
+                      <th class="col-num">Total Final</th>
                     </tr>
                   </thead>
                   <tbody>
                     <% resumoEquipes.forEach((equipe) => { %>
                       <tr>
-                        <td><strong><%= equipe.equipe_nome %></strong></td>
-                        <td style="text-align: right;"><%= equipe.pontos_atuais %></td>
-                        <td style="text-align: right;">
+                        <td class="col-academia" data-label="Academia">
+                          <strong><%= equipe.equipe_nome %></strong>
+                        </td>
+                        <td class="col-num" data-label="Pontos anteriores">
+                          <%= equipe.pontos_atuais %>
+                        </td>
+                        <td class="col-num" data-label="Vitórias nesta chave">
                           <%= equipe.pontos_vitorias > 0 ? '+' + equipe.pontos_vitorias : '-' %>
                         </td>
-                        <td style="text-align: right;">
+                        <td class="col-num" data-label="Pódio">
                           <%= equipe.pontos_colocacao > 0 ? '+' + equipe.pontos_colocacao : '-' %>
                         </td>
-                        <td style="text-align: right; color: #111;">
+                        <td class="col-num col-novos" data-label="Novos pontos">
                           <strong>+<%= equipe.novos_pontos %></strong>
                         </td>
-                        <td style="text-align: right;">
+                        <td class="col-num col-total" data-label="Total final">
                           <strong><%= equipe.total_apos %></strong>
                         </td>
                       </tr>
