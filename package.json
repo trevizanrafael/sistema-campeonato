@@ -8,6 +8,17 @@
     "migrate": "node src/config/migrate.js",
     "create-admin": "node scripts/createAdmin.js",
     "db:setup": "npm run migrate && npm run create-admin",
+    "demo": "node demo/gravar.js",
+    "demo:tour": "node demo/gravar.js tour",
+    "demo:login": "node demo/gravar.js login",
+    "demo:campeonato": "node demo/gravar.js campeonato",
+    "demo:documento": "node demo/gravar.js documento",
+    "demo:manual": "node demo/gravar.js manual",
+    "demo:pontuacao": "node demo/gravar.js pontuacao",
+    "demo:chaves": "node demo/gravar.js chaves",
+    "demo:lutas": "node demo/gravar.js lutas",
+    "demo:ranking": "node demo/gravar.js ranking",
+    "demo:seed": "node demo/seed.js",
     "test:eventos": "node scripts/test-phase5.js",
     "test:faixas": "node scripts/test-phase6.js",
     "test:equipes": "node scripts/test-phase7.js",
@@ -49,5 +60,8 @@
     "helmet": "^8.3.0",
     "multer": "^2.4.0",
     "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.0"
   }
 }
