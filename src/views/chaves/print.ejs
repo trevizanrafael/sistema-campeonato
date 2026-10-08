@@ -707,78 +707,77 @@
           });
         }
       %>
-        <div class="bracket-outer">
-          <div class="print-bracket" id="bracket" data-round-count="<%= rodadas.length %>">
-            <svg class="bracket-connections" id="bracketConnections" aria-hidden="true"></svg>
+      <div class="bracket-outer">
+        <div class="print-bracket" id="bracket" data-round-count="<%= rodadas.length %>">
+          <svg class="bracket-connections" id="bracketConnections" aria-hidden="true"></svg>
 
-            <% rodadas.forEach(function(rodada) { %>
-              <section class="bracket-round">
-                <div class="bracket-round-header">
-                  <%= rodada.nome %>
-                </div>
+          <% rodadas.forEach(function(rodada) { %>
+            <section class="bracket-round">
+              <div class="bracket-round-header">
+                <%= rodada.nome %>
+              </div>
 
-                <div class="bracket-matches-col">
-                  <% rodada.lutas.forEach(function(luta) { %>
-                    <article class="print-match-card" id="match-<%= luta.id %>" data-match-id="<%= luta.id %>"
-                      data-next-match-id="<%= luta.proxima_luta_id || '' %>">
-                      <div class="print-match-header">
-                        <span>LUTA #<%= luta.posicao %></span>
-                        <% if (comResultado && luta.status === 'FINALIZADA') { %>
-                          <span class="match-tag-status">
-                            <%= luta.tipo_resultado ? luta.tipo_resultado : 'Finalizada' %>
-                          </span>
+              <div class="bracket-matches-col">
+                <% rodada.lutas.forEach(function(luta) { %>
+                  <article class="print-match-card" id="match-<%= luta.id %>" data-match-id="<%= luta.id %>" data-next-match-id="<%= luta.proxima_luta_id || '' %>">
+                    <div class="print-match-header">
+                      <span>LUTA #<%= luta.posicao %></span>
+                      <% if (comResultado && luta.status === 'FINALIZADA') { %>
+                        <span class="match-tag-status">
+                          <%= luta.tipo_resultado ? luta.tipo_resultado : 'Finalizada' %>
+                        </span>
+                      <% } %>
+                    </div>
+
+                    <!-- Competidor 1 -->
+                    <%
+                      const mostrarSlot1 = comResultado || rodada.numero === 1;
+                      const c1Vencedor = comResultado && Boolean(luta.competidor1 && luta.competidor1.vencedor);
+                      const numAtleta1 = (!comResultado && luta.competidor1) ? numeroPorAtleta.get(luta.competidor1.id || luta.competidor1.nome) : null;
+                    %>
+                    <div class="print-competitor-row <%= c1Vencedor ? 'is-winner' : '' %>">
+                      <div class="competitor-info">
+                        <% if (!mostrarSlot1) { %>
+                          <div class="competitor-blank-line"></div>
+                        <% } else if (luta.competidor1.tipo === 'COMPETIDOR') { %>
+                          <span class="competitor-name"><%= numAtleta1 ? `${numAtleta1}. ` : '' %><%= luta.competidor1.nome %></span>
+                          <span class="competitor-team"><%= luta.competidor1.equipe || 'Sem academia' %></span>
+                        <% } else if (luta.competidor1.tipo === 'BYE') { %>
+                          <span class="competitor-bye">[ AVANÇO POR BYE ]</span>
+                        <% } else { %>
+                          <div class="competitor-blank-line"></div>
                         <% } %>
                       </div>
 
-                      <!-- Competidor 1 -->
-                      <%
-                        const mostrarSlot1 = comResultado || rodada.numero === 1;
-                        const c1Vencedor = comResultado && Boolean(luta.competidor1 && luta.competidor1.vencedor);
-                        const numAtleta1 = (!comResultado && luta.competidor1) ? numeroPorAtleta.get(luta.competidor1.id || luta.competidor1.nome) : null;
-                      %>
-                      <div class="print-competitor-row <%= c1Vencedor ? 'is-winner' : '' %>">
-                        <div class="competitor-info">
-                          <% if (!mostrarSlot1) { %>
-                            <div class="competitor-blank-line"></div>
-                          <% } else if (luta.competidor1.tipo === 'COMPETIDOR') { %>
-                            <span class="competitor-name"><%= numAtleta1 ? `${numAtleta1}. ` : '' %><%= luta.competidor1.nome %></span>
-                            <span class="competitor-team"><%= luta.competidor1.equipe || 'Sem academia' %></span>
-                          <% } else if (luta.competidor1.tipo === 'BYE') { %>
-                            <span class="competitor-bye">[ AVANÇO POR BYE ]</span>
-                          <% } else { %>
-                            <div class="competitor-blank-line"></div>
-                          <% } %>
-                        </div>
+                      <% if (c1Vencedor) { %>
+                        <span class="badge-vencedor">Vencedor</span>
+                      <% } %>
+                    </div>
 
-                        <% if (c1Vencedor) { %>
-                          <span class="badge-vencedor">Vencedor</span>
+                    <!-- Competidor 2 -->
+                    <%
+                      const mostrarSlot2 = comResultado || rodada.numero === 1;
+                      const c2Vencedor = comResultado && Boolean(luta.competidor2 && luta.competidor2.vencedor);
+                      const numAtleta2 = (!comResultado && luta.competidor2) ? numeroPorAtleta.get(luta.competidor2.id || luta.competidor2.nome) : null;
+                    %>
+                    <div class="print-competitor-row <%= c2Vencedor ? 'is-winner' : '' %>">
+                      <div class="competitor-info">
+                        <% if (!mostrarSlot2) { %>
+                          <div class="competitor-blank-line"></div>
+                        <% } else if (luta.competidor2.tipo === 'COMPETIDOR') { %>
+                          <span class="competitor-name"><%= numAtleta2 ? `${numAtleta2}. ` : '' %><%= luta.competidor2.nome %></span>
+                          <span class="competitor-team"><%= luta.competidor2.equipe || 'Sem academia' %></span>
+                        <% } else if (luta.competidor2.tipo === 'BYE') { %>
+                          <span class="competitor-bye">[ AVANÇO POR BYE ]</span>
+                        <% } else { %>
+                          <div class="competitor-blank-line"></div>
                         <% } %>
                       </div>
 
-                      <!-- Competidor 2 -->
-                      <%
-                        const mostrarSlot2 = comResultado || rodada.numero === 1;
-                        const c2Vencedor = comResultado && Boolean(luta.competidor2 && luta.competidor2.vencedor);
-                        const numAtleta2 = (!comResultado && luta.competidor2) ? numeroPorAtleta.get(luta.competidor2.id || luta.competidor2.nome) : null;
-                      %>
-                      <div class="print-competitor-row <%= c2Vencedor ? 'is-winner' : '' %>">
-                        <div class="competitor-info">
-                          <% if (!mostrarSlot2) { %>
-                            <div class="competitor-blank-line"></div>
-                          <% } else if (luta.competidor2.tipo === 'COMPETIDOR') { %>
-                            <span class="competitor-name"><%= numAtleta2 ? `${numAtleta2}. ` : '' %><%= luta.competidor2.nome %></span>
-                            <span class="competitor-team"><%= luta.competidor2.equipe || 'Sem academia' %></span>
-                          <% } else if (luta.competidor2.tipo === 'BYE') { %>
-                            <span class="competitor-bye">[ AVANÇO POR BYE ]</span>
-                          <% } else { %>
-                            <div class="competitor-blank-line"></div>
-                          <% } %>
-                        </div>
-
-                        <% if (c2Vencedor) { %>
-                          <span class="badge-vencedor">Vencedor</span>
-                        <% } %>
-                      </div>
+                      <% if (c2Vencedor) { %>
+                        <span class="badge-vencedor">Vencedor</span>
+                      <% } %>
+                    </div>
                     </article>
                     <% }); %>
                 </div>

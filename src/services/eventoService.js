@@ -282,9 +282,19 @@ async function montarPainel(id, pode = () => true) {
       permissao: 'chaves.visualizar',
       icone: 'chaves',
       titulo: 'Chaves',
-      resumo: p.lutas_total > 0
-        ? `${plural(p.chaves_total, 'chave', 'chaves')} · ${p.lutas_finalizadas}/${p.lutas_total} lutas`
-        : plural(p.chaves_total, 'chave', 'chaves'),
+      resumo: (() => {
+        let textoChaves;
+        if (p.chaves_rapidas > 0 && p.chaves_normais > 0) {
+          textoChaves = `${plural(p.chaves_total, 'chave', 'chaves')} (${p.chaves_normais} ${p.chaves_normais === 1 ? 'normal' : 'normais'}, ${p.chaves_rapidas} ${p.chaves_rapidas === 1 ? 'rápida' : 'rápidas'})`;
+        } else if (p.chaves_rapidas > 0 && p.chaves_normais === 0) {
+          textoChaves = plural(p.chaves_total, 'chave rápida', 'chaves rápidas');
+        } else {
+          textoChaves = plural(p.chaves_total, 'chave', 'chaves');
+        }
+        return p.lutas_total > 0
+          ? `${textoChaves} · ${p.lutas_finalizadas}/${p.lutas_total} lutas`
+          : textoChaves;
+      })(),
       path: '/chaves',
     },
     {
