@@ -19,10 +19,6 @@
         <div class="page-header">
           <div>
             <%- include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: chaveRapida.nome }] }) %>
-            <a href="/eventos/<%= evento.id %>/chaves" class="botao-voltar-mobile" id="botaoVoltarChaves">
-              <%- include("../partials/icone", { nome: 'voltar' }) %>
-              Voltar para chaves
-            </a>
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
               <h1 class="page-title"><%= chaveRapida.nome %></h1>
               <span class="badge badge-warning" style="font-weight: 700;">Chave Rápida</span>
@@ -44,6 +40,16 @@
           </div>
 
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a
+              href="/eventos/<%= evento.id %>/chaves"
+              class="button button-outline"
+              id="btnVoltarChavesRapida"
+              title="Voltar para a listagem de chaves"
+            >
+              <%- include("../partials/icone", { nome: 'voltar' }) %>
+              Voltar para as chaves
+            </a>
+
             <% if (chaveRapida.chave_id) { %>
               <a href="/eventos/<%= evento.id %>/chaves/<%= chaveRapida.chave_id %>" class="button button-primary">
                 Abrir Chave de Lutas

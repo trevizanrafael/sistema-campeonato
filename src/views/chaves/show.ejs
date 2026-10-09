@@ -18,10 +18,6 @@
         <div class="page-header">
           <div>
             <%- include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: categoria ? categoria.nome : chave.nome }] }) %>
-            <a href="/eventos/<%= evento.id %>/chaves" class="botao-voltar-mobile" id="botaoVoltarChaves">
-              <%- include("../partials/icone", { nome: 'voltar' }) %>
-              Voltar para chaves
-            </a>
             <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
               <h1 class="page-title"><%= categoria ? categoria.nome : chave.nome %></h1>
               <% if (chave.chave_rapida_id) { %>
@@ -41,6 +37,16 @@
           </div>
 
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a
+              href="/eventos/<%= evento.id %>/chaves"
+              class="button button-outline"
+              id="btnVoltarChaves"
+              title="Voltar para a listagem de chaves"
+            >
+              <%- include("../partials/icone", { nome: 'voltar' }) %>
+              Voltar para as chaves
+            </a>
+
             <% if (chave.status === 'FINALIZADA') { %>
               <button
                 type="button"
@@ -263,12 +269,6 @@
 
                         <!-- Competidor 1 -->
                         <div class="match-competitor <%= luta.competidor1.vencedor ? 'winner' : '' %> <%= luta.competidor1.tipo !== 'COMPETIDOR' ? 'placeholder' : '' %>">
-                          <% if (luta.competidor1.seed) { %>
-                            <span class="competitor-seed" title="Seed <%= luta.competidor1.seed %>">
-                              <%= luta.competidor1.seed %>
-                            </span>
-                          <% } %>
-
                           <div class="competitor-info">
                             <strong><%= luta.competidor1.nome %></strong>
                             <% if (luta.competidor1.equipe) { %>
@@ -283,12 +283,6 @@
 
                         <!-- Competidor 2 -->
                         <div class="match-competitor <%= luta.competidor2.vencedor ? 'winner' : '' %> <%= luta.competidor2.tipo !== 'COMPETIDOR' ? 'placeholder' : '' %>">
-                          <% if (luta.competidor2.seed) { %>
-                            <span class="competitor-seed" title="Seed <%= luta.competidor2.seed %>">
-                              <%= luta.competidor2.seed %>
-                            </span>
-                          <% } %>
-
                           <div class="competitor-info">
                             <strong><%= luta.competidor2.nome %></strong>
                             <% if (luta.competidor2.equipe) { %>
