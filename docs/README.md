@@ -14,6 +14,7 @@ Documentação técnica do banco de dados e regras de negócio.
 | [logica-pontuacao.md](logica-pontuacao.md) | Sistema de pontuação e ranking |
 | [migrations.md](migrations.md) | Como rodar migrations e seeds |
 | [regras-validacao.md](regras-validacao.md) | O que valida no banco vs. Node.js |
+| [manual-sobrevivencia-lightsail.md](manual-sobrevivencia-lightsail.md) | Guia de infraestrutura na AWS Lightsail, dimensionamento e armadilhas do público aberto |
 
 ## Estrutura do Projeto
 
