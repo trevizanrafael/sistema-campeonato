@@ -25,6 +25,7 @@ async function autenticar(email, senha) {
     id: usuario.id,
     nome: usuario.nome,
     email: usuario.email,
+    cargo: usuario.cargo,
   };
 }
 

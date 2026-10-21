@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
       titulo: "Escolher Categoria - " + evento.nome
@@ -16,15 +16,11 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos/<%= evento.id %>/inscricoes" class="button button-small button-outline">
-                &larr; Voltar para inscricoes
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Inscrições', path: '/inscricoes' }, { label: 'Escolher categoria' }] }) %>
 
             <h1 class="page-title">Escolha a categoria do competidor</h1>
             <p class="page-subtitle">
-              Foram encontradas multiplas categorias compativeis com os dados de <strong><%= inscricao.nome %></strong> (<%= inscricao.idade %> anos, <%= inscricao.peso %> kg, <%= formatarSexo(inscricao.sexo) %>).
+              Foram encontradas múltiplas categorias compatíveis com os dados de <strong><%= inscricao.nome %></strong> (<%= inscricao.idade %> anos, <%= inscricao.peso %> kg, <%= formatarSexo(inscricao.sexo) %>).
             </p>
           </div>
         </div>
@@ -52,7 +48,7 @@
               <input type="hidden" name="categoria_confirmada" value="1">
 
               <p style="margin-bottom: 16px; font-weight: 500;">
-                Selecione em qual das categorias compativeis o competidor devera ser inscrito:
+                Selecione em qual das categorias compatíveis o competidor deverá ser inscrito:
               </p>
 
               <div class="category-selection-list">
@@ -79,6 +75,11 @@
                         <%= formatarIntervaloFaixa(categoria) %> &middot;
                         <%= formatarSexo(categoria.sexo) %>
                       </span>
+                      <% if (categoria.chave_status === 'NAO_INICIADA') { %>
+                        <span style="display: block; margin-top: 6px; font-size: 0.8rem; font-weight: 600; color: #78350f;">
+                          Chave já gerada: será preciso sortear novamente para incluir o atleta.
+                        </span>
+                      <% } %>
                     </div>
                   </label>
                 <% }) %>

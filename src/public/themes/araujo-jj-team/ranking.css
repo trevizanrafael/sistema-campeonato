@@ -1,0 +1,85 @@
+/* ==========================================================================
+   RANKING — IDENTIDADE ARAÚJO JJ TEAM
+   Visual limpo, medalhas nítidas, informativo e de fácil leitura
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .ranking-table-container {
+  background: var(--ajj-white);
+  border: 1px solid var(--ajj-border);
+  border-radius: var(--radius-medium);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+/* Primeira Equipe (Campeã) */
+[data-theme="araujo-jj-team"] .ranking-row-first,
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child {
+  background: #fefce8 !important;
+  font-weight: 600;
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child td {
+  border-bottom: 1px solid #fef08a;
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child .ranking-posicao {
+  font-size: 1.15rem;
+  color: #ca8a04;
+  font-weight: 800;
+}
+
+[data-theme="araujo-jj-team"] .ranking-table tbody tr:first-child a {
+  color: #0f172a !important;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: #ca8a04;
+}
+
+/* Destaque para Coluna de Pontos */
+[data-theme="araujo-jj-team"] .ranking-pontos-total {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ajj-red);
+}
+
+/* Badges de Medalhas */
+[data-theme="araujo-jj-team"] .medal-gold {
+  color: #ca8a04;
+  font-weight: 700;
+}
+
+[data-theme="araujo-jj-team"] .medal-silver {
+  color: #64748b;
+  font-weight: 700;
+}
+
+[data-theme="araujo-jj-team"] .medal-bronze {
+  color: #b45309;
+  font-weight: 700;
+}
+
+/* Extrato da Equipe */
+[data-theme="araujo-jj-team"] .team-stat-card {
+  background: var(--ajj-white);
+  border: 1px solid var(--ajj-border);
+  border-radius: var(--radius-medium);
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="araujo-jj-team"] .team-stat-card.stat-primary {
+  border-left: 4px solid var(--ajj-red);
+}
+
+[data-theme="araujo-jj-team"] .team-stat-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--ajj-text);
+  margin-top: 4px;
+}
+
+[data-theme="araujo-jj-team"] .team-stat-card.stat-primary .team-stat-value {
+  color: var(--ajj-red);
+}

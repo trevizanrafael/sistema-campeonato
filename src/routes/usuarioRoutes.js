@@ -1,12 +1,12 @@
 const express = require('express');
 const usuarioController = require('../controllers/usuarioController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const { exigirAutenticacao, exigirPermissao } = require('../middlewares/authMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 const router = express.Router();
 
-// Todas as rotas exigem autenticação
-router.use(exigirAutenticacao);
+// Todas as rotas exigem autenticação e cargo de Administrador
+router.use(exigirAutenticacao, exigirPermissao('usuarios.gerenciar'));
 
 // Listagem
 router.get('/', usuarioController.listar);

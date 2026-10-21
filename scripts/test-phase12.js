@@ -285,7 +285,7 @@ async function runTests() {
 
   // Dados dos competidores, seeds e byes
   assert(chaveHtml.includes('Campeao Seed Um'), 'Exibe nome do competidor');
-  assert(chaveHtml.includes('class="competitor-seed"'), 'Exibe badge de seed');
+  assert(!chaveHtml.includes('class="competitor-seed"'), 'Badge de seed não é exibido nos cards da chave');
   assert(chaveHtml.includes('BYE'), 'Exibe slot de avanço livre BYE');
   assert(chaveHtml.includes('Aguardando'), 'Exibe slot futuro Aguardando');
 

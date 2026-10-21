@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
       titulo: "Nova categoria - " + evento.nome
@@ -16,15 +16,11 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos/<%= evento.id %>/categorias" class="button button-small button-outline">
-                &larr; Voltar para categorias
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Categorias', path: '/categorias' }, { label: 'Nova categoria' }] }) %>
 
             <h1 class="page-title">Nova categoria</h1>
             <p class="page-subtitle">
-              Evento: <%= evento.nome %>
+              Campeonato: <%= evento.nome %>
             </p>
           </div>
         </div>

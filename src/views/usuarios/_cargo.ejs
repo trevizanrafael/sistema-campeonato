@@ -1,0 +1,39 @@
+<%#
+  Seletor de cargo (radio cards).
+  Espera: dados.cargo, e opcionalmente bloqueado (boolean) + motivoBloqueio (string).
+%>
+<% const cargoAtual = (dados && dados.cargo) || 'OPERADOR'; %>
+<% const travado = typeof bloqueado !== 'undefined' && bloqueado; %>
+
+<fieldset class="form-group cargo-picker">
+  <legend class="form-label">Cargo</legend>
+
+  <div class="cargo-options">
+    <% Object.keys(CARGOS_INFO).forEach(function(codigo) { %>
+      <% const info = CARGOS_INFO[codigo]; %>
+      <label class="cargo-option <%= cargoAtual === codigo ? 'is-selected' : '' %> <%= travado ? 'is-disabled' : '' %>" for="cargo_<%= codigo %>">
+        <input
+          type="radio"
+          id="cargo_<%= codigo %>"
+          name="cargo"
+          value="<%= codigo %>"
+          <%= cargoAtual === codigo ? 'checked' : '' %>
+          <%= travado ? 'disabled' : '' %>
+          required
+        >
+        <span class="cargo-option__body">
+          <span class="cargo-option__title">
+            <span class="badge badge-cargo badge-cargo--<%= codigo.toLowerCase() %>"><%= info.nome %></span>
+          </span>
+          <span class="cargo-option__desc"><%= info.descricao %></span>
+        </span>
+      </label>
+    <% }); %>
+  </div>
+
+  <% if (travado) { %>
+    <%# Campo desabilitado não é enviado: reenviamos o valor atual %>
+    <input type="hidden" name="cargo" value="<%= cargoAtual %>">
+    <p class="form-hint"><%= typeof motivoBloqueio !== 'undefined' ? motivoBloqueio : '' %></p>
+  <% } %>
+</fieldset>

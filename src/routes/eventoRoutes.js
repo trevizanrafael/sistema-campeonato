@@ -1,19 +1,31 @@
 const express = require('express');
 const eventoController = require('../controllers/eventoController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const {
+  exigirAutenticacao,
+  exigirPermissao,
+  registrarUltimoEvento,
+} = require('../middlewares/authMiddleware');
+const { carregarContextoEvento } = require('../middlewares/eventoContextoMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 const router = express.Router();
 
 router.use(exigirAutenticacao);
 
-router.get('/', eventoController.listar);
-router.get('/novo', eventoController.mostrarCadastro);
-router.post('/', csrfProtection, eventoController.cadastrar);
+const podeVer = exigirPermissao('eventos.visualizar');
+const podeGerenciar = exigirPermissao('eventos.gerenciar');
 
-router.get('/:id/editar', eventoController.mostrarEdicao);
-router.post('/:id', csrfProtection, eventoController.editar);
-router.post('/:id/excluir', csrfProtection, eventoController.excluir);
+router.get('/', podeVer, eventoController.listar);
+router.get('/novo', podeGerenciar, eventoController.mostrarCadastro);
+router.post('/', podeGerenciar, csrfProtection, eventoController.cadastrar);
+
+// Memoriza o último campeonato aberto e carrega o contexto (menu lateral/trilha)
+// para qualquer rota /eventos/:id/...
+router.use('/:eventoId', registrarUltimoEvento, carregarContextoEvento);
+
+router.get('/:id/editar', podeGerenciar, eventoController.mostrarEdicao);
+router.post('/:id', podeGerenciar, csrfProtection, eventoController.editar);
+router.post('/:id/excluir', podeGerenciar, csrfProtection, eventoController.excluir);
 
 const categoriaRoutes = require('./categoriaRoutes');
 const inscricaoRoutes = require('./inscricaoRoutes');
@@ -25,9 +37,13 @@ router.use('/:eventoId/categorias', categoriaRoutes);
 router.use('/:eventoId/inscricoes', inscricaoRoutes);
 
 const chaveRoutes = require('./chaveRoutes');
+const chaveRapidaRoutes = require('./chaveRapidaRoutes');
 
 // Rotas aninhadas de chaves e sorteios (Fase 11)
 router.use('/:eventoId', chaveRoutes);
+
+// Rotas aninhadas de chaves rápidas
+router.use('/:eventoId/chaves-rapidas', chaveRapidaRoutes);
 
 const rankingRoutes = require('./rankingRoutes');
 
@@ -39,6 +55,11 @@ const pontuacaoRoutes = require('./pontuacaoRoutes');
 // Rotas aninhadas de pontuação (Fase 10)
 router.use('/:eventoId/pontuacao', pontuacaoRoutes);
 
-router.get('/:id', eventoController.visualizar);
+const auditoriaRoutes = require('./auditoriaRoutes');
+
+// Rotas aninhadas de auditoria (Fase 18)
+router.use('/:eventoId/auditoria', auditoriaRoutes);
+
+router.get('/:id', podeVer, eventoController.visualizar);
 
 module.exports = router;

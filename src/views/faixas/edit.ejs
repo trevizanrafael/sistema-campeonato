@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
       titulo: titulo || "Editar faixa"
@@ -41,7 +41,7 @@
                 </a>
 
                 <button type="submit" class="button button-primary">
-                  Salvar alteracoes
+                  Salvar alterações
                 </button>
               </div>
             </form>

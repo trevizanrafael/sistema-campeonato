@@ -135,6 +135,18 @@ async function buscarPontosVitoriaPorChave(chaveId, client = null) {
   return rows;
 }
 
+async function buscarPorChave(chaveId, client = null) {
+  const db = client || pool;
+  const sql = `
+    SELECT *
+    FROM pontos_equipes
+    WHERE chave_id = $1
+    ORDER BY id ASC;
+  `;
+  const { rows } = await db.query(sql, [chaveId]);
+  return rows;
+}
+
 async function excluirPontosColocacaoPorChave(chaveId, client) {
   const db = client || pool;
   const sql = `
@@ -155,5 +167,6 @@ module.exports = {
   criarPontoColocacao,
   buscarPontosAtuaisPorEvento,
   buscarPontosVitoriaPorChave,
+  buscarPorChave,
   excluirPontosColocacaoPorChave,
 };

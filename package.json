@@ -4,10 +4,23 @@
   "description": "Seguinte vou fazer um sistema de controle de campeonato de JIUJITSU",
   "main": "src/app.js",
   "scripts": {
-    "dev": "node --watch src/app.js",
+    "start": "node src/app.js",
+    "dev": "node --watch --watch-path=src --watch-path=.env src/app.js",
     "migrate": "node src/config/migrate.js",
     "create-admin": "node scripts/createAdmin.js",
     "db:setup": "npm run migrate && npm run create-admin",
+    "simular": "node scripts/simularCampeonato.js",
+    "demo": "node demo/gravar.js",
+    "demo:tour": "node demo/gravar.js tour",
+    "demo:login": "node demo/gravar.js login",
+    "demo:campeonato": "node demo/gravar.js campeonato",
+    "demo:documento": "node demo/gravar.js documento",
+    "demo:manual": "node demo/gravar.js manual",
+    "demo:pontuacao": "node demo/gravar.js pontuacao",
+    "demo:chaves": "node demo/gravar.js chaves",
+    "demo:lutas": "node demo/gravar.js lutas",
+    "demo:ranking": "node demo/gravar.js ranking",
+    "demo:seed": "node demo/seed.js",
     "test:eventos": "node scripts/test-phase5.js",
     "test:faixas": "node scripts/test-phase6.js",
     "test:equipes": "node scripts/test-phase7.js",
@@ -20,6 +33,7 @@
     "test:correcao": "node scripts/test-phase14.js",
     "test:finalizacao": "node scripts/test-phase15.js",
     "test:ranking": "node scripts/test-phase17.js",
+    "test:integridade": "node scripts/check-integrity.js",
     "test": "node scripts/test-phase5.js && node scripts/test-phase6.js && node scripts/test-phase7.js && node scripts/test-phase8.js && node scripts/test-phase9.js && node scripts/test-phase10.js && node scripts/test-phase11.js && node scripts/test-phase12.js && node scripts/test-phase13.js && node scripts/test-phase14.js && node scripts/test-phase15.js && node scripts/test-phase17.js"
   },
   "repository": {
@@ -40,11 +54,16 @@
     "csrf-sync": "^4.2.1",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
+    "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "express-ejs-layouts": "^2.5.1",
     "express-rate-limit": "^8.7.0",
     "express-session": "^1.19.0",
     "helmet": "^8.3.0",
+    "multer": "^2.4.0",
     "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.64.0"
   }
 }

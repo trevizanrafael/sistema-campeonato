@@ -134,7 +134,7 @@ async function buscarVisualizacao(eventoId, chaveId) {
   return {
     evento: {
       id: chave.evento_id,
-      nome: chave.evento_nome || 'Evento',
+      nome: chave.evento_nome || 'Campeonato',
     },
     categoria: {
       id: chave.categoria_id,

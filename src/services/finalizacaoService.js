@@ -1,9 +1,11 @@
 const pool = require('../config/database');
 const chaveRepository = require('../repositories/chaveRepository');
+const chaveRapidaRepository = require('../repositories/chaveRapidaRepository');
 const lutaRepository = require('../repositories/lutaRepository');
 const pontoEquipeRepository = require('../repositories/pontoEquipeRepository');
 const regraPontuacaoRepository = require('../repositories/regraPontuacaoRepository');
 const { NotFoundError, RegraNegocioError } = require('../utils/errors');
+const auditoriaService = require('./auditoriaService');
 
 /**
  * Serviço responsável pelo encerramento de categorias,
@@ -184,7 +186,7 @@ async function calcularResumoEquipes(eventoId, chaveIdOrPodio, podioOrClient, ma
 
     listaResumo.push({
       equipe_id: Number(key),
-      equipe_nome: nomesEquipesMap.get(key) || `Equipe #${key}`,
+      equipe_nome: nomesEquipesMap.get(key) || `Academia #${key}`,
       pontos_atuais: pontos_anteriores,
       pontos_vitorias,
       pontos_colocacao,
@@ -243,7 +245,7 @@ async function calcularPreview(eventoId, chaveId) {
   return {
     evento: {
       id: chave.evento_id,
-      nome: chave.evento_nome || 'Evento',
+      nome: chave.evento_nome || 'Campeonato',
     },
     categoria: {
       id: chave.categoria_id,
@@ -255,7 +257,7 @@ async function calcularPreview(eventoId, chaveId) {
   };
 }
 
-async function finalizarCategoria(eventoId, chaveId) {
+async function finalizarCategoria(eventoId, chaveId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -307,8 +309,8 @@ async function finalizarCategoria(eventoId, chaveId) {
     // 5. Recalcular pódio dentro da transação
     const podio = await calcularPodio(chave, finalLuta, client);
 
-    // 6. Criar pontos de colocação se pontos > 0
-    if (podio.primeiro.pontos > 0) {
+    // 6. Criar pontos de colocação se pontos > 0 e se competidor tiver equipe
+    if (podio.primeiro.pontos > 0 && podio.primeiro.equipe_id) {
       await pontoEquipeRepository.criarPontoColocacao(
         {
           evento_id: eventoId,
@@ -323,7 +325,7 @@ async function finalizarCategoria(eventoId, chaveId) {
       );
     }
 
-    if (podio.segundo.pontos > 0) {
+    if (podio.segundo.pontos > 0 && podio.segundo.equipe_id) {
       await pontoEquipeRepository.criarPontoColocacao(
         {
           evento_id: eventoId,
@@ -338,7 +340,7 @@ async function finalizarCategoria(eventoId, chaveId) {
       );
     }
 
-    if (podio.terceiro && podio.terceiro.pontos > 0) {
+    if (podio.terceiro && podio.terceiro.pontos > 0 && podio.terceiro.equipe_id) {
       await pontoEquipeRepository.criarPontoColocacao(
         {
           evento_id: eventoId,
@@ -364,6 +366,31 @@ async function finalizarCategoria(eventoId, chaveId) {
       client
     );
 
+    if (chave.chave_rapida_id) {
+      await chaveRapidaRepository.atualizarStatus(chave.chave_rapida_id, 'FINALIZADA', client);
+    }
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'CATEGORIA_FINALIZADA',
+      entidade: 'CHAVE',
+      entidadeId: chaveId,
+      descricao: `Categoria "${chave.categoria_nome}" finalizada.`,
+      dadosAnteriores: {
+        status: chave.status,
+      },
+      dadosNovos: {
+        status: 'FINALIZADA',
+        podio: {
+          primeiro: podio.primeiro,
+          segundo: podio.segundo,
+          terceiro: podio.terceiro,
+        },
+      },
+      client,
+    });
+
     await client.query('COMMIT');
     return { chave: chaveFinalizada, podio };
   } catch (error) {
@@ -374,7 +401,7 @@ async function finalizarCategoria(eventoId, chaveId) {
   }
 }
 
-async function reabrirCategoria(eventoId, chaveId) {
+async function reabrirCategoria(eventoId, chaveId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -404,6 +431,32 @@ async function reabrirCategoria(eventoId, chaveId) {
       chaveId,
       client
     );
+
+    if (chave.chave_rapida_id) {
+      await chaveRapidaRepository.atualizarStatus(chave.chave_rapida_id, 'EM_ANDAMENTO', client);
+    }
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'CATEGORIA_REABERTA',
+      entidade: 'CHAVE',
+      entidadeId: chaveId,
+      descricao: `Categoria "${chave.categoria_nome}" reaberta.`,
+      dadosAnteriores: {
+        status: chave.status,
+        primeiro_lugar_id: chave.primeiro_lugar_id,
+        segundo_lugar_id: chave.segundo_lugar_id,
+        terceiro_lugar_id: chave.terceiro_lugar_id,
+      },
+      dadosNovos: {
+        status: 'EM_ANDAMENTO',
+        primeiro_lugar_id: null,
+        segundo_lugar_id: null,
+        terceiro_lugar_id: null,
+      },
+      client,
+    });
 
     await client.query('COMMIT');
     return { chave: chaveReaberta };

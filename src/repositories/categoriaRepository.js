@@ -27,6 +27,7 @@ async function listarPorEvento(eventoId, client = pool) {
 
         COUNT(DISTINCT i.id)::INTEGER AS total_inscricoes,
         COUNT(DISTINCT ch.id)::INTEGER AS total_chaves,
+        MAX(ch.status) AS chave_status,
 
         c.created_at,
         c.updated_at

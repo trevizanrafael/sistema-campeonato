@@ -46,13 +46,15 @@ async function mostrarFormulario(req, res, next) {
 
 async function salvar(req, res, next) {
   const { eventoId, chaveId, lutaId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
     const { luta, proximaLutaId } = await resultadoService.lancarResultado(
       eventoId,
       chaveId,
       lutaId,
-      req.body
+      req.body,
+      usuarioId
     );
 
     req.session.mensagemSucesso = 'Resultado registrado com sucesso.';
@@ -140,13 +142,15 @@ async function mostrarEdicao(req, res, next) {
 
 async function corrigir(req, res, next) {
   const { eventoId, chaveId, lutaId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
     const { luta } = await resultadoService.corrigirResultado(
       eventoId,
       chaveId,
       lutaId,
-      req.body
+      req.body,
+      usuarioId
     );
 
     req.session.mensagemSucesso = 'Resultado corrigido com sucesso.';
@@ -192,12 +196,14 @@ async function corrigir(req, res, next) {
 
 async function anular(req, res, next) {
   const { eventoId, chaveId, lutaId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
     const { luta } = await resultadoService.anularResultado(
       eventoId,
       chaveId,
-      lutaId
+      lutaId,
+      usuarioId
     );
 
     req.session.mensagemSucesso = 'Resultado anulado com sucesso.';

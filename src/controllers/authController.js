@@ -37,9 +37,6 @@ async function entrar(req, res, next) {
       });
     }
 
-    // Captura returnTo antes de regenerar
-    const returnTo = req.session.returnTo || '/';
-
     // Regenerar sessão para prevenir fixação
     req.session.regenerate((erro) => {
       if (erro) {
@@ -52,9 +49,7 @@ async function entrar(req, res, next) {
           return next(erroSalvar);
         }
 
-        // Valida que returnTo é rota interna
-        const destino = (returnTo && returnTo.startsWith('/')) ? returnTo : '/';
-        return res.redirect(destino);
+        return res.redirect('/');
       });
     });
   } catch (erro) {
@@ -63,13 +58,18 @@ async function entrar(req, res, next) {
 }
 
 function sair(req, res, next) {
-  req.session.destroy((erro) => {
-    if (erro) {
-      return next(erro);
-    }
+  if (req.session) {
+    req.session.destroy((erro) => {
+      if (erro) {
+        return next(erro);
+      }
+      res.clearCookie('lutas.sid');
+      return res.redirect('/login');
+    });
+  } else {
     res.clearCookie('lutas.sid');
     return res.redirect('/login');
-  });
+  }
 }
 
 module.exports = {

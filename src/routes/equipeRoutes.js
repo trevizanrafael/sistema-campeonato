@@ -1,11 +1,11 @@
 const express = require('express');
 const equipeController = require('../controllers/equipeController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const { exigirAutenticacao, exigirPermissao } = require('../middlewares/authMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 const router = express.Router();
 
-router.use(exigirAutenticacao);
+router.use(exigirAutenticacao, exigirPermissao('equipes.gerenciar'));
 
 router.get('/', equipeController.listar);
 router.get('/nova', equipeController.mostrarCadastro);

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: titulo || "Editar Usuario"
+      titulo: titulo || "Editar Usuário"
     }) %>
   </head>
 
@@ -16,8 +16,8 @@
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Editar Usuario</h1>
-            <p class="page-subtitle">Atualize as informacoes do usuario.</p>
+            <h1 class="page-title">Editar Usuário</h1>
+            <p class="page-subtitle">Atualize as informações do usuário.</p>
           </div>
         </div>
 
@@ -43,6 +43,13 @@
                 <label for="email" class="form-label">E-mail</label>
                 <input type="text" id="email" name="email" class="form-control" value="<%= dados.email %>" required>
               </div>
+
+              <% const proprioUsuario = String(usuario.id) === String(usuarioLogado.id); %>
+              <%- include("_cargo", {
+                dados: dados,
+                bloqueado: proprioUsuario,
+                motivoBloqueio: "Você não pode alterar o seu próprio cargo. Peça para outro Administrador."
+              }) %>
 
               <div class="form-actions">
                 <button type="submit" class="button button-primary">Salvar</button>

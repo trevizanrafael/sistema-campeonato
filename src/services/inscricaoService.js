@@ -11,23 +11,27 @@ const {
 } = require('../validators/inscricaoValidator');
 const {
   inscricaoCompativelComCategoria,
-  buscarCategoriasCompativeis,
+  buscarCategoriasDisponiveis,
+  chaveJaIniciada,
+  avisoChaveGerada,
+  avisoChaveIniciada,
 } = require('./classificacaoService');
 const {
   NotFoundError,
   ValidationError,
   BusinessRuleError,
 } = require('../utils/errors');
+const auditoriaService = require('./auditoriaService');
 
 async function validarEventoExistente(eventoId, client = pool) {
   const validId = validarId(eventoId);
   if (!validId) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   const evento = await eventoRepository.buscarPorId(validId, client);
   if (!evento) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   return evento;
@@ -73,7 +77,7 @@ async function buscarInscricao(eventoId, inscricaoId) {
   const validInscricaoId = validarId(inscricaoId);
 
   if (!validEventoId || !validInscricaoId) {
-    throw new NotFoundError('Inscrição não encontrada neste evento.');
+    throw new NotFoundError('Inscrição não encontrada neste campeonato.');
   }
 
   await validarEventoExistente(validEventoId);
@@ -84,13 +88,113 @@ async function buscarInscricao(eventoId, inscricaoId) {
   );
 
   if (!inscricao) {
-    throw new NotFoundError('Inscrição não encontrada neste evento.');
+    throw new NotFoundError('Inscrição não encontrada neste campeonato.');
   }
 
   return inscricao;
 }
 
-async function processarCadastro(eventoId, dados) {
+async function persistirCriacaoComAuditoria(dadosInscricao, evento, usuarioId) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const inscricao = await inscricaoRepository.criar(dadosInscricao, client);
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: evento.id,
+      acao: 'INSCRICAO_CRIADA',
+      entidade: 'INSCRICAO',
+      entidadeId: inscricao.id,
+      descricao: `Inscrição "${inscricao.nome}" criada.`,
+      dadosAnteriores: null,
+      dadosNovos: {
+        nome: inscricao.nome,
+        idade: inscricao.idade,
+        peso: inscricao.peso,
+        sexo: inscricao.sexo,
+        faixa_id: inscricao.faixa_id,
+        equipe_id: inscricao.equipe_id,
+        categoria_id: inscricao.categoria_id,
+        status: inscricao.status,
+      },
+      client,
+    });
+    await client.query('COMMIT');
+    return inscricao;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function persistirEdicaoComAuditoria(
+  inscricaoAtual,
+  dadosAtualizacao,
+  eventoId,
+  usuarioId,
+  apenasNome = false
+) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    let atualizada;
+    if (apenasNome) {
+      atualizada = await inscricaoRepository.atualizarApenasNome(
+        inscricaoAtual.id,
+        inscricaoAtual.evento_id,
+        dadosAtualizacao.nome,
+        client
+      );
+    } else {
+      atualizada = await inscricaoRepository.atualizar(
+        inscricaoAtual.id,
+        eventoId,
+        dadosAtualizacao,
+        client
+      );
+    }
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'INSCRICAO_EDITADA',
+      entidade: 'INSCRICAO',
+      entidadeId: atualizada.id,
+      descricao: `Inscrição "${atualizada.nome}" editada.`,
+      dadosAnteriores: {
+        nome: inscricaoAtual.nome,
+        idade: inscricaoAtual.idade,
+        peso: inscricaoAtual.peso,
+        sexo: inscricaoAtual.sexo,
+        faixa_id: inscricaoAtual.faixa_id,
+        equipe_id: inscricaoAtual.equipe_id,
+        categoria_id: inscricaoAtual.categoria_id,
+        status: inscricaoAtual.status,
+      },
+      dadosNovos: {
+        nome: atualizada.nome,
+        idade: atualizada.idade,
+        peso: atualizada.peso,
+        sexo: atualizada.sexo,
+        faixa_id: atualizada.faixa_id,
+        equipe_id: atualizada.equipe_id,
+        categoria_id: atualizada.categoria_id,
+        status: atualizada.status,
+      },
+      client,
+    });
+    await client.query('COMMIT');
+    return atualizada;
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
+async function processarCadastro(eventoId, dados, usuarioId = null) {
   const evento = await validarEventoExistente(eventoId);
 
   const [faixas, equipes, categorias] = await Promise.all([
@@ -129,7 +233,7 @@ async function processarCadastro(eventoId, dados) {
 
     if (!categoriaEscolhida) {
       throw new ValidationError({
-        categoria_id: 'Categoria selecionada não foi encontrada neste evento.',
+        categoria_id: 'Categoria selecionada não foi encontrada neste campeonato.',
       });
     }
 
@@ -142,58 +246,80 @@ async function processarCadastro(eventoId, dados) {
       });
     }
 
-    const inscricao = await inscricaoRepository.criar({
-      ...normalizado,
-      evento_id: evento.id,
-      categoria_id: categoriaEscolhida.id,
-      status: 'CONFIRMADA',
-    });
+    if (chaveJaIniciada(categoriaEscolhida)) {
+      throw new ValidationError({
+        geral: `A chave de "${categoriaEscolhida.nome}" já começou e não aceita novos atletas. Confira os dados e cadastre novamente.`,
+      });
+    }
+
+    const inscricao = await persistirCriacaoComAuditoria(
+      {
+        ...normalizado,
+        evento_id: evento.id,
+        categoria_id: categoriaEscolhida.id,
+        status: 'CONFIRMADA',
+      },
+      evento,
+      usuarioId
+    );
 
     return {
       tipo: 'CRIADA',
       inscricao,
       categoria: categoriaEscolhida,
       mensagem: `Inscrição cadastrada e classificada em "${categoriaEscolhida.nome}".`,
+      aviso: avisoChaveGerada(categoriaEscolhida),
     };
   }
 
-  // Classificação automática padrão
-  const compativeis = buscarCategoriasCompativeis(
+  // Classificação automática padrão (ignora categorias com chave já iniciada)
+  const { disponiveis, bloqueadas } = buscarCategoriasDisponiveis(
     atletaClassificacao,
     categorias
   );
 
-  if (compativeis.length === 0) {
-    const inscricao = await inscricaoRepository.criar({
-      ...normalizado,
-      evento_id: evento.id,
-      categoria_id: null,
-      status: 'PENDENTE',
-    });
+  if (disponiveis.length === 0) {
+    const inscricao = await persistirCriacaoComAuditoria(
+      {
+        ...normalizado,
+        evento_id: evento.id,
+        categoria_id: null,
+        status: 'PENDENTE',
+      },
+      evento,
+      usuarioId
+    );
 
     return {
       tipo: 'CRIADA',
       inscricao,
       categoria: null,
-      mensagem:
-        'Inscrição cadastrada, mas nenhuma categoria compatível foi encontrada. Status definido como Pendente.',
+      mensagem: bloqueadas.length > 0
+        ? 'Inscrição cadastrada como Pendente.'
+        : 'Inscrição cadastrada, mas nenhuma categoria compatível foi encontrada. Status definido como Pendente.',
+      aviso: avisoChaveIniciada(bloqueadas),
     };
   }
 
-  if (compativeis.length === 1) {
-    const categoriaEncontrada = compativeis[0];
-    const inscricao = await inscricaoRepository.criar({
-      ...normalizado,
-      evento_id: evento.id,
-      categoria_id: categoriaEncontrada.id,
-      status: 'CONFIRMADA',
-    });
+  if (disponiveis.length === 1) {
+    const categoriaEncontrada = disponiveis[0];
+    const inscricao = await persistirCriacaoComAuditoria(
+      {
+        ...normalizado,
+        evento_id: evento.id,
+        categoria_id: categoriaEncontrada.id,
+        status: 'CONFIRMADA',
+      },
+      evento,
+      usuarioId
+    );
 
     return {
       tipo: 'CRIADA',
       inscricao,
       categoria: categoriaEncontrada,
       mensagem: `Inscrição cadastrada e classificada em "${categoriaEncontrada.nome}".`,
+      aviso: avisoChaveGerada(categoriaEncontrada),
     };
   }
 
@@ -202,11 +328,11 @@ async function processarCadastro(eventoId, dados) {
     tipo: 'ESCOLHER_CATEGORIA',
     evento,
     dados: normalizado,
-    categoriasCompativeis: compativeis,
+    categoriasCompativeis: disponiveis,
   };
 }
 
-async function processarEdicao(eventoId, inscricaoId, dados) {
+async function processarEdicao(eventoId, inscricaoId, dados, usuarioId = null) {
   const inscricaoAtual = await buscarInscricao(eventoId, inscricaoId);
 
   const emLuta = await inscricaoRepository.verificarParticipacaoEmLutas(
@@ -226,10 +352,12 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
       });
     }
 
-    const atualizada = await inscricaoRepository.atualizarApenasNome(
-      inscricaoAtual.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
+      { nome: nomeLimpo },
       inscricaoAtual.evento_id,
-      nomeLimpo
+      usuarioId,
+      true
     );
 
     return {
@@ -280,7 +408,7 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
 
     if (!categoriaEscolhida) {
       throw new ValidationError({
-        categoria_id: 'Categoria selecionada não foi encontrada neste evento.',
+        categoria_id: 'Categoria selecionada não foi encontrada neste campeonato.',
       });
     }
 
@@ -293,14 +421,21 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
       });
     }
 
-    const atualizada = await inscricaoRepository.atualizar(
-      inscricaoAtual.id,
-      evento.id,
+    if (chaveJaIniciada(categoriaEscolhida)) {
+      throw new ValidationError({
+        geral: `A chave de "${categoriaEscolhida.nome}" já começou e não aceita novos atletas. Confira os dados e salve novamente.`,
+      });
+    }
+
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
       {
         ...normalizado,
         categoria_id: categoriaEscolhida.id,
         status: 'CONFIRMADA',
-      }
+      },
+      evento.id,
+      usuarioId
     );
 
     return {
@@ -308,45 +443,50 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
       inscricao: atualizada,
       categoria: categoriaEscolhida,
       mensagem: `Inscrição atualizada e classificada em "${categoriaEscolhida.nome}".`,
+      aviso: avisoChaveGerada(categoriaEscolhida),
     };
   }
 
-  // Reclassificação automática
-  const compativeis = buscarCategoriasCompativeis(
+  // Reclassificação automática (ignora categorias com chave já iniciada)
+  const { disponiveis: compativeis, bloqueadas } = buscarCategoriasDisponiveis(
     atletaClassificacao,
     categorias
   );
 
   if (compativeis.length === 0) {
-    const atualizada = await inscricaoRepository.atualizar(
-      inscricaoAtual.id,
-      evento.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
       {
         ...normalizado,
         categoria_id: null,
         status: 'PENDENTE',
-      }
+      },
+      evento.id,
+      usuarioId
     );
 
     return {
       tipo: 'CRIADA',
       inscricao: atualizada,
       categoria: null,
-      mensagem:
-        'Inscrição atualizada, mas não há categoria compatível com os novos dados. Status definido como Pendente.',
+      mensagem: bloqueadas.length > 0
+        ? 'Inscrição atualizada como Pendente.'
+        : 'Inscrição atualizada, mas não há categoria compatível com os novos dados. Status definido como Pendente.',
+      aviso: avisoChaveIniciada(bloqueadas),
     };
   }
 
   if (compativeis.length === 1) {
     const categoriaEncontrada = compativeis[0];
-    const atualizada = await inscricaoRepository.atualizar(
-      inscricaoAtual.id,
-      evento.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
       {
         ...normalizado,
         categoria_id: categoriaEncontrada.id,
         status: 'CONFIRMADA',
-      }
+      },
+      evento.id,
+      usuarioId
     );
 
     return {
@@ -354,6 +494,7 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
       inscricao: atualizada,
       categoria: categoriaEncontrada,
       mensagem: `Inscrição atualizada e classificada em "${categoriaEncontrada.nome}".`,
+      aviso: avisoChaveGerada(categoriaEncontrada),
     };
   }
 
@@ -364,14 +505,15 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
   );
 
   if (atualAindaCompativel) {
-    const atualizada = await inscricaoRepository.atualizar(
-      inscricaoAtual.id,
-      evento.id,
+    const atualizada = await persistirEdicaoComAuditoria(
+      inscricaoAtual,
       {
         ...normalizado,
         categoria_id: atualAindaCompativel.id,
         status: 'CONFIRMADA',
-      }
+      },
+      evento.id,
+      usuarioId
     );
 
     return {
@@ -379,6 +521,7 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
       inscricao: atualizada,
       categoria: atualAindaCompativel,
       mensagem: `Inscrição atualizada e mantida na categoria "${atualAindaCompativel.nome}".`,
+      aviso: avisoChaveGerada(atualAindaCompativel),
     };
   }
 
@@ -392,7 +535,7 @@ async function processarEdicao(eventoId, inscricaoId, dados) {
   };
 }
 
-async function cancelarInscricao(eventoId, inscricaoId) {
+async function cancelarInscricao(eventoId, inscricaoId, usuarioId = null) {
   const inscricao = await buscarInscricao(eventoId, inscricaoId);
 
   const emLuta = await inscricaoRepository.verificarParticipacaoEmLutas(
@@ -404,16 +547,41 @@ async function cancelarInscricao(eventoId, inscricaoId) {
     );
   }
 
-  await inscricaoRepository.alterarStatus(
-    inscricao.id,
-    inscricao.evento_id,
-    'CANCELADA'
-  );
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-  return inscricao;
+    await inscricaoRepository.alterarStatus(
+      inscricao.id,
+      inscricao.evento_id,
+      'CANCELADA',
+      undefined,
+      client
+    );
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: inscricao.evento_id,
+      acao: 'INSCRICAO_CANCELADA',
+      entidade: 'INSCRICAO',
+      entidadeId: inscricao.id,
+      descricao: `Inscrição "${inscricao.nome}" cancelada.`,
+      dadosAnteriores: { status: inscricao.status },
+      dadosNovos: { status: 'CANCELADA' },
+      client,
+    });
+
+    await client.query('COMMIT');
+    return inscricao;
+  } catch (erro) {
+    await client.query('ROLLBACK');
+    throw erro;
+  } finally {
+    client.release();
+  }
 }
 
-async function reativarInscricao(eventoId, inscricaoId) {
+async function reativarInscricao(eventoId, inscricaoId, usuarioId = null) {
   const inscricao = await buscarInscricao(eventoId, inscricaoId);
 
   const [faixas, categorias] = await Promise.all([
@@ -429,19 +597,24 @@ async function reativarInscricao(eventoId, inscricaoId) {
     faixa_ordem: faixaOrdem,
   };
 
-  const compativeis = buscarCategoriasCompativeis(
+  // Categorias com chave já iniciada não recebem o atleta reativado
+  const { disponiveis: compativeis, bloqueadas } = buscarCategoriasDisponiveis(
     atletaClassificacao,
     categorias
   );
 
   let novaCategoriaId = null;
   let novoStatus = 'PENDENTE';
-  let mensagem = 'Inscrição reativada, mas nenhuma categoria compatível foi encontrada. Status definido como Pendente.';
+  let mensagem = bloqueadas.length > 0
+    ? 'Inscrição reativada como Pendente.'
+    : 'Inscrição reativada, mas nenhuma categoria compatível foi encontrada. Status definido como Pendente.';
+  let aviso = avisoChaveIniciada(bloqueadas);
 
   if (compativeis.length === 1) {
     novaCategoriaId = compativeis[0].id;
     novoStatus = 'CONFIRMADA';
     mensagem = `Inscrição reativada e classificada em "${compativeis[0].nome}".`;
+    aviso = avisoChaveGerada(compativeis[0]);
   } else if (compativeis.length > 1) {
     // Se a categoria anterior ainda for compatível, mantém ela; senão pega a primeira
     const anterior = compativeis.find(
@@ -451,27 +624,60 @@ async function reativarInscricao(eventoId, inscricaoId) {
     novaCategoriaId = escolhida.id;
     novoStatus = 'CONFIRMADA';
     mensagem = `Inscrição reativada e classificada em "${escolhida.nome}".`;
+    aviso = avisoChaveGerada(escolhida);
   }
 
-  await inscricaoRepository.alterarStatus(
-    inscricao.id,
-    inscricao.evento_id,
-    novoStatus,
-    novaCategoriaId
-  );
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
 
-  return {
-    inscricao,
-    mensagem,
-  };
+    await inscricaoRepository.alterarStatus(
+      inscricao.id,
+      inscricao.evento_id,
+      novoStatus,
+      novaCategoriaId,
+      client
+    );
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: inscricao.evento_id,
+      acao: 'INSCRICAO_REATIVADA',
+      entidade: 'INSCRICAO',
+      entidadeId: inscricao.id,
+      descricao: `Inscrição "${inscricao.nome}" reativada.`,
+      dadosAnteriores: {
+        status: inscricao.status,
+        categoria_id: inscricao.categoria_id,
+      },
+      dadosNovos: {
+        status: novoStatus,
+        categoria_id: novaCategoriaId,
+      },
+      client,
+    });
+
+    await client.query('COMMIT');
+
+    return {
+      inscricao,
+      mensagem,
+      aviso,
+    };
+  } catch (erro) {
+    await client.query('ROLLBACK');
+    throw erro;
+  } finally {
+    client.release();
+  }
 }
 
-async function excluirInscricao(eventoId, inscricaoId) {
+async function excluirInscricao(eventoId, inscricaoId, usuarioId = null) {
   const validEventoId = validarId(eventoId);
   const validInscricaoId = validarId(inscricaoId);
 
   if (!validEventoId || !validInscricaoId) {
-    throw new NotFoundError('Inscrição não encontrada neste evento.');
+    throw new NotFoundError('Inscrição não encontrada neste campeonato.');
   }
 
   await validarEventoExistente(validEventoId);
@@ -487,7 +693,7 @@ async function excluirInscricao(eventoId, inscricaoId) {
     );
 
     if (!inscricao) {
-      throw new NotFoundError('Inscrição não encontrada neste evento.');
+      throw new NotFoundError('Inscrição não encontrada neste campeonato.');
     }
 
     const emLuta = await inscricaoRepository.verificarParticipacaoEmLutas(
@@ -506,11 +712,33 @@ async function excluirInscricao(eventoId, inscricaoId) {
     );
     if (possuiPontos) {
       throw new BusinessRuleError(
-        'Esta inscrição não pode ser excluída porque já possui pontuação de equipe gerada.'
+        'Esta inscrição não pode ser excluída porque já possui pontuação de academia gerada.'
       );
     }
 
     await inscricaoRepository.excluir(validInscricaoId, validEventoId, client);
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId: validEventoId,
+      acao: 'INSCRICAO_EXCLUIDA',
+      entidade: 'INSCRICAO',
+      entidadeId: validInscricaoId,
+      descricao: `Inscrição "${inscricao.nome}" excluída.`,
+      dadosAnteriores: {
+        nome: inscricao.nome,
+        idade: inscricao.idade,
+        peso: inscricao.peso,
+        sexo: inscricao.sexo,
+        faixa_id: inscricao.faixa_id,
+        equipe_id: inscricao.equipe_id,
+        categoria_id: inscricao.categoria_id,
+        status: inscricao.status,
+      },
+      dadosNovos: null,
+      client,
+    });
+
     await client.query('COMMIT');
     return inscricao;
   } catch (erro) {

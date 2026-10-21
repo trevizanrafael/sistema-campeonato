@@ -1,11 +1,11 @@
 const express = require('express');
 const resultadoController = require('../controllers/resultadoController');
-const { exigirAutenticacao } = require('../middlewares/authMiddleware');
+const { exigirAutenticacao, exigirPermissao } = require('../middlewares/authMiddleware');
 const { csrfProtection } = require('../middlewares/csrfMiddleware');
 
 const router = express.Router({ mergeParams: true });
 
-router.use(exigirAutenticacao);
+router.use(exigirAutenticacao, exigirPermissao('lutas.operar'));
 
 // Formulário de lançamento de resultado
 router.get('/', resultadoController.mostrarFormulario);

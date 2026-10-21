@@ -40,6 +40,7 @@ async function listarPorEvento(eventoId, filtros = {}, client = pool) {
     JOIN faixas f ON f.id = i.faixa_id
     LEFT JOIN categorias c ON c.id = i.categoria_id
     WHERE i.evento_id = $1
+      AND i.chave_rapida_id IS NULL
   `;
 
   const params = [eventoId];
@@ -405,6 +406,20 @@ async function excluir(id, eventoId, client = pool) {
   return resultado.rows[0] || null;
 }
 
+/** Nomes já inscritos (não cancelados) por uma academia no campeonato. */
+async function listarNomesAtivosDaEquipeNoEvento(eventoId, equipeId, client = pool) {
+  const query = `
+    SELECT nome
+    FROM inscricoes
+    WHERE evento_id = $1
+      AND equipe_id = $2
+      AND status <> 'CANCELADA';
+  `;
+
+  const resultado = await client.query(query, [eventoId, equipeId]);
+  return resultado.rows.map((r) => r.nome);
+}
+
 module.exports = {
   listarPorEvento,
   contarPorEvento,
@@ -419,4 +434,5 @@ module.exports = {
   verificarPontosGerados,
   bloquearPorIdNoEvento,
   excluir,
+  listarNomesAtivosDaEquipeNoEvento,
 };

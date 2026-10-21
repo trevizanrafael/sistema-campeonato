@@ -4,11 +4,11 @@ function validarLogin(dados) {
   const senha = dados.senha || '';
 
   if (!email) {
-    erros.push('O e-mail e obrigatorio.');
+    erros.push('O e-mail é obrigatório.');
   }
 
   if (!senha) {
-    erros.push('A senha e obrigatoria.');
+    erros.push('A senha é obrigatória.');
   }
 
   return erros;

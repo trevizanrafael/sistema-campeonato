@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
+  <head>
+    <%- include("../partials/head", {
+      titulo: titulo || "Nova Chave Rápida"
+    }) %>
+  </head>
+
+  <body>
+    <div class="app">
+      <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+
+      <main class="main-content">
+        <%- include("../partials/messages") %>
+
+        <div class="page-header">
+          <div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: 'Nova Chave Rápida' }] }) %>
+
+            <h1 class="page-title">Nova Chave Rápida</h1>
+            <p class="page-subtitle">
+              Campeonato: <strong><%= evento.nome %></strong> — Crie uma chave avulsa para inscrições de última hora, sem restrições de peso, faixa ou idade.
+            </p>
+          </div>
+        </div>
+
+        <section class="page-content">
+          <div class="card" style="max-width: 650px;">
+            <form action="/eventos/<%= evento.id %>/chaves-rapidas" method="POST" novalidate>
+              <input
+                type="hidden"
+                name="_csrf"
+                value="<%= csrfToken %>"
+              >
+
+              <div class="form-group" style="margin-bottom: 20px;">
+                <label for="nome" class="form-label" style="font-weight: 600; display: block; margin-bottom: 6px;">
+                  Nome da Chave Rápida *
+                </label>
+                <input
+                  type="text"
+                  id="nome"
+                  name="nome"
+                  class="form-input <%= erros.nome ? 'form-input-error' : '' %>"
+                  value="<%= valores.nome || '' %>"
+                  placeholder="Ex: Desafio Casadão, Absoluto Avulso..."
+                  maxlength="200"
+                  required
+                  autofocus
+                  style="width: 100%; padding: 10px 12px; font-size: 15px;"
+                >
+                <% if (erros.nome) { %>
+                  <span class="form-error" style="color: var(--color-danger, #e53e3e); font-size: 13px; margin-top: 4px; display: block;">
+                    <%= erros.nome %>
+                  </span>
+                <% } %>
+                <small style="color: var(--color-text-muted); font-size: 12px; margin-top: 6px; display: block;">
+                  Dê um nome para identificar este confronto ou categoria rápida.
+                </small>
+              </div>
+
+              <div style="background: rgba(0,0,0,0.03); border: 1px dashed var(--color-border); border-radius: 6px; padding: 16px; margin-bottom: 24px;">
+                <strong style="display: block; font-size: 13px; margin-bottom: 4px;">Como funciona a Chave Rápida:</strong>
+                <ol style="margin: 0; padding-left: 20px; font-size: 13px; color: var(--color-text-muted); line-height: 1.6;">
+                  <li>Defina o nome da chave e clique em <strong>Criar Chave Rápida</strong>.</li>
+                  <li>Na tela seguinte, você poderá cadastrar rapidamente os nomes e academias dos competidores.</li>
+                  <li>Com pelo menos 2 atletas, a chave eliminatória já pode ser gerada e iniciada normalmente!</li>
+                </ol>
+              </div>
+
+              <div class="form-actions" style="display: flex; gap: 12px;">
+                <button type="submit" class="button button-primary">
+                  Criar Chave Rápida
+                </button>
+
+                <a
+                  href="/eventos/<%= evento.id %>/chaves"
+                  class="button button-outline"
+                >
+                  Cancelar
+                </a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <%- include("../partials/footer") %>
+    </div>
+
+    <%- include("../partials/scripts") %>
+  </body>
+</html>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: titulo || "Eventos"
+      titulo: titulo || "Campeonatos"
     }) %>
   </head>
 
@@ -16,13 +16,15 @@
 
         <div class="page-header">
           <div>
-            <h1 class="page-title">Eventos</h1>
-            <p class="page-subtitle">Gerencie os campeonatos cadastrados.</p>
+            <h1 class="page-title">Campeonatos</h1>
+            <p class="page-subtitle"><%= pode('eventos.gerenciar') ? 'Gerencie os campeonatos cadastrados.' : 'Escolha o campeonato em que você vai trabalhar.' %></p>
           </div>
 
-          <a href="/eventos/novo" class="button button-primary">
-            Novo evento
-          </a>
+          <% if (pode('eventos.gerenciar')) { %>
+            <a href="/eventos/novo" class="button button-primary">
+              Novo campeonato
+            </a>
+          <% } %>
         </div>
 
         <section class="page-content">
@@ -32,7 +34,7 @@
               id="busca"
               name="busca"
               class="form-control"
-              placeholder="Pesquisar por nome ou descricao"
+              placeholder="Pesquisar por nome ou descrição"
               value="<%= typeof busca !== 'undefined' ? busca : '' %>"
             >
 
@@ -49,22 +51,22 @@
 
           <% if (eventos && eventos.length > 0) { %>
             <div class="table-container">
-              <table class="table">
+              <table class="table table-eventos">
                 <thead>
                   <tr>
-                    <th>Evento</th>
-                    <th>Categorias</th>
-                    <th>Inscricoes</th>
+                    <th class="col-campeonato">Campeonato</th>
+                    <th class="col-num">Categorias</th>
+                    <th class="col-num">Inscrições</th>
                     <th class="col-hide-mobile">Criado em</th>
-                    <th>Acoes</th>
+                    <th class="col-acoes">Ações</th>
                   </tr>
                 </thead>
 
                 <tbody>
                   <% eventos.forEach((evento) => { %>
                     <tr>
-                      <td>
-                        <a href="/eventos/<%= evento.id %>">
+                      <td class="col-campeonato">
+                        <a href="/eventos/<%= evento.id %>" class="campeonato-card-titulo">
                           <strong><%= evento.nome %></strong>
                         </a>
 
@@ -75,28 +77,35 @@
                         <% } %>
                       </td>
 
-                      <td><%= evento.total_categorias %></td>
-                      <td><%= evento.total_inscricoes %></td>
+                      <td class="col-num">
+                        <strong><%= evento.total_categorias %></strong>
+                      </td>
+
+                      <td class="col-num">
+                        <strong><%= evento.total_inscricoes %></strong>
+                      </td>
 
                       <td class="col-hide-mobile">
                         <%= formatarData(evento.created_at) %>
                       </td>
 
-                      <td>
+                      <td class="col-acoes">
                         <div class="table-actions">
                           <a
                             href="/eventos/<%= evento.id %>"
-                            class="button button-small button-outline"
+                            class="button button-small button-outline button-abrir"
                           >
                             Abrir
                           </a>
 
-                          <a
-                            href="/eventos/<%= evento.id %>/editar"
-                            class="button button-small button-outline"
-                          >
-                            Editar
-                          </a>
+                          <% if (pode('eventos.gerenciar')) { %>
+                            <a
+                              href="/eventos/<%= evento.id %>/editar"
+                              class="button button-small button-outline"
+                            >
+                              Editar
+                            </a>
+                          <% } %>
                         </div>
                       </td>
                     </tr>
@@ -118,18 +127,22 @@
             <% if (typeof busca !== 'undefined' && busca) { %>
               <div class="empty-state">
                 <h2>Nenhum resultado encontrado</h2>
-                <p>Nao encontramos eventos correspondentes a pesquisa.</p>
+                <p>Não encontramos campeonatos correspondentes a pesquisa.</p>
                 <a href="/eventos" class="button button-outline">
                   Limpar pesquisa
                 </a>
               </div>
             <% } else { %>
               <div class="empty-state">
-                <h2>Nenhum evento cadastrado</h2>
-                <p>Crie o primeiro evento para comecar a cadastrar categorias e inscricoes.</p>
-                <a href="/eventos/novo" class="button button-primary">
-                  Criar primeiro evento
-                </a>
+                <h2>Nenhum campeonato cadastrado</h2>
+                <% if (pode('eventos.gerenciar')) { %>
+                  <p>Crie o primeiro campeonato para começar a cadastrar categorias e inscrições.</p>
+                  <a href="/eventos/novo" class="button button-primary">
+                    Criar primeiro campeonato
+                  </a>
+                <% } else { %>
+                  <p>Peça para um organizador cadastrar o campeonato.</p>
+                <% } %>
               </div>
             <% } %>
           <% } %>

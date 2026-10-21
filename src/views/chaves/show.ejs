@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
-      titulo: `${categoria ? categoria.nome : chave.nome} - ${evento.nome}`
+      titulo: `${categoria ? categoria.nome : chave.nome} - ${evento.nome}`,
+      pagina: "chave"
     }) %>
-    <link rel="stylesheet" href="/css/bracket.css">
   </head>
 
   <body>
@@ -17,15 +17,14 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a href="/eventos/<%= evento.id %>/chaves" class="button button-small button-outline">
-                &larr; Voltar para as chaves
-              </a>
-            </div>
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <%- include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: categoria ? categoria.nome : chave.nome }] }) %>
+            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
               <h1 class="page-title"><%= categoria ? categoria.nome : chave.nome %></h1>
+              <% if (chave.chave_rapida_id) { %>
+                <span class="badge badge-warning" style="font-weight: 700;">Chave Rápida</span>
+              <% } %>
               <% if (chave.status === 'NAO_INICIADA') { %>
-                <span class="badge badge-warning">Nao iniciada</span>
+                <span class="badge badge-warning">Não iniciada</span>
               <% } else if (chave.status === 'EM_ANDAMENTO') { %>
                 <span class="badge badge-ativo">Em andamento</span>
               <% } else if (chave.status === 'FINALIZADA') { %>
@@ -33,12 +32,53 @@
               <% } %>
             </div>
             <p class="page-subtitle">
-              Evento: <strong><%= evento.nome %></strong> | Chave eliminatoria de <strong><%= chave.tamanho %> posicoes</strong>
+              Campeonato: <strong><%= evento.nome %></strong> | Chave eliminatória de <strong><%= chave.tamanho %> posições</strong>
             </p>
           </div>
 
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a
+              href="/eventos/<%= evento.id %>/chaves"
+              class="button button-outline"
+              id="btnVoltarChaves"
+              title="Voltar para a listagem de chaves"
+            >
+              <%- include("../partials/icone", { nome: 'voltar' }) %>
+              Voltar para as chaves
+            </a>
+
+            <% if (chave.status === 'FINALIZADA') { %>
+              <button
+                type="button"
+                class="button button-outline btn-abrir-modal-print"
+                id="btnImprimirChave"
+                data-url="/eventos/<%= evento.id %>/chaves/<%= chave.id %>"
+                data-nome="<%= categoria ? categoria.nome : chave.nome %>"
+                title="Opções de impressão (Chave finalizada)"
+              >
+                <%- include("../partials/icone", { nome: 'documento' }) %>
+                Imprimir Chave (PDF)
+              </button>
+            <% } else { %>
+              <a
+                href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/imprimir"
+                target="_blank"
+                class="button button-outline"
+                id="btnImprimirChave"
+                title="Abrir versão de impressão e salvar em PDF"
+              >
+                <%- include("../partials/icone", { nome: 'documento' }) %>
+                Imprimir Chave (PDF)
+              </a>
+            <% } %>
+
+            <% if (chave.chave_rapida_id) { %>
+              <a href="/eventos/<%= evento.id %>/chaves-rapidas/<%= chave.chave_rapida_id %>" class="button button-outline">
+                Ver Inscrições
+              </a>
+            <% } %>
             <% if (chave.status === 'NAO_INICIADA') { %>
+              <% if (pode('chaves.gerar')) { %>
               <form
                 action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/sortear"
                 method="POST"
@@ -53,6 +93,7 @@
                   Sortear novamente
                 </button>
               </form>
+              <% } %>
 
               <form
                 action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/iniciar"
@@ -63,12 +104,13 @@
                 <button
                   type="submit"
                   class="button button-primary"
-                  onclick="return confirm('Deseja iniciar esta chave? A distribuicao ficara bloqueada e os byes avancarao automaticamente.');"
+                  onclick="return confirm('Deseja iniciar esta chave? A distribuição ficará bloqueada e os byes avançarão automaticamente.');"
                 >
                   Iniciar chave
                 </button>
               </form>
 
+              <% if (pode('chaves.gerenciar')) { %>
               <form
                 action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/excluir"
                 method="POST"
@@ -83,6 +125,7 @@
                   Excluir chave
                 </button>
               </form>
+              <% } %>
             <% } else if (chave.status === 'EM_ANDAMENTO') { %>
               <% if (todasFinalizadas) { %>
                 <a
@@ -93,10 +136,10 @@
                 </a>
               <% } else { %>
                 <span class="badge badge-neutral" style="padding: 8px 12px; font-size: 13px;">
-                  Chave bloqueada para alteracoes estruturais
+                  Chave bloqueada para alterações estruturais
                 </span>
               <% } %>
-            <% } else if (chave.status === 'FINALIZADA') { %>
+            <% } else if (chave.status === 'FINALIZADA' && pode('chaves.gerenciar')) { %>
               <form
                 action="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/reabrir"
                 method="POST"
@@ -136,7 +179,7 @@
                     </span>
                     <div style="margin-top: 6px;">
                       <strong style="display: block; font-size: 15px;"><%= chave.primeiro_lugar_nome %></strong>
-                      <small style="color: var(--color-text-muted);"><%= chave.primeiro_lugar_equipe_nome || 'Sem equipe' %></small>
+                      <small style="color: var(--color-text-muted);"><%= chave.primeiro_lugar_equipe_nome || 'Sem academia' %></small>
                     </div>
                   </div>
                 <% } %>
@@ -148,7 +191,7 @@
                     </span>
                     <div style="margin-top: 6px;">
                       <strong style="display: block; font-size: 15px;"><%= chave.segundo_lugar_nome %></strong>
-                      <small style="color: var(--color-text-muted);"><%= chave.segundo_lugar_equipe_nome || 'Sem equipe' %></small>
+                      <small style="color: var(--color-text-muted);"><%= chave.segundo_lugar_equipe_nome || 'Sem academia' %></small>
                     </div>
                   </div>
                 <% } %>
@@ -160,7 +203,7 @@
                     </span>
                     <div style="margin-top: 6px;">
                       <strong style="display: block; font-size: 15px;"><%= chave.terceiro_lugar_nome %></strong>
-                      <small style="color: var(--color-text-muted);"><%= chave.terceiro_lugar_equipe_nome || 'Sem equipe' %></small>
+                      <small style="color: var(--color-text-muted);"><%= chave.terceiro_lugar_equipe_nome || 'Sem academia' %></small>
                     </div>
                   </div>
                 <% } %>
@@ -169,15 +212,25 @@
           <% } %>
 
           <p class="bracket-mobile-tip">
-            Deslize horizontalmente para visualizar as proximas rodadas.
+            Deslize horizontalmente para visualizar as próximas rodadas.
           </p>
 
           <div class="bracket-scroll">
             <div
               class="bracket"
               id="bracket"
-              style="--round-count: <%= rodadas.length %>; min-height: <%= alturaMinima %>px;"
+              data-round-count="<%= rodadas.length %>"
+              data-min-height="<%= alturaMinima %>"
             >
+              <script>
+                (function() {
+                  var b = document.getElementById('bracket');
+                  if (b) {
+                    if (b.dataset.roundCount) b.style.setProperty('--round-count', b.dataset.roundCount);
+                    if (b.dataset.minHeight) b.style.minHeight = b.dataset.minHeight + 'px';
+                  }
+                })();
+              </script>
               <svg
                 class="bracket-connections"
                 id="bracketConnections"
@@ -216,12 +269,6 @@
 
                         <!-- Competidor 1 -->
                         <div class="match-competitor <%= luta.competidor1.vencedor ? 'winner' : '' %> <%= luta.competidor1.tipo !== 'COMPETIDOR' ? 'placeholder' : '' %>">
-                          <% if (luta.competidor1.seed) { %>
-                            <span class="competitor-seed" title="Seed <%= luta.competidor1.seed %>">
-                              <%= luta.competidor1.seed %>
-                            </span>
-                          <% } %>
-
                           <div class="competitor-info">
                             <strong><%= luta.competidor1.nome %></strong>
                             <% if (luta.competidor1.equipe) { %>
@@ -236,12 +283,6 @@
 
                         <!-- Competidor 2 -->
                         <div class="match-competitor <%= luta.competidor2.vencedor ? 'winner' : '' %> <%= luta.competidor2.tipo !== 'COMPETIDOR' ? 'placeholder' : '' %>">
-                          <% if (luta.competidor2.seed) { %>
-                            <span class="competitor-seed" title="Seed <%= luta.competidor2.seed %>">
-                              <%= luta.competidor2.seed %>
-                            </span>
-                          <% } %>
-
                           <div class="competitor-info">
                             <strong><%= luta.competidor2.nome %></strong>
                             <% if (luta.competidor2.equipe) { %>
@@ -272,6 +313,14 @@
                                   href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/lutas/<%= luta.id %>/resultado/editar"
                                   class="button button-small button-outline"
                                   style="flex: 1; padding: 3px 6px; font-size: 11px; text-transform: uppercase; font-weight: 600; text-align: center;"
+                                  data-resultado="<%= JSON.stringify({
+                                    modo: 'corrigir',
+                                    acao: '/eventos/' + evento.id + '/chaves/' + chave.id + '/lutas/' + luta.id + '/resultado/editar',
+                                    titulo: 'Luta ' + luta.posicao,
+                                    vencedorId: luta.competidor1.vencedor ? luta.competidor1.id : (luta.competidor2.vencedor ? luta.competidor2.id : null),
+                                    c1: { id: luta.competidor1.id, nome: luta.competidor1.nome, equipe: luta.competidor1.equipe },
+                                    c2: { id: luta.competidor2.id, nome: luta.competidor2.nome, equipe: luta.competidor2.equipe }
+                                  }) %>"
                                 >
                                   Corrigir
                                 </a>
@@ -280,6 +329,7 @@
                                   method="POST"
                                   style="flex: 1; margin: 0;"
                                   data-confirm="Deseja anular este resultado? O avanço e os pontos serão removidos."
+                                  data-ajax
                                 >
                                   <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                   <button
@@ -301,6 +351,14 @@
                               href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>/lutas/<%= luta.id %>/resultado"
                               class="button button-small"
                               style="width: 100%; padding: 4px 8px; font-size: 11px; text-transform: uppercase; font-weight: 600; display: block; text-align: center;"
+                              data-resultado="<%= JSON.stringify({
+                                modo: 'lancar',
+                                acao: '/eventos/' + evento.id + '/chaves/' + chave.id + '/lutas/' + luta.id + '/resultado',
+                                titulo: 'Luta ' + luta.posicao,
+                                vencedorId: null,
+                                c1: { id: luta.competidor1.id, nome: luta.competidor1.nome, equipe: luta.competidor1.equipe },
+                                c2: { id: luta.competidor2.id, nome: luta.competidor2.nome, equipe: luta.competidor2.equipe }
+                              }) %>"
                             >
                               Lançar resultado
                             </a>
@@ -316,10 +374,49 @@
         </section>
       </main>
 
+      <%# Modal de resultado (preenchido por /js/resultado-modal.js) %>
+      <dialog class="modal-resultado" id="modalResultado" aria-labelledby="modalResultadoTitulo">
+        <form method="POST" id="formModalResultado" class="modal-resultado-form" data-ajax>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+          <header class="modal-resultado-header">
+            <div>
+              <span class="modal-resultado-rotulo" id="modalResultadoRotulo">Lançar resultado</span>
+              <h2 id="modalResultadoTitulo">Quem venceu?</h2>
+            </div>
+            <button type="button" class="modal-resultado-fechar" data-fechar-modal aria-label="Fechar">&times;</button>
+          </header>
+
+          <p class="modal-resultado-aviso" id="modalResultadoAviso" hidden>
+            <strong>Atenção:</strong> a correção remove o avanço e a pontuação do vencedor atual e aplica o novo resultado.
+          </p>
+
+          <div class="modal-resultado-opcoes">
+            <% [1, 2].forEach(function(n) { %>
+              <label class="modal-resultado-opcao">
+                <input type="radio" name="vencedor_id" id="modalVencedor<%= n %>" required>
+                <span class="modal-resultado-atleta">
+                  <strong data-nome></strong>
+                  <small data-equipe></small>
+                </span>
+                <span class="modal-resultado-tag" data-tag>Atleta <%= n %></span>
+              </label>
+            <% }); %>
+          </div>
+
+          <footer class="modal-resultado-acoes">
+            <button type="button" class="button button-outline" data-fechar-modal>Cancelar</button>
+            <button type="submit" class="button button-primary" id="modalResultadoConfirmar">Confirmar vitória</button>
+          </footer>
+        </form>
+      </dialog>
+
+      <%- include("./modal-impressao") %>
       <%- include("../partials/footer") %>
     </div>
 
     <%- include("../partials/scripts") %>
     <script src="/js/bracket.js" defer></script>
+    <script src="/js/resultado-modal.js" defer></script>
   </body>
 </html>

@@ -12,6 +12,7 @@ const {
   BusinessRuleError,
   ValidationError,
 } = require('../utils/errors');
+const auditoriaService = require('./auditoriaService');
 
 /**
  * Serviço responsável pelas operações, lançamento, correção e anulação de resultados de lutas.
@@ -80,7 +81,7 @@ async function buscarLutaParaResultado(eventoId, chaveId, lutaId) {
   return luta;
 }
 
-async function lancarResultado(eventoId, chaveId, lutaId, body) {
+async function lancarResultado(eventoId, chaveId, lutaId, body, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -166,6 +167,26 @@ async function lancarResultado(eventoId, chaveId, lutaId, body) {
       client
     );
 
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'RESULTADO_LANCADO',
+      entidade: 'LUTA',
+      entidadeId: luta.id,
+      descricao: `Resultado lançado para a luta #${luta.posicao_chave || luta.id}.`,
+      dadosAnteriores: null,
+      dadosNovos: {
+        chave_id: chaveId,
+        vencedor_id: dados.vencedor_id,
+        perdedor_id: perdedorId,
+        tipo_resultado: dados.tipo_resultado,
+        placar_1: dados.placar_1,
+        placar_2: dados.placar_2,
+        observacao: dados.observacao,
+      },
+      client,
+    });
+
     await client.query('COMMIT');
 
     return {
@@ -203,7 +224,7 @@ async function buscarParaEdicao(eventoId, chaveId, lutaId) {
   return luta;
 }
 
-async function corrigirResultado(eventoId, chaveId, lutaId, body) {
+async function corrigirResultado(eventoId, chaveId, lutaId, body, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -282,6 +303,34 @@ async function corrigirResultado(eventoId, chaveId, lutaId, body) {
       client
     );
 
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'RESULTADO_CORRIGIDO',
+      entidade: 'LUTA',
+      entidadeId: luta.id,
+      descricao: `Resultado corrigido para a luta #${luta.posicao_chave || luta.id}.`,
+      dadosAnteriores: {
+        chave_id: chaveId,
+        vencedor_id: luta.vencedor_id,
+        perdedor_id: luta.perdedor_id,
+        tipo_resultado: luta.tipo_resultado,
+        placar_1: luta.placar_1,
+        placar_2: luta.placar_2,
+        observacao: luta.observacao,
+      },
+      dadosNovos: {
+        chave_id: chaveId,
+        vencedor_id: dados.vencedor_id,
+        perdedor_id: perdedorId,
+        tipo_resultado: dados.tipo_resultado,
+        placar_1: dados.placar_1,
+        placar_2: dados.placar_2,
+        observacao: dados.observacao,
+      },
+      client,
+    });
+
     await client.query('COMMIT');
 
     return {
@@ -296,7 +345,7 @@ async function corrigirResultado(eventoId, chaveId, lutaId, body) {
   }
 }
 
-async function anularResultado(eventoId, chaveId, lutaId) {
+async function anularResultado(eventoId, chaveId, lutaId, usuarioId = null) {
   const client = await pool.connect();
 
   try {
@@ -337,6 +386,26 @@ async function anularResultado(eventoId, chaveId, lutaId) {
 
     // 6. Limpar dados de resultado e voltar luta para PRONTA
     const lutaAnulada = await lutaRepository.anular(luta.id, client);
+
+    await auditoriaService.registrar({
+      usuarioId,
+      eventoId,
+      acao: 'RESULTADO_ANULADO',
+      entidade: 'LUTA',
+      entidadeId: luta.id,
+      descricao: `Resultado anulado para a luta #${luta.posicao_chave || luta.id}.`,
+      dadosAnteriores: {
+        chave_id: chaveId,
+        vencedor_id: luta.vencedor_id,
+        perdedor_id: luta.perdedor_id,
+        tipo_resultado: luta.tipo_resultado,
+        placar_1: luta.placar_1,
+        placar_2: luta.placar_2,
+        observacao: luta.observacao,
+      },
+      dadosNovos: null,
+      client,
+    });
 
     await client.query('COMMIT');
 

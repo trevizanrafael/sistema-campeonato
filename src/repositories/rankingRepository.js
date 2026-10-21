@@ -60,11 +60,13 @@ async function buscarRanking(eventoId, client) {
                 inscricao.equipe_id,
                 'OURO' AS tipo
             FROM chaves chave
-            JOIN categorias categoria
+            LEFT JOIN categorias categoria
                 ON categoria.id = chave.categoria_id
+            LEFT JOIN chaves_rapidas cr
+                ON cr.id = chave.chave_rapida_id
             JOIN inscricoes inscricao
                 ON inscricao.id = chave.primeiro_lugar_id
-            WHERE categoria.evento_id = $1
+            WHERE COALESCE(categoria.evento_id, cr.evento_id) = $1
               AND chave.status = 'FINALIZADA'
 
             UNION ALL
@@ -73,11 +75,13 @@ async function buscarRanking(eventoId, client) {
                 inscricao.equipe_id,
                 'PRATA' AS tipo
             FROM chaves chave
-            JOIN categorias categoria
+            LEFT JOIN categorias categoria
                 ON categoria.id = chave.categoria_id
+            LEFT JOIN chaves_rapidas cr
+                ON cr.id = chave.chave_rapida_id
             JOIN inscricoes inscricao
                 ON inscricao.id = chave.segundo_lugar_id
-            WHERE categoria.evento_id = $1
+            WHERE COALESCE(categoria.evento_id, cr.evento_id) = $1
               AND chave.status = 'FINALIZADA'
 
             UNION ALL
@@ -86,11 +90,13 @@ async function buscarRanking(eventoId, client) {
                 inscricao.equipe_id,
                 'BRONZE' AS tipo
             FROM chaves chave
-            JOIN categorias categoria
+            LEFT JOIN categorias categoria
                 ON categoria.id = chave.categoria_id
+            LEFT JOIN chaves_rapidas cr
+                ON cr.id = chave.chave_rapida_id
             JOIN inscricoes inscricao
                 ON inscricao.id = chave.terceiro_lugar_id
-            WHERE categoria.evento_id = $1
+            WHERE COALESCE(categoria.evento_id, cr.evento_id) = $1
               AND chave.status = 'FINALIZADA'
         ) resultados
         GROUP BY resultados.equipe_id
@@ -100,7 +106,7 @@ async function buscarRanking(eventoId, client) {
         SELECT
             vencedor.equipe_id,
             COUNT(*) FILTER (
-                WHERE luta.tipo_resultado <> 'BYE'
+                WHERE COALESCE(luta.tipo_resultado, '') <> 'BYE'
             )::INTEGER AS vitorias,
             COUNT(*) FILTER (
                 WHERE luta.tipo_resultado = 'BYE'
@@ -108,11 +114,13 @@ async function buscarRanking(eventoId, client) {
         FROM lutas luta
         JOIN chaves chave
             ON chave.id = luta.chave_id
-        JOIN categorias categoria
+        LEFT JOIN categorias categoria
             ON categoria.id = chave.categoria_id
+        LEFT JOIN chaves_rapidas cr
+            ON cr.id = chave.chave_rapida_id
         JOIN inscricoes vencedor
             ON vencedor.id = luta.vencedor_id
-        WHERE categoria.evento_id = $1
+        WHERE COALESCE(categoria.evento_id, cr.evento_id) = $1
           AND luta.status = 'FINALIZADA'
         GROUP BY vencedor.equipe_id
     )
@@ -157,9 +165,11 @@ async function buscarSituacao(eventoId, client) {
             WHERE chave.status = 'FINALIZADA'
         )::INTEGER AS finalizadas
     FROM chaves chave
-    JOIN categorias categoria
+    LEFT JOIN categorias categoria
         ON categoria.id = chave.categoria_id
-    WHERE categoria.evento_id = $1;
+    LEFT JOIN chaves_rapidas cr
+        ON cr.id = chave.chave_rapida_id
+    WHERE COALESCE(categoria.evento_id, cr.evento_id) = $1;
   `;
 
   const { rows } = await db.query(sql, [eventoId]);
@@ -194,7 +204,7 @@ async function buscarExtratoEquipe(eventoId, equipeId, client) {
         ponto.descricao,
         ponto.created_at,
         inscricao.nome AS competidor_nome,
-        categoria.nome AS categoria_nome,
+        COALESCE(categoria.nome, cr.nome) AS categoria_nome,
         luta.rodada,
         luta.posicao AS luta_posicao
     FROM pontos_equipes ponto
@@ -204,6 +214,8 @@ async function buscarExtratoEquipe(eventoId, equipeId, client) {
         ON chave.id = ponto.chave_id
     LEFT JOIN categorias categoria
         ON categoria.id = chave.categoria_id
+    LEFT JOIN chaves_rapidas cr
+        ON cr.id = chave.chave_rapida_id
     LEFT JOIN lutas luta
         ON luta.id = ponto.luta_id
     WHERE ponto.evento_id = $1

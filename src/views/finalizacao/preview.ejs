@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="<%= (typeof brand !== 'undefined' && brand.id) ? brand.id : 'base' %>">
   <head>
     <%- include("../partials/head", {
       titulo: `Finalizar ${categoria.nome} - ${evento.nome}`
@@ -16,21 +16,14 @@
 
         <div class="page-header">
           <div>
-            <div style="margin-bottom: 8px;">
-              <a
-                href="/eventos/<%= evento.id %>/chaves/<%= chave.id %>"
-                class="button button-small button-outline"
-              >
-                &larr; Voltar para a chave
-              </a>
-            </div>
+            <%- include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: categoria ? categoria.nome : chave.nome, path: '/chaves/' + chave.id }, { label: 'Finalizar categoria' }] }) %>
 
             <h1 class="page-title">
               Finalizar categoria
             </h1>
 
             <p class="page-subtitle">
-              <%= categoria.nome %> &bull; Evento: <strong><%= evento.nome %></strong>
+              <%= categoria.nome %> &bull; Campeonato: <strong><%= evento.nome %></strong>
             </p>
           </div>
         </div>
@@ -53,9 +46,13 @@
                     <%= index + 1 %>º lugar
                   </span>
                   <strong style="font-size: 16px;"><%= colocado.nome %></strong>
-                  <span style="font-size: 13px; color: var(--color-text-muted);"><%= colocado.equipe_nome %></span>
+                  <span style="font-size: 13px; color: var(--color-text-muted);"><%= colocado.equipe_nome || 'Sem academia (Avulso)' %></span>
                   <span class="podium-points" style="font-size: 13px; font-weight: 700; border: 1px dashed var(--color-border); padding: 4px 8px; border-radius: 2px; margin-top: 4px;">
-                    +<%= colocado.pontos %> <%= colocado.pontos === 1 ? 'ponto' : 'pontos' %>
+                    <% if (colocado.equipe_id) { %>
+                      +<%= colocado.pontos %> <%= colocado.pontos === 1 ? 'ponto' : 'pontos' %>
+                    <% } else { %>
+                      Não pontua equipe
+                    <% } %>
                   </span>
                 </div>
               <% }) %>
@@ -70,37 +67,41 @@
 
           <div style="margin-bottom: 28px;">
             <h2 style="font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px;">
-              Resumo de Pontuação por Equipe
+              Resumo de Pontuação por Academia
             </h2>
 
             <% if (resumoEquipes && resumoEquipes.length > 0) { %>
               <div class="table-container">
-                <table class="table">
+                <table class="table table-resumo-pontuacao">
                   <thead>
                     <tr>
-                      <th>Equipe</th>
-                      <th style="text-align: right;">Pontos anteriores</th>
-                      <th style="text-align: right;">Vitórias nesta chave</th>
-                      <th style="text-align: right;">Pódio</th>
-                      <th style="text-align: right;">Novos pontos</th>
-                      <th style="text-align: right;">Total após finalizar</th>
+                      <th class="col-academia">Academia</th>
+                      <th class="col-num">Anterior</th>
+                      <th class="col-num">Vitórias</th>
+                      <th class="col-num">Pódio</th>
+                      <th class="col-num">+ Novos</th>
+                      <th class="col-num">Total Final</th>
                     </tr>
                   </thead>
                   <tbody>
                     <% resumoEquipes.forEach((equipe) => { %>
                       <tr>
-                        <td><strong><%= equipe.equipe_nome %></strong></td>
-                        <td style="text-align: right;"><%= equipe.pontos_atuais %></td>
-                        <td style="text-align: right;">
+                        <td class="col-academia" data-label="Academia">
+                          <strong><%= equipe.equipe_nome %></strong>
+                        </td>
+                        <td class="col-num" data-label="Pontos anteriores">
+                          <%= equipe.pontos_atuais %>
+                        </td>
+                        <td class="col-num" data-label="Vitórias nesta chave">
                           <%= equipe.pontos_vitorias > 0 ? '+' + equipe.pontos_vitorias : '-' %>
                         </td>
-                        <td style="text-align: right;">
+                        <td class="col-num" data-label="Pódio">
                           <%= equipe.pontos_colocacao > 0 ? '+' + equipe.pontos_colocacao : '-' %>
                         </td>
-                        <td style="text-align: right; color: #111;">
+                        <td class="col-num col-novos" data-label="Novos pontos">
                           <strong>+<%= equipe.novos_pontos %></strong>
                         </td>
-                        <td style="text-align: right;">
+                        <td class="col-num col-total" data-label="Total final">
                           <strong><%= equipe.total_apos %></strong>
                         </td>
                       </tr>
@@ -111,7 +112,7 @@
             <% } else { %>
               <div class="card">
                 <p style="margin: 0; font-size: 13px; color: var(--color-text-muted);">
-                  Nenhuma equipe pontuará nesta categoria.
+                  Nenhuma academia pontuará nesta categoria.
                 </p>
               </div>
             <% } %>

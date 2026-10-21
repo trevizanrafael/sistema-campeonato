@@ -14,7 +14,7 @@ function validarEvento(dados) {
   const erros = {};
 
   if (!dados.nome) {
-    erros.nome = 'Informe o nome do evento.';
+    erros.nome = 'Informe o nome do campeonato.';
   } else if (dados.nome.length < 2) {
     erros.nome = 'O nome deve possuir pelo menos 2 caracteres.';
   } else if (dados.nome.length > 200) {
@@ -32,7 +32,7 @@ function validarId(id) {
   const numero = Number(id);
 
   if (!Number.isInteger(numero) || numero <= 0) {
-    throw new NotFoundError('Evento não encontrado.');
+    throw new NotFoundError('Campeonato não encontrado.');
   }
 
   return numero;

@@ -168,9 +168,10 @@ async function buscarParaResultado(lutaId, chaveId, eventoId, client, paraAtuali
       l.*,
       ch.status AS chave_status,
       ch.categoria_id,
+      ch.chave_rapida_id,
       ch.tamanho AS chave_tamanho,
-      c.nome AS categoria_nome,
-      c.evento_id,
+      COALESCE(c.nome, cr.nome) AS categoria_nome,
+      COALESCE(c.evento_id, cr.evento_id) AS evento_id,
       e.nome AS evento_nome,
       i1.nome AS competidor_1_nome,
       i1.equipe_id AS competidor_1_equipe_id,
@@ -180,8 +181,9 @@ async function buscarParaResultado(lutaId, chaveId, eventoId, client, paraAtuali
       e2.nome AS competidor_2_equipe_nome
     FROM lutas l
     JOIN chaves ch ON ch.id = l.chave_id
-    JOIN categorias c ON c.id = ch.categoria_id
-    JOIN eventos e ON e.id = c.evento_id
+    LEFT JOIN categorias c ON c.id = ch.categoria_id
+    LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+    JOIN eventos e ON e.id = COALESCE(c.evento_id, cr.evento_id)
     LEFT JOIN inscricoes i1 ON i1.id = l.competidor_1_id
     LEFT JOIN equipes e1 ON e1.id = i1.equipe_id
     LEFT JOIN inscricoes i2 ON i2.id = l.competidor_2_id
@@ -189,7 +191,7 @@ async function buscarParaResultado(lutaId, chaveId, eventoId, client, paraAtuali
     WHERE l.id = $1
       AND l.chave_id = $2
       AND ch.id = $2
-      AND c.evento_id = $3
+      AND COALESCE(c.evento_id, cr.evento_id) = $3
     ${paraAtualizacao ? 'FOR UPDATE OF l' : ''};
   `;
 
@@ -253,9 +255,10 @@ async function buscarParaCorrecao(lutaId, chaveId, eventoId, client, paraAtualiz
       l.*,
       ch.status AS chave_status,
       ch.categoria_id,
+      ch.chave_rapida_id,
       ch.tamanho AS chave_tamanho,
-      c.nome AS categoria_nome,
-      c.evento_id,
+      COALESCE(c.nome, cr.nome) AS categoria_nome,
+      COALESCE(c.evento_id, cr.evento_id) AS evento_id,
       e.nome AS evento_nome,
       i1.nome AS competidor_1_nome,
       i1.equipe_id AS competidor_1_equipe_id,
@@ -269,8 +272,9 @@ async function buscarParaCorrecao(lutaId, chaveId, eventoId, client, paraAtualiz
       proxima.competidor_2_id AS proxima_competidor_2_id
     FROM lutas l
     JOIN chaves ch ON ch.id = l.chave_id
-    JOIN categorias c ON c.id = ch.categoria_id
-    JOIN eventos e ON e.id = c.evento_id
+    LEFT JOIN categorias c ON c.id = ch.categoria_id
+    LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+    JOIN eventos e ON e.id = COALESCE(c.evento_id, cr.evento_id)
     LEFT JOIN inscricoes i1 ON i1.id = l.competidor_1_id
     LEFT JOIN equipes e1 ON e1.id = i1.equipe_id
     LEFT JOIN inscricoes i2 ON i2.id = l.competidor_2_id
@@ -279,7 +283,7 @@ async function buscarParaCorrecao(lutaId, chaveId, eventoId, client, paraAtualiz
     WHERE l.id = $1
       AND l.chave_id = $2
       AND ch.id = $2
-      AND c.evento_id = $3
+      AND COALESCE(c.evento_id, cr.evento_id) = $3
     ${paraAtualizacao ? 'FOR UPDATE OF l' : ''};
   `;
 

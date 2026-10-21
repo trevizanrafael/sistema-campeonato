@@ -1,0 +1,508 @@
+/* ==========================================================================
+   TEMA ARAÚJO JJ TEAM — IDENTIDADE VISUAL OFICIAL
+   Preto, Branco e Vermelho | Limpo, Moderno, Autêntico e Profissional
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
+
+[data-theme="araujo-jj-team"] {
+  /* Paleta Oficial Araújo JJ Team */
+  --ajj-black: #111113;
+  --ajj-black-soft: #18181b;
+  --ajj-charcoal: #27272a;
+
+  --ajj-red: #b60000;
+  --ajj-red-hover: #960000;
+  --ajj-red-dark: #7a0000;
+  --ajj-red-soft: #fef2f2;
+
+  --ajj-white: #ffffff;
+  --ajj-off-white: #f8fafc;
+  --ajj-gray-light: #f1f5f9;
+  --ajj-gray: #94a3b8;
+  --ajj-gray-dark: #475569;
+
+  --ajj-text: #0f172a;
+  --ajj-text-muted: #64748b;
+  --ajj-border: #e2e8f0;
+
+  /* Formas & Raios */
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
+
+  /* Tipografia */
+  --font-heading: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-accent: "Montserrat", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Layout & Dimensões */
+  --header-height: 64px;
+
+  /* Cores Semânticas de Marca */
+  --brand-primary: var(--ajj-red);
+  --brand-primary-hover: var(--ajj-red-hover);
+  --brand-secondary: var(--ajj-black);
+  --page-background: var(--ajj-off-white);
+  --surface-background: var(--ajj-white);
+  --text-primary: var(--ajj-text);
+  --text-secondary: var(--ajj-text-muted);
+  --border-color: var(--ajj-border);
+
+  font-family: var(--font-body);
+  color: var(--text-primary);
+  background-color: var(--page-background);
+}
+
+/* ==========================================================================
+   TIPOGRAFIA GERAL
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] h1,
+[data-theme="araujo-jj-team"] h2,
+[data-theme="araujo-jj-team"] h3,
+[data-theme="araujo-jj-team"] .page-title {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+  color: var(--ajj-text);
+  font-weight: 700;
+}
+
+[data-theme="araujo-jj-team"] h1,
+[data-theme="araujo-jj-team"] .page-title {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+[data-theme="araujo-jj-team"] h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+[data-theme="araujo-jj-team"] h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+[data-theme="araujo-jj-team"] .page-subtitle {
+  color: var(--ajj-text-muted);
+  font-weight: 400;
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   CABEÇALHO (APP-HEADER)
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .app-header {
+  background: var(--ajj-black);
+  border-bottom: 2px solid var(--ajj-red);
+  color: var(--ajj-white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  padding: 0 1.5rem;
+  height: var(--header-height);
+  min-height: var(--header-height);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+}
+
+[data-theme="araujo-jj-team"] .app-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+[data-theme="araujo-jj-team"] .app-logo-image {
+  height: 42px;
+  width: auto;
+  max-width: 200px;
+  object-fit: contain;
+  display: block;
+}
+
+[data-theme="araujo-jj-team"] .sidebar-toggle {
+  color: var(--ajj-white);
+  border: 1px solid #3f3f46;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-small);
+}
+
+[data-theme="araujo-jj-team"] .sidebar-toggle:hover {
+  background: #27272a;
+  color: var(--ajj-white);
+}
+
+[data-theme="araujo-jj-team"] .header-user-name {
+  color: #e2e8f0;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+[data-theme="araujo-jj-team"] .header-user .button-outline {
+  background: transparent;
+  border: 1px solid #3f3f46;
+  color: #e2e8f0;
+  border-radius: var(--radius-small);
+  transition: all 0.15s ease;
+}
+
+[data-theme="araujo-jj-team"] .header-user .button-outline:hover {
+  background: var(--ajj-red);
+  border-color: var(--ajj-red);
+  color: var(--ajj-white);
+}
+
+/* ==========================================================================
+   MENU LATERAL (SIDEBAR)
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .sidebar {
+  background: var(--ajj-black-soft);
+  color: #e2e8f0;
+  border-right: 1px solid #27272a;
+  box-shadow: none;
+  top: var(--header-height);
+  bottom: 0;
+  height: calc(100vh - var(--header-height));
+  height: calc(100dvh - var(--header-height));
+  max-height: calc(100dvh - var(--header-height));
+}
+
+[data-theme="araujo-jj-team"] .sidebar-link {
+  color: #cbd5e1;
+  font-weight: 500;
+  font-size: 0.88rem;
+  letter-spacing: 0.01em;
+  border-left: 3px solid transparent;
+  transition: all 0.15s ease;
+  padding: 11px 18px;
+}
+
+[data-theme="araujo-jj-team"] .sidebar-link:hover {
+  background: #27272a;
+  color: #ffffff;
+  border-left-color: #71717a;
+}
+
+[data-theme="araujo-jj-team"] .sidebar-link.active {
+  background: rgba(182, 0, 0, 0.12);
+  border-left-color: var(--ajj-red);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   CONTEÚDO PRINCIPAL (LIMPO, SEM GRUNGE)
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .main-content {
+  background-color: var(--ajj-off-white);
+  background-image: none;
+  min-height: 100vh;
+  margin-left: var(--sidebar-width);
+  padding: calc(var(--header-height, 64px) + 24px) 32px 48px;
+}
+
+@media (max-width: 768px) {
+  [data-theme="araujo-jj-team"] .main-content {
+    margin-left: 0;
+    padding: calc(var(--header-height, 64px) + 16px) 16px 32px;
+  }
+}
+
+/* ==========================================================================
+   CARDS, PAINÉIS E DASHBOARD
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .card {
+  background: var(--ajj-white);
+  border: 1px solid var(--ajj-border);
+  border-radius: var(--radius-medium);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  padding: 1.5rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+[data-theme="araujo-jj-team"] .dashboard-card {
+  text-decoration: none;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme="araujo-jj-team"] .dashboard-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="araujo-jj-team"] .dashboard-card h2 {
+  color: var(--ajj-text);
+  margin-bottom: 0.5rem;
+}
+
+[data-theme="araujo-jj-team"] .dashboard-card p {
+  color: var(--ajj-text-muted);
+  font-size: 0.9rem;
+}
+
+/* ==========================================================================
+   BOTÕES E AÇÕES
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .button {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-radius: 6px;
+  padding: 9px 16px;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+[data-theme="araujo-jj-team"] .button-primary {
+  background: var(--ajj-red);
+  color: var(--ajj-white);
+  border: 1px solid var(--ajj-red-dark);
+}
+
+[data-theme="araujo-jj-team"] .button-primary:hover {
+  background: var(--ajj-red-hover);
+  color: var(--ajj-white);
+}
+
+[data-theme="araujo-jj-team"] .button-secondary,
+[data-theme="araujo-jj-team"] .button-outline {
+  background: var(--ajj-white);
+  border: 1px solid #d1d5db;
+  color: #374151;
+}
+
+[data-theme="araujo-jj-team"] .button-secondary:hover,
+[data-theme="araujo-jj-team"] .button-outline:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+[data-theme="araujo-jj-team"] .button-danger {
+  background: #dc2626;
+  color: var(--ajj-white);
+  border: 1px solid #b91c1c;
+}
+
+[data-theme="araujo-jj-team"] .button-danger:hover {
+  background: #b91c1c;
+  color: var(--ajj-white);
+}
+
+/* ==========================================================================
+   FORMULÁRIOS & CAMPOS
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .form-group {
+  margin-bottom: 1.25rem;
+}
+
+[data-theme="araujo-jj-team"] .form-label {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #374151;
+  margin-bottom: 6px;
+  display: block;
+}
+
+[data-theme="araujo-jj-team"] .form-control {
+  background: var(--ajj-white);
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  color: var(--ajj-text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 9px 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  width: 100%;
+}
+
+[data-theme="araujo-jj-team"] .form-control:focus {
+  border-color: var(--ajj-red);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(182, 0, 0, 0.12);
+}
+
+/* ==========================================================================
+   TABELAS DE DADOS
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ajj-white);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--ajj-border);
+}
+
+[data-theme="araujo-jj-team"] .table th {
+  background: #f8fafc;
+  color: #475569;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+[data-theme="araujo-jj-team"] .table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--ajj-text);
+  font-size: 0.9rem;
+}
+
+[data-theme="araujo-jj-team"] .table tr:hover td {
+  background-color: #f8fafc;
+}
+
+/* ==========================================================================
+   BADGES & STATUS
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .badge,
+[data-theme="araujo-jj-team"] .status-badge {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+[data-theme="araujo-jj-team"] .badge-success,
+[data-theme="araujo-jj-team"] .status-finalizada {
+  background: #dcfce7;
+  color: #166534;
+}
+
+[data-theme="araujo-jj-team"] .badge-warning,
+[data-theme="araujo-jj-team"] .status-em-andamento {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+[data-theme="araujo-jj-team"] .badge-danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+[data-theme="araujo-jj-team"] .badge-info,
+[data-theme="araujo-jj-team"] .status-pronta {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+/* ==========================================================================
+   ALERTAS & MENSAGENS FLASH
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .alert {
+  border-radius: 6px;
+  border-left: 4px solid;
+  padding: 12px 16px;
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+  font-size: 0.92rem;
+}
+
+[data-theme="araujo-jj-team"] .alert-success {
+  background: #f0fdf4;
+  border-left-color: #22c55e;
+  color: #15803d;
+}
+
+[data-theme="araujo-jj-team"] .alert-danger,
+[data-theme="araujo-jj-team"] .alert-error {
+  background: #fef2f2;
+  border-left-color: #ef4444;
+  color: #b91c1c;
+}
+
+[data-theme="araujo-jj-team"] .alert-warning {
+  background: #fffbeb;
+  border-left-color: #f59e0b;
+  color: #b45309;
+}
+
+[data-theme="araujo-jj-team"] .alert-info {
+  background: #f8fafc;
+  border-left-color: #64748b;
+  color: #334155;
+}
+
+/* ==========================================================================
+   PÓDIO DE CATEGORIA
+   ========================================================================== */
+
+[data-theme="araujo-jj-team"] .podio-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+[data-theme="araujo-jj-team"] .podio-card {
+  border-radius: var(--radius-medium);
+  padding: 1.5rem;
+  text-align: center;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="araujo-jj-team"] .podio-primeiro {
+  border-top: 4px solid #eab308;
+}
+
+[data-theme="araujo-jj-team"] .podio-primeiro .podio-posicao {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #ca8a04;
+  margin-bottom: 0.25rem;
+}
+
+[data-theme="araujo-jj-team"] .podio-segundo {
+  border-top: 4px solid #94a3b8;
+}
+
+[data-theme="araujo-jj-team"] .podio-segundo .podio-posicao {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+[data-theme="araujo-jj-team"] .podio-terceiro {
+  border-top: 4px solid #d97706;
+}
+
+[data-theme="araujo-jj-team"] .podio-terceiro .podio-posicao {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #b45309;
+  margin-bottom: 0.25rem;
+}

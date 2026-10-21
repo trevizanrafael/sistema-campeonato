@@ -14,7 +14,7 @@ async function listar(req, res, next) {
     );
 
     return res.render('inscricoes/index', {
-      titulo: 'Inscricoes',
+      titulo: 'Inscrições',
       evento: resultado.evento,
       inscricoes: resultado.inscricoes,
       resumo: resultado.resumo,
@@ -39,7 +39,7 @@ async function mostrarCadastro(req, res, next) {
       await inscricaoService.prepararFormulario(eventoId);
 
     return res.render('inscricoes/create', {
-      titulo: 'Nova inscricao',
+      titulo: 'Nova inscrição',
       evento,
       equipes,
       faixas,
@@ -59,11 +59,13 @@ async function mostrarCadastro(req, res, next) {
 
 async function cadastrar(req, res, next) {
   const { eventoId } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
     const resultado = await inscricaoService.processarCadastro(
       eventoId,
-      req.body
+      req.body,
+      usuarioId
     );
 
     if (resultado.tipo === 'ESCOLHER_CATEGORIA') {
@@ -77,6 +79,7 @@ async function cadastrar(req, res, next) {
     }
 
     req.session.mensagemSucesso = resultado.mensagem;
+    if (resultado.aviso) req.session.mensagemAviso = resultado.aviso;
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {
@@ -96,7 +99,7 @@ async function cadastrar(req, res, next) {
           await inscricaoService.prepararFormulario(eventoId);
 
         return res.status(422).render('inscricoes/create', {
-          titulo: 'Nova inscricao',
+          titulo: 'Nova inscrição',
           evento,
           equipes,
           faixas,
@@ -122,7 +125,7 @@ async function mostrarEdicao(req, res, next) {
     const inscricao = await inscricaoService.buscarInscricao(eventoId, id);
 
     return res.render('inscricoes/edit', {
-      titulo: 'Editar inscricao',
+      titulo: 'Editar inscrição',
       evento,
       equipes,
       faixas,
@@ -142,12 +145,14 @@ async function mostrarEdicao(req, res, next) {
 
 async function editar(req, res, next) {
   const { eventoId, id } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
     const resultado = await inscricaoService.processarEdicao(
       eventoId,
       id,
-      req.body
+      req.body,
+      usuarioId
     );
 
     if (resultado.tipo === 'ESCOLHER_CATEGORIA') {
@@ -162,6 +167,7 @@ async function editar(req, res, next) {
     }
 
     req.session.mensagemSucesso = resultado.mensagem;
+    if (resultado.aviso) req.session.mensagemAviso = resultado.aviso;
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {
@@ -185,7 +191,7 @@ async function editar(req, res, next) {
         } catch (_) {}
 
         return res.status(422).render('inscricoes/edit', {
-          titulo: 'Editar inscricao',
+          titulo: 'Editar inscrição',
           evento,
           equipes,
           faixas,
@@ -208,9 +214,10 @@ async function editar(req, res, next) {
 
 async function cancelar(req, res, next) {
   const { eventoId, id } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    await inscricaoService.cancelarInscricao(eventoId, id);
+    await inscricaoService.cancelarInscricao(eventoId, id, usuarioId);
     req.session.mensagemSucesso = 'Inscrição cancelada com sucesso.';
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
@@ -231,10 +238,12 @@ async function cancelar(req, res, next) {
 
 async function reativar(req, res, next) {
   const { eventoId, id } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    const resultado = await inscricaoService.reativarInscricao(eventoId, id);
+    const resultado = await inscricaoService.reativarInscricao(eventoId, id, usuarioId);
     req.session.mensagemSucesso = resultado.mensagem;
+    if (resultado.aviso) req.session.mensagemAviso = resultado.aviso;
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {
     if (erro instanceof NotFoundError || erro.statusCode === 404) {
@@ -254,9 +263,10 @@ async function reativar(req, res, next) {
 
 async function excluir(req, res, next) {
   const { eventoId, id } = req.params;
+  const usuarioId = req.session?.usuario?.id || null;
 
   try {
-    await inscricaoService.excluirInscricao(eventoId, id);
+    await inscricaoService.excluirInscricao(eventoId, id, usuarioId);
     req.session.mensagemSucesso = 'Inscrição excluída com sucesso.';
     return res.redirect(`/eventos/${eventoId}/inscricoes`);
   } catch (erro) {

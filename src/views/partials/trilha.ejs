@@ -1,0 +1,30 @@
+<%#
+  Trilha de navegação (breadcrumb) do campeonato.
+  Sempre começa com: Campeonatos › <nome do campeonato>
+  Uso: include("../partials/trilha", { itens: [{ label: 'Chaves', path: '/chaves' }, { label: 'Adulto Azul' }] })
+  - path é relativo ao campeonato (/eventos/:id + path). Item sem path = página atual.
+%>
+<% const extras = typeof itens !== 'undefined' && Array.isArray(itens) ? itens : []; %>
+<% if (eventoContexto) { %>
+  <% const base = '/eventos/' + eventoContexto.id; %>
+  <nav class="trilha" aria-label="Você está em">
+    <ol>
+      <li><a href="/eventos">Campeonatos</a></li>
+      <% if (extras.length === 0) { %>
+        <li aria-current="page"><span><%= eventoContexto.nome %></span></li>
+      <% } else { %>
+        <li><a href="<%= base %>"><%= eventoContexto.nome %></a></li>
+        <% extras.forEach(function(item, i) { %>
+          <% const ultimo = i === extras.length - 1; %>
+          <li <%- ultimo ? 'aria-current="page"' : '' %>>
+            <% if (item.path !== undefined && !ultimo) { %>
+              <a href="<%= base + item.path %>"><%= item.label %></a>
+            <% } else { %>
+              <span><%= item.label %></span>
+            <% } %>
+          </li>
+        <% }); %>
+      <% } %>
+    </ol>
+  </nav>
+<% } %>

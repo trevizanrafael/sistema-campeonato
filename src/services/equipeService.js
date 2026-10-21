@@ -18,7 +18,7 @@ async function buscarEquipe(id) {
   const validId = validarId(id);
   const equipe = await equipeRepository.buscarPorId(validId);
   if (!equipe) {
-    throw new NotFoundError('Equipe não encontrada.');
+    throw new NotFoundError('Academia não encontrada.');
   }
   return equipe;
 }
@@ -33,7 +33,7 @@ async function criarEquipe(dados) {
 
   const existente = await equipeRepository.buscarPorNome(nomeNormalizado);
   if (existente) {
-    throw new BusinessRuleError('Já existe uma equipe com este nome.');
+    throw new BusinessRuleError('Já existe uma academia com este nome.');
   }
 
   return equipeRepository.criar(nomeNormalizado);
@@ -52,7 +52,7 @@ async function editarEquipe(id, dados) {
 
   const existente = await equipeRepository.buscarPorNome(nomeNormalizado, validId);
   if (existente) {
-    throw new BusinessRuleError('Já existe uma equipe com este nome.');
+    throw new BusinessRuleError('Já existe uma academia com este nome.');
   }
 
   return equipeRepository.atualizar(validId, nomeNormalizado);
@@ -65,7 +65,7 @@ async function excluirEquipe(id) {
   const totalInscricoes = await equipeRepository.contarInscricoes(validId);
   if (totalInscricoes > 0) {
     throw new BusinessRuleError(
-      'Esta equipe não pode ser excluída porque possui inscrições vinculadas.'
+      'Esta academia não pode ser excluída porque possui inscrições vinculadas.'
     );
   }
 

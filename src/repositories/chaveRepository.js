@@ -41,8 +41,8 @@ async function buscarPorIdNoEvento(chaveId, eventoId, client) {
   const sql = `
     SELECT
       ch.*,
-      c.nome AS categoria_nome,
-      c.evento_id,
+      COALESCE(c.nome, cr.nome) AS categoria_nome,
+      COALESCE(c.evento_id, cr.evento_id) AS evento_id,
       e.nome AS evento_nome,
       p1.nome AS primeiro_lugar_nome,
       e1.nome AS primeiro_lugar_equipe_nome,
@@ -51,15 +51,16 @@ async function buscarPorIdNoEvento(chaveId, eventoId, client) {
       p3.nome AS terceiro_lugar_nome,
       e3.nome AS terceiro_lugar_equipe_nome
     FROM chaves ch
-    JOIN categorias c ON c.id = ch.categoria_id
-    JOIN eventos e ON e.id = c.evento_id
+    LEFT JOIN categorias c ON c.id = ch.categoria_id
+    LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+    JOIN eventos e ON e.id = COALESCE(c.evento_id, cr.evento_id)
     LEFT JOIN inscricoes p1 ON p1.id = ch.primeiro_lugar_id
     LEFT JOIN equipes e1 ON e1.id = p1.equipe_id
     LEFT JOIN inscricoes p2 ON p2.id = ch.segundo_lugar_id
     LEFT JOIN equipes e2 ON e2.id = p2.equipe_id
     LEFT JOIN inscricoes p3 ON p3.id = ch.terceiro_lugar_id
     LEFT JOIN equipes e3 ON e3.id = p3.equipe_id
-    WHERE ch.id = $1 AND c.evento_id = $2;
+    WHERE ch.id = $1 AND COALESCE(c.evento_id, cr.evento_id) = $2;
   `;
 
   const { rows } = await db.query(sql, [chaveId, eventoId]);
@@ -71,11 +72,12 @@ async function bloquearPorIdNoEvento(chaveId, eventoId, client) {
   const sql = `
     SELECT
       ch.*,
-      c.nome AS categoria_nome,
-      c.evento_id
+      COALESCE(c.nome, cr.nome) AS categoria_nome,
+      COALESCE(c.evento_id, cr.evento_id) AS evento_id
     FROM chaves ch
-    JOIN categorias c ON c.id = ch.categoria_id
-    WHERE ch.id = $1 AND c.evento_id = $2
+    LEFT JOIN categorias c ON c.id = ch.categoria_id
+    LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
+    WHERE ch.id = $1 AND COALESCE(c.evento_id, cr.evento_id) = $2
     FOR UPDATE OF ch;
   `;
 
@@ -137,10 +139,11 @@ async function buscarPorId(chaveId, client) {
   const sql = `
     SELECT
       ch.*,
-      c.nome AS categoria_nome,
-      c.evento_id
+      COALESCE(c.nome, cr.nome) AS categoria_nome,
+      COALESCE(c.evento_id, cr.evento_id) AS evento_id
     FROM chaves ch
-    JOIN categorias c ON c.id = ch.categoria_id
+    LEFT JOIN categorias c ON c.id = ch.categoria_id
+    LEFT JOIN chaves_rapidas cr ON cr.id = ch.chave_rapida_id
     WHERE ch.id = $1;
   `;
 
@@ -160,21 +163,35 @@ async function buscarPorCategoria(categoriaId, client) {
   return rows[0] || null;
 }
 
+async function buscarPorChaveRapida(chaveRapidaId, client) {
+  const db = client || pool;
+  const sql = `
+    SELECT *
+    FROM chaves
+    WHERE chave_rapida_id = $1;
+  `;
+
+  const { rows } = await db.query(sql, [chaveRapidaId]);
+  return rows[0] || null;
+}
+
 async function criar(dados, client) {
   const db = client || pool;
   const sql = `
     INSERT INTO chaves (
       categoria_id,
+      chave_rapida_id,
       nome,
       tamanho,
       status
     )
-    VALUES ($1, $2, $3, COALESCE($4, 'NAO_INICIADA'))
+    VALUES ($1, $2, $3, $4, COALESCE($5, 'NAO_INICIADA'))
     RETURNING *;
   `;
 
   const { rows } = await db.query(sql, [
-    dados.categoria_id,
+    dados.categoria_id || null,
+    dados.chave_rapida_id || null,
     dados.nome,
     dados.tamanho,
     dados.status || 'NAO_INICIADA',
@@ -218,6 +235,7 @@ module.exports = {
   limparPodioEReabrir,
   buscarPorId,
   buscarPorCategoria,
+  buscarPorChaveRapida,
   criar,
   atualizarStatus,
   excluir,
