@@ -15,6 +15,7 @@ Documentação técnica do banco de dados e regras de negócio.
 | [migrations.md](migrations.md) | Como rodar migrations e seeds |
 | [regras-validacao.md](regras-validacao.md) | O que valida no banco vs. Node.js |
 | [manual-sobrevivencia-lightsail.md](manual-sobrevivencia-lightsail.md) | Guia de infraestrutura na AWS Lightsail, dimensionamento e armadilhas do público aberto |
+| [roadmap-inscricoes-atletas-google-oauth.md](roadmap-inscricoes-atletas-google-oauth.md) | Roadmap do Portal do Atleta, inscrições públicas, checkout Asaas e Google OAuth 100% |
 
 ## Estrutura do Projeto
 
